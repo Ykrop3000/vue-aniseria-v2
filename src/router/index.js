@@ -1,31 +1,71 @@
 import Vue from 'vue'
-import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import Router from 'vue-router'
+import List from '../views/List' 
+import FullPage from '../views/FullPage/FullPage' 
+import Overview from '../views/FullPage/Overview'
+import Watch from '../views/FullPage/Watch'
+import Auth from '../views/Auth/Auth'
 
-Vue.use(VueRouter)
+Vue.use(Router)
 
-const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: function () {
-      return import(/* webpackChunkName: "about" */ '../views/About.vue')
+export default new Router({
+  mode:'history',
+  routes:
+  [
+    {
+      path: '/animes',
+      name: 'Animes',
+      component: List
+    },
+
+
+    {
+      path: '/anime/:slug',
+      name: 'Anime',
+      component: FullPage,
+      children: [{
+        name: 'Watch',
+        path: 'watch',
+        component: Watch
+      },
+      {
+        name: 'Overview',
+        path: '',
+        component: Overview
+      },]
+    },
+
+    
+    {
+      path: '/genre/:slug',
+      name: 'Genre',
+      component: List
+    },
+
+    {
+      path: '/login',
+      name: 'Login',
+      component: Auth
+    },
+    {
+      path: '/signup',
+      name: 'Signup',
+      component: Auth
+    },
+    {
+      path: '/user/:username',
+      name: 'User',
+      component: function () {
+        return import('../views/Profile.vue')
+      }
     }
-  }
-]
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
-  routes
+  ]
 })
 
-export default router
+/*
+component: function () {
+  return import('../views/About.vue')
+}
+*/
+
