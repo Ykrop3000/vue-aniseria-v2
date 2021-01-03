@@ -4,10 +4,25 @@
             <div class="avatar" :style="{'background-image': `url(${APIURL + USER.avatar})`}"></div>
             <i class="chevron fas fa-chevron-down"></i>
             <div class="dropdown" >
+
                 <div class="primary-links">
+
                     <router-link class="primary-link" :to="{name: 'User', params:{username:USER.username}}">
                         <i class="fa-user icon fas"></i>
                         <div class="label">Профиль</div>
+                    </router-link>
+
+                    <router-link class="primary-link" :to="{name: 'Settings', params:{username:USER.username}}">
+                        <i class="fa-cog icon fas"></i>
+                        <div class="label">Настройки</div>
+                    </router-link>
+
+                </div>
+
+                 <div class="footer">
+                    <router-link class="secondary-link" :to="{name: 'Logout'}">
+                        <i class="fa-sign-out-alt icon fas"></i>
+                        Выйти
                     </router-link>
                 </div>
             </div>
@@ -134,5 +149,22 @@ export default {
     -webkit-user-select: auto;
     -ms-user-select: auto;
     user-select: auto;
+}
+.footer {
+    background: rgb(var(--color-background-200));
+    border-radius: 0 0 6px 6px;
+    color: rgb(var(--color-gray-700));
+    display: grid;
+    font-size: 1.1rem;
+    font-weight: 600;
+    grid-gap: 14px 12px;
+    grid-template-columns: 72px auto;
+    padding: 16px 27px;
+}
+.secondary-link{
+    display: grid;
+    grid-column-gap: 7px;
+    grid-template-columns: 12px auto;
+    transition: color .2s ease;
 }
 </style>

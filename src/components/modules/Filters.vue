@@ -5,7 +5,7 @@
         <div class="mobile-filters"  v-if="width < 1040">
             <div class="search-wrap">
                 <i class="icon fas fa-search"></i>
-                <input type="search" placeholder="Поиск" class="search">
+                <input v-model="search" type="search" placeholder="Поиск" class="search">
             </div>
             <div class="open-btn" :class="{'active': mobileFilters}" @click="mobileFilters = !mobileFilters">
                 <i class="icon fas fa-sliders-h"></i>
@@ -18,10 +18,11 @@
                 </div>
                 <div class="search-wrap">
                     <i class="fas fa-search"></i>
-                    <input type="text" class="search">
+                    <input v-model="search" type="text" class="search">
                 </div>
             </div>
-            <SelectItem :title="'Жанры'" :options="GENRES"/>          
+            <SelectItem :title="'Жанры'" @opt="SelectHandler" :type='0' :options="GENRES"/>          
+            <SelectItem :title="'Студии'" @opt="SelectHandler" :type='1' :options="STUDIOS"/>          
         </div>
     </div>
 </template>
@@ -35,10 +36,16 @@ export default {
         SelectItem
     },
     props:[
-        'GENRES'
+        'GENRES',
+        'STUDIOS'
+
     ],
     data(){
         return{
+            filter: {
+                
+            },
+            search: '',
             width: window.innerWidth,
             mobileFilters: false
         }
@@ -47,6 +54,14 @@ export default {
         handleWidthChange() {
             this.width =  window.innerWidth;
         },
+        SelectHandler({opt,type}){
+            if(type === 0){
+                this.filter.genres = opt
+            }else if(type === 1){
+                this.filter.studios = opt
+            }
+            this.$emit('fs', this.filter)
+        }
     },
     mounted(){
         window.addEventListener(
@@ -60,6 +75,9 @@ export default {
             this.GENRES.forEach(function(item) {
                 item.active = false;
             });
+        },
+        search(){
+            this.$emit('ss', this.search)
         }
     }
 }

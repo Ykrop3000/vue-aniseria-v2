@@ -1,5 +1,5 @@
 <template>
-    <router-link class="genre" :to="{name:'Genre',params:{slug:j}}"> {{j}} </router-link>
+    <router-link class="genre" :to="{name:'Genre',params:{slug:j.name}}"> {{j.russian}} </router-link>
 </template>
 
 <script>

@@ -8,11 +8,11 @@
 
                     <div  v-if="options.filter(opt => opt.active === true).length != 0 " class="tags">
 
-                        <div class="tag" v-text="options.filter(opt => opt.active === true)[0].name"></div>
+                        <div class="tag" v-text="options.filter(opt => opt.active === true)[0].russian || options.filter(opt => opt.active === true)[0].name"></div>
                         <div class="tag" v-if="options.filter(opt => opt.active === true).length > 1"  v-text="'+'+(options.filter(opt => opt.active === true).length-1).toString()"></div>
 
                     </div>
-                    <div class="placeholder" v-if="options.filter(opt => opt.active === true).length === 0 && input === '' && !inputFocuse">Any</div>
+                    <div class="placeholder" v-if="options.filter(opt => opt.active === true).length === 0 && input === '' && !inputFocuse">Любые</div>
 
                     <input @focus="inputFocuse = true" @blur="inputFocuse = false" type="search" class="filter" v-model="input">
                 </div>
@@ -31,7 +31,7 @@
                         <div class="group-title" v-text="title"></div>
                         <div class="option" v-for="(i,index) in options" :key="index" @click="Select(i)">
                             <div class="label">
-                                <div class="name" v-text="i.name"></div>
+                                <div class="name" v-text="i.russian || i.name"></div>
                                 <div v-if="i.active" class="selected-icon circle">
                                     <i class="fas fa-check"></i>
                                 </div>
@@ -59,7 +59,8 @@ export default {
     },
     props:[
         'title',
-        'options'
+        'options',
+        'type'
     ],
     data(){
         let data = {
@@ -84,7 +85,7 @@ export default {
     },
     methods:{
         FO(){
-            this.FilterOptions = this.options.filter(opt => opt.name.includes(this.input))
+            this.FilterOptions = this.options.filter(opt => opt.russian.includes(this.input) || opt.name.includes(this.input))
         },
         handleWidthChange() {
             this.width =  window.innerWidth;
@@ -104,8 +105,11 @@ export default {
             this.options.forEach(function(item) {
                 if(item.id === i.id){
                     item.active = !item.active
-                   
                 }
+            })
+            this.$emit('opt',{
+                opt:this.options.filter(o => o.active === true),
+                type:this.type
             })
             this.$forceUpdate();
         }
@@ -118,6 +122,7 @@ export default {
             this.FO()
         },
         options(){
+
             this.FilterOptions = this.options
             this.$forceUpdate();
         }

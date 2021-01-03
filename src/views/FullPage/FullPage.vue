@@ -9,14 +9,14 @@
                 <div class="container">
                     <div class="cover-wrap overlap-banner">
                         <div class="cover-wrap-inner">
-                            <img :src="SHIKIURL+ANIME.poster" alt="" class="cover">
+                            <img :src="SHIKIURL+ ANIME.image.original" alt="" class="cover">
                             <div class="actions">
                                 <div class="list">
                                     <div class="add">
                                         Добавить в список
                                     </div>
                                 </div>
-                                <div class="favourite">
+                                <div class="favourite" @click="setfavorite">
                                     <i class="fas fa-heart"></i>
                                 </div>
                             </div>
@@ -29,7 +29,7 @@
                             Читать Больше
                         </div>
                         <div class="nav">
-                            <router-link :to="{ name: 'Overview'}" replace class="link">Обзор</router-link>
+                            <router-link :to="{ name: 'Anime'}" replace class="link">Обзор</router-link>
                             <router-link :to="{ name: 'Watch'}" replace class="link">Просмотр</router-link>
                         </div>
                     </div>
@@ -48,7 +48,7 @@
                     <div class="data-set data-list" v-if="ANIME.genres">
                         <div class="type">Жанры</div>
                         <div class="value">
-                            <span v-text="ANIME.genres.split('||').join(', ')"></span>
+                            <span v-text="ANIME.genres.map(e => e.russian).join(', ')"></span>
                         </div>
                     </div>
 
@@ -62,7 +62,7 @@
                     <div class="data-set" v-if="ANIME.studios">
                         <div class="type">Студии</div>
                         <div class="value">
-                            <span v-text="ANIME.studios.split('||').join(', ')"></span>
+                            <span v-text="ANIME.studios.map(e => e.name).join(', ')"></span>
                         </div>
                     </div>
 
@@ -92,6 +92,8 @@
 
 <script>
 import {mapGetters} from 'vuex';
+import { mapActions } from 'vuex'
+
 import Overview from '@/views/FullPage/Overview'
 
 export default {
@@ -104,15 +106,41 @@ export default {
             width: window.innerWidth,
         }
     },
+    methods:{
+        ...mapActions([
+            'CLEAR_ANIME',
+            'GET_ANIME',
+            'GET_RELATED',
+            'GET_ROLES',
+            'GET_GENRES'
+        ]),
+        setfavorite(){
+            this.$store.dispatch('SET_FAVORITES',this.ANIME.id);
+        }
+    },
+    beforeMount(){
+    },
     mounted() {
-        this.$store.dispatch('GET_ANIME',this.$route.params.slug);
-        this.$store.dispatch('GET_GENRES');
+        this.GET_ANIME(this.$route.params.slug);
+        this.GET_GENRES();
     },
     computed: {
-        ...mapGetters(['ANIME']),
-        ...mapGetters(['SHIKIURL']),
-        ...mapGetters(['GENRES'])
-    }
+        ...mapGetters([
+            'ANIME',
+            'SHIKIURL',
+            'GENRES',
+        ]),
+    },
+    watch:{
+        ANIME(){
+            this.GET_RELATED(this.ANIME.id);
+            this.GET_ROLES(this.ANIME.id);
+        },
+        '$route.params.slug'(){
+            this.CLEAR_ANIME();
+            this.GET_ANIME(this.$route.params.slug);
+        }
+    }    
 }
 </script>
 
@@ -144,7 +172,6 @@ export default {
     margin-top: -58px;
     filter: blur(2px);
 }
-
 .description-length-toggle{
     background: linear-gradient(0deg,rgb(var(--color-foreground)) 30%,rgba(var(--color-foreground),.4));
     color: rgb(var(--color-text-lighter));
@@ -190,7 +217,6 @@ export default {
     background: rgb(var(--color-foreground));
     position: relative;
 }
-
 .header .container{
     display: grid;
     grid-column-gap: 30px;
@@ -361,6 +387,5 @@ export default {
         color: rgb(var(--color-text));
         font-size: 1.4rem;
     }
-
 }
 </style>

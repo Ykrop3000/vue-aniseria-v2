@@ -4,10 +4,12 @@
             <i class="fas fa-search"></i>
         </div>
         <div class="quick-search" :class="{'visible':visible}">
-            <div class="input"  v-click-outside="triger">
-                <i class="icon fas fa-search"></i>
+            <div class="input" >
+                <i class="icon fas fa-search"></i>  
                 <input type="text">
-                <i class="icon right fa-times fas" @click="visible = !visible"></i>
+                <div @click="visible = !visible">
+                    <i class="icon right fa-times fas" ></i>
+                </div>
             </div>
         </div>
     </div>
@@ -26,7 +28,7 @@ export default {
     },
     methods:{
         triger(){
-            if (this.visible){
+            if (this.visible === true){
                 this.visible = false
             }
         }

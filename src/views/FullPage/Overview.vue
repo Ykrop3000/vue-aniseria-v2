@@ -6,22 +6,53 @@
             <h2>Описание</h2>
             <div class="description content-wrap" v-text="anime.description"></div>
         </div>
+        <Player v-if="anime.video_link" :src="anime.video_link" />
+        <Roles v-if="ROLES" :roles="ROLES.filter(r => r.roles[0] === 'Main')" />
+        <Screenshots v-if="anime.screenshots" :images="anime.screenshots"/>
+        <Trailer v-if="anime.videos.filter(v => v.hosting === 'youtube')[0]" :src="anime.videos.filter(v => v.hosting === 'youtube')[0].player_url "/>
+        <Related v-if="RELATED.filter(r => r.anime != null)"  :related="RELATED" :key="rkey"/>
 
-        <Trailer :src="'https://www.youtube.com/embed/VpO6APNqY1c'"/>
-        
     </div>
 </template>
 
 
 <script>
-import Trailer from './Trailer'
+import Trailer from './components/Trailer'
+import Screenshots from './components/Screenshots'
+import Related from './components/Related'
+import Player from './components/Player'
+import Roles from './components/Roles'
+
+
+
+import {mapGetters} from 'vuex'
+
 export default {
+    name:'Overview',
     props:[
         'anime'
     ],
+    data(){
+        return{
+            rkey: 0
+        }
+    },
+    computed:{
+        ...mapGetters([
+            'RELATED',
+            'ROLES'
+        ])
+    },
+    mounted(){
+        this.rkey += 1
+    },
     components:{
-        Trailer
-    }
+        Trailer,
+        Screenshots,
+        Related,
+        Player,
+        Roles
+    },
 }
 </script>
 

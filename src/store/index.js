@@ -20,8 +20,13 @@ export default new Vuex.Store({
 
       animesType: null,
       animes: [],
+
       anime:{},
+      related:[],
+      roles:[],
+
       genres: [],
+      studios: [],
       animes_status: 'loading',
 
       nav:[
@@ -58,6 +63,8 @@ export default new Vuex.Store({
       reg_error:{},
       login_error: {},
       errors: [],
+      sucsess: [],
+
       shikiUrl: 'https://shikimori.one',
       APIurl: 'http://127.0.0.1:8000',
 
@@ -72,6 +79,13 @@ export default new Vuex.Store({
     ANIME: state =>{
       return state.anime;
     },
+    RELATED: state =>{
+      return state.related
+    },
+    ROLES: state =>{
+      return state.roles
+    },
+
     SHIKIURL: state =>{
         return state.shikiUrl;
     },
@@ -81,6 +95,9 @@ export default new Vuex.Store({
     GENRES: state =>{
         return state.genres;
     },
+    STUDIOS: state =>{
+      return state.studios;
+  },
     GENRE_BY_ID: (state) => (id) =>{
         return state.genres.find(genres => genres.id === id)
     },
@@ -98,6 +115,7 @@ export default new Vuex.Store({
     LOGIN_ERROR: state => state.login_error,
     ANIMESSTATUS: state => state.animes_status,
     ERRORS: state => state.errors,
+    SUCSESS: state => state.sucsess
   },
   mutations: {
       SET_ANIMES: (state, payload) =>{
@@ -110,8 +128,18 @@ export default new Vuex.Store({
       SET_GENRES: (state, payload) =>{
         state.genres = payload;
       },
+      SET_STUDIOS: (state, payload) =>{
+        state.studios = payload;
+      },
+
       SET_ANIME: (state, payload) =>{
         state.anime = payload;
+      },
+      SET_ANIME_RELATED:(state, payload) =>{
+        state.related = payload;
+      },
+      SET_ANIME_ROLES:(state, payload) =>{
+        state.roles = payload;
       },
 
 
@@ -157,6 +185,9 @@ export default new Vuex.Store({
       del_error(state,index){
         state.errors.splice(index, 1);
       },
+      del_sucsess(state,index){
+        state.sucsess.splice(index, 1);
+      },
       logout(state){
         state.status = ''
         state.token = ''
@@ -166,6 +197,9 @@ export default new Vuex.Store({
   actions: {
       DEL_ERROR({commit},i){
         commit('del_error',i);
+      },
+      DEL_SUCSESS({commit},i){
+        commit('del_sucsess',i);
       },
       GET_ANIMES({commit}, payload){
         return new Promise((resolve, reject) => {
@@ -180,13 +214,13 @@ export default new Vuex.Store({
             gf: payload.gf
           }
           if (payload.genres){
-            params.genres = payload.genres.join(',')
+            params.genres = payload.genres.map(g => g.id).join(',')
           }
 
 
           axios({url: `${this.state.APIurl}/api/v2/${payload.type}`, params:params, method: 'GET' })
           .then(resp => {
-
+          
             
             if(payload.page > 1){
               commit('ADD_ANIMES', resp.data.results);
@@ -205,15 +239,86 @@ export default new Vuex.Store({
           })
         })
       },
+      GET_RELATED({commit}, id){
+        return new Promise((resolve, reject) => {
+          axios({url: `${this.state.shikiUrl}/api/animes/${id}/related`, method: 'GET' })
+          .then(resp => {
+            commit('SET_ANIME_RELATED',resp.data)
+            resolve(resp)
+          })
+          .catch(err => {
+            reject(err)
+          })
+        })
+      },
+      GET_ROLES({commit},id){
+        return new Promise((resolve, reject) => {
+          axios({url: `${this.state.shikiUrl}/api/animes/${id}/roles`, method: 'GET' })
+          .then(resp => {
+            commit('SET_ANIME_ROLES', resp.data.filter(d => d.character != null));
+            resolve(resp)
+          })
+          .catch(err => {
+            reject(err)
+          })
+        })
+       },
+
+
+      GET_FAVORITES({commit}){
+        return new Promise((resolve, reject) => {
+          commit('ANIME_REQUEST')
+          axios({url: `${this.state.APIurl}/api/v2/favorite`, method: 'GET' })
+          .then(resp => {
+            commit('SET_ANIMES', {});
+            commit('SET_ANIMES', resp.data.results);
+            commit('ANIME_SUCCESS');
+            resolve(resp)
+          })
+          .catch(err => {
+            commit('ANIME_ERROR');
+            reject(err)
+          })
+        })
+       },
+       SET_FAVORITES({commit},id){
+        return new Promise((resolve, reject) => {
+          commit('ANIME_REQUEST')
+          axios({url: `${this.state.APIurl}/api/v2/favorite`,data:{'id': id}, method: 'POST' })
+          .then(resp => {
+            commit('ANIME_SUCCESS');
+            resolve(resp)
+          })
+          .catch(err => {
+            commit('ANIME_ERROR');
+            reject(err)
+          })
+        })
+       },
       CLEAR_ANIMES({commit}){
         commit('SET_ANIMES', {});
+      },
+      CLEAR_ANIME({commit}){
+        commit('SET_ANIME', {});
       },
       
       GET_GENRES({commit}){
         return new Promise((resolve, reject) => {
-          axios({url: `${this.state.APIurl}/api/genres`, method: 'GET' })
+          axios({url: `${this.state.shikiUrl}/api/genres`, method: 'GET' })
           .then(resp => {
-            commit('SET_GENRES', resp.data.genres);
+            commit('SET_GENRES', resp.data.filter(g => g.kind === 'anime'));
+            resolve(resp)
+          })
+          .catch(err => {
+            reject(err)
+          })
+        })
+      },
+      GET_STUDIOS({commit}){
+        return new Promise((resolve, reject) => {
+          axios({url: `${this.state.shikiUrl}/api/studios`, method: 'GET' })
+          .then(resp => {
+            commit('SET_STUDIOS', resp.data);
             resolve(resp)
           })
           .catch(err => {
@@ -261,7 +366,7 @@ export default new Vuex.Store({
         })
        },      
       LOGIN({commit}, user){
-        console.log(user)
+        
         return new Promise((resolve, reject) => {
           commit('auth_request')
           axios({url: `${this.state.APIurl}/api/login`, data: user, method: 'POST' })
@@ -311,7 +416,5 @@ export default new Vuex.Store({
           })
         })
        },
-
-
   },
 });

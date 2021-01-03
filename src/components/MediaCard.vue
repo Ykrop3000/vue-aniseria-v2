@@ -1,10 +1,10 @@
 <template>
     <div class="media-card">
 
-        <router-link  :to="{name: 'Anime', params:{slug: Anime.slug}}" class="cover">
-            <img :src="SHIKIURL + Anime.poster" alt="" class="image loaded">
+        <router-link  :to="{name: 'Anime', params:{slug: Anime.url.split('/')[2]}}" class="cover" :class="{'loading':loading}">
+            <img :src="SHIKIURL + Anime.image.preview" alt="poster" class="image" :class="{'loaded':!loading}" @load="loading = false">
 
-            <div class="wrap list-btns-wrap" v-if="ViewMode == '0' && isLoggedIn" >
+            <div class="wrap list-btns-wrap"  v-show="ViewMode == '0' && isLoggedIn" >
                 <div label="Open List Editor" class="btn open">
                     <i class="fa fa-plus"></i>
                 </div>
@@ -14,42 +14,49 @@
                 </div>
             </div>
             
-            <div class="overlay" v-if="ViewMode == '1'">
-                <router-link :to="{name: 'Anime', params:{slug: Anime.slug}}" class="title"  v-text="Anime.name"></router-link>
+            <div class="overlay" v-show="ViewMode == '1'">
+                <router-link :to="{name: 'Anime', params:{slug: Anime.url.split('/')[2]}}" class="title"  v-text="Anime.russian"></router-link>
                 <div class="studio">
-                    <span v-for="i in Anime.studiosList" :key="i" v-text="i"></span>
+                    <span v-for="(i,id) in Anime.studios" :key="id" v-text="i.name"></span>
                 </div>
             </div>
 
         </router-link>
 
-        <router-link to="/" v-if="ViewMode == '0'" class="title" v-text="Anime.name"></router-link>
+        <router-link :to="{name: 'Anime', params:{slug: Anime.url.split('/')[2]}}" v-if="ViewMode == '0'" class="title" :class="{'loading':loading}" v-text="Anime.russian"></router-link>
 
         <div class="hover-data right">
-
+            <div class="header">
+                <div class="date" v-text="Anime.aired_on.split('-')[0]"></div>
+                <div class="score" v-text="Anime.score"></div>
+            </div>
+            <div class="studios" v-text="Anime.studios.map(e => e.name).join(', ')"></div>
+            <div class="info">
+                <span v-text="Anime.kind"></span>
+                <span class="separator" > • </span>
+                <span v-text="Anime.episodes + ' серий'"></span>
+            </div>
+            <div class="genres">
+                <GenerItem v-for="(j,id) in Anime.genres" :key="id" :j="j" :GENRES="GENRES"/>
+            </div>
         </div>
 
-        <div class="data" v-if="ViewMode == '1'"> 
+        <div class="data" v-show="ViewMode == '1'"> 
             <div class="body">
                 <div class="scroll-wrap">
                     <div class="header">
                         <div>
-                            <div class="date" v-text="Anime.aired_on"></div>
+                            <div class="date" v-text="Anime.aired_on.split('-')[0]"></div>
                             <div class="typings">
-                                <span>
-                                </span>
-                                <span class="separator">•</span>
-                                <span>
-
-                                </span>
+                                <span v-text="Anime.kind"></span>
+                                <span class="separator" > • </span>
+                                <span v-text="Anime.episodes + ' серий'"></span>
                             </div>
                         </div>
                         <div>
                             <div class="score">
                                 <i class="far fa-smile icon"></i>
-                                <div class="percentage">
-
-                                </div>
+                                <div class="percentage" v-text="Anime.score"></div>
                             </div>
                         </div>
                     </div>
@@ -58,7 +65,7 @@
             </div>
             <div class="footer">
                 <div class="genres">
-                    <GenerItem v-for="j in Anime.genres.split('||')" :key="j" :j="j" :GENRES="GENRES"/>
+                    <GenerItem v-for="(j,id) in Anime.genres" :key="id" :j="j" :GENRES="GENRES"/>
                 </div>
             </div>
         </div>
@@ -80,25 +87,52 @@ export default {
         'ViewMode',
         'isLoggedIn'
     ],
+    data(){
+        return{
+            loading: true
+        }
+    },
     computed:{
         ...mapGetters(['SHIKIURL'])
+    },
+    watch:{
+        Anime(){
+            this.loading = false
+        }
     }
-
 }
 </script>
 
 <style scoped>
-
+.cover.loading, .description.loading div, .title.loading{
+    background: rgba(var(--color-background-300),.8);
+    box-shadow: none;
+    opacity: 1;
+    overflow: hidden;
+}
+.title.loading{
+    border-radius: 4px;
+    height: 17px;
+    margin-top: 12px;
+    width: 80%;
+}
+.cover.loading:before, .title.loading:before {
+    animation: loading-pulse-data-v-758c163c 2s linear infinite;
+    background: linear-gradient(90deg,rgba(var(--color-gray-300),0) 0,rgba(var(--color-blue-700),.06) 40%,rgba(var(--color-blue-700),.06) 60%,rgba(var(--color-gray-300),0));
+    content: "";
+    display: block;
+    height: 100%;
+    transform: translateX(0);
+    width: 200%;
+}
 .cover .media-card {
-    animation: in-data-v-758c163c .3s linear;
+    transition: 0.3s linear;
     display: grid;
     grid-template-rows: -webkit-min-content auto;
     grid-template-rows: min-content auto;
     position: relative;
     width: 185px;
 }
-
-
 .cover {
     background: rgba(var(--color-background-300),.8);
     border-radius: 4px;
@@ -139,7 +173,6 @@ export default {
 .image.loaded {
     opacity: 1;
 }
-
 .data{
     display: grid;
     grid-template-columns: 100%;
@@ -288,7 +321,6 @@ export default {
 .chart a.title{
     color: rgb(var(--color-white));
 }
-
 .overlay a{
     position: relative;
     z-index: 10;
@@ -302,7 +334,6 @@ a.image-link {
     display: block;
     opacity: 1;
 }
-
 .background-color, .image-link, .image{
     height: 100%;
     left: 0;
@@ -405,6 +436,34 @@ a.image-link {
     animation: in-data-v-758c163c .22s;
     opacity: 1;
 }
+.hover-data .studios{
+    color: var(--media-text);
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-top: 10px;
+}
+.hover-data .info{
+    color: rgb(var(--color-gray-700));
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-top: 6px;
+}
+.hover-data  .genres {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    height: 20px;
+    overflow: hidden;
+    margin-top: 22px;
+}
+.hover-data .header{
+    display: grid;
+    grid-template-columns: auto 60px;
+    font-weight: 600;
+    color: rgb(var(--color-gray-800));
+    font-size: 1.6rem;
+    padding: 0;
+}
 @media (max-width: 1040px){
     .media-card {
         width: 100% !important;;
@@ -434,7 +493,6 @@ a.image-link {
         line-height: 17px;
     }
 }
-
 @media (max-width: 400px){
     .header{
         grid-template-columns: auto;
@@ -445,5 +503,4 @@ a.image-link {
         margin-top: 0;
     }
 }
-
 </style>

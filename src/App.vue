@@ -4,7 +4,7 @@
     <MobileNav v-if="width<1040" :isLoggedIn="isLoggedIn"/>
     <div class="page-content">
       
-        <router-view :GENRES="GENRES" :isLoggedIn="isLoggedIn"/>
+        <router-view :GENRES="GENRES" :STUDIOS="STUDIOS" :isLoggedIn="isLoggedIn"/>
       
     </div>
   </div>
@@ -42,15 +42,26 @@ export default {
         },
         error(e){
           this.$message.error(e);
+        },
+        sucsess(e){
+          this.$message({
+            message: e,
+            type: 'success'
+          })
         }
     },
     computed:{
-      ...mapGetters(['isLoggedIn']),
-      ...mapGetters(['GENRES']),
-      ...mapGetters(['USER']),
-      ...mapGetters(['ERRORS']),
-      ...mapGetters(['REG_ERROR']),
-      ...mapGetters(['LOGIN_ERROR']),
+      ...mapGetters([
+        'isLoggedIn',
+        'STUDIOS',
+        'GENRES',
+        'USER',
+        'ERRORS',
+        'SUCSESS',
+        'REG_ERROR',
+        'LOGIN_ERROR'
+      ]),
+
 
     },
     watch:{
@@ -60,6 +71,14 @@ export default {
           
           this.error(`${item}`)
           this.$store.dispatch('DEL_ERROR',i)
+        });
+      },
+      SUCSESS(){
+        if (this.SUCSESS.length === 0) return
+        this.SUCSESS.forEach((item,i) => {
+          
+          this.error(`${item}`)
+          this.$store.dispatch('DEL_SUCSESS',i)
         });
       }
     }

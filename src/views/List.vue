@@ -10,91 +10,112 @@
             </div>
         </div>
 
-        <Filters :GENRES="GENRES"/>
+        <Filters :GENRES="GENRES" :STUDIOS="STUDIOS" @fs="filter_send" @ss="search_send"/>
 
         <!------------------------------------->
         <div class="secondary-filters">
-            <div class="active-filters"></div>
+            <div class="active-filters">
+                <i class="fas fa-tags tags-icon" v-if="filterActive || searchActive"></i>
+                <div class="filter" v-if="searchActive">
+                    <span class="lable" v-text="'Поиск: '+ search"></span>
+                </div>
+            </div>
             <div class="selects-wrap">
-                <div class="sort-wrap sort-select">
+                <div class="sort-wrap sort-select" v-click-outside="tr">
                     <i class="fas fa-sort icon"></i>
-                    <span class="label">Trending</span>
+                    <span @click="sortTr = !sortTr" class="label" v-text="sortText"></span>
+                    <div v-if="sortTr"  class="dropdown">
+                        <div class="option"  @click="sortVal = '-year'; sortText = 'Дате выхода'; sortTr = false" v-text="'Дате выхода'"></div>
+                        <div class="option"  @click="sortVal = '-user_rate'; sortText = 'Рейтингу'; sortTr = false " v-text="'Рейтингу'"></div>
+                        <div class="option"  @click="sortVal = '-id'; sortText = 'Дате добавления'; sortTr = false" v-text="'Дате добавления'"></div>
+                    </div>
                 </div>
                 <div class="wrap">
                     <div class="icon-wrap cover" :class="{ active: ViewMode==0}" @click="ViewMode=0"><i class="fas fa-th icon"></i></div>
                     <div class="icon-wrap chart" :class="{ active: ViewMode==1}" @click="ViewMode=1"><i class="fas fa-th-large icon"></i></div>
                     <div class="icon-wrap" :class="{ active: ViewMode==2}" @click="ViewMode=2"><i class="fas fa-th-list icon" ></i></div>
-
                 </div>
             </div>
         </div>
         <!------------------------------------->
-
         <div class="results" :class="{ cover:ViewMode==0, chart:ViewMode==1, table:ViewMode==2}">
             <MediaCard v-for="i in ANIMES" :key="i.id" :Anime="i" :ViewMode="ViewMode" :GENRES="GENRES" :isLoggedIn="isLoggedIn"/>
         </div>
-
     </div>
-
 </template>
-
 <script>
 import {mapGetters} from 'vuex';
-
 import MediaCard from '@/components/MediaCard'
 import Filters from "@/components/modules/Filters"
+import ClickOutside from 'vue-click-outside'
+
 
 export default {
     components:{
         MediaCard,
         Filters
     },
+    directives:{
+        ClickOutside
+    },
     props:[
         'GENRES',
+        'STUDIOS',
         'isLoggedIn'
     ],
     data(){
         return{
             ViewMode: 0,
-            ordering: '-year',
             pretype: this.$attrs.type,
             page: 1,
             pagination: true,
             width: window.innerWidth,
+
             filterActive: false,
             filter: {},
-            stateFilter:true
+            stateFilter:true,
+
+            searchActive: false,
+            search: '',
+
+            sortTr: false,
+            sortVal: '-year',
+            sortText: 'Дате выхода'
         }
     },
     methods: {
+        tr(){
+            this.sortTr = false
+        },  
         get_time(){
             let d =  new Date();
             return d.getMinutes()*60 + d.getSeconds()
         },
         get_animes(t = true){
             if (this.ANIMES.length == 0 || this.$attrs.type != this.pretype || t) {
-
                 let page = Math.ceil(this.ANIMES.length/24)+1 || 1;
                 let params = {
                     type: this.$attrs.type || 'animes',
-                    ordering: this.ordering,
+                    ordering: this.sortVal,
                     page: page,
+                    search: this.search
                 }
-
                 if (this.filterActive){
-                    params.year_start = this.filter.year[0];
-                    params.year_end = this.filter.year[1];
                     params.genres =  this.filter.genres;
-                    params.gf =  this.filter.gf;
                 }
                     
-                this.$store.dispatch('GET_ANIMES', params);
+                this.$store.dispatch('GET_ANIMES', params);                
                 this.pretype = this.$attrs.type;
             }
         },
         get_genres(){
             if (this.GENRES.length == 0) {
                 this.$store.dispatch('GET_GENRES');
+            }
+        },
+        get_studios(){
+            if (this.GENRES.length == 0) {
+                this.$store.dispatch('GET_STUDIOS');
             }
         },
         handleScroll: function() {
@@ -107,31 +128,39 @@ export default {
             this.filter = d;
             this.$store.dispatch('CLEAR_ANIMES');
             this.get_animes()
-        }
+        },
+        search_send: function(d){
+            this.search = d;
+            if (this.search){
+                this.searchActive = true
+            }else{
+                this.searchActive = false
+            }
+            this.$store.dispatch('CLEAR_ANIMES');
+            this.get_animes()
+        },
     },
     mounted() {
         this.get_animes();
         this.get_genres();
+        this.get_studios();
     },
     computed: {
         ...mapGetters(['ANIMES']),
         ...mapGetters(['ANIMESSTATUS']),
-
         lastRequest: () =>{
             let d =  new Date();
             return d.getMinutes()*60 + d.getSeconds()
         }
     },
     watch: {
-        ordering() {
+        sortVal() {
             this.$store.dispatch('CLEAR_ANIMES');
             this.get_animes(true)
         }
     }
-
 }
 </script>
-
 <style scoped>
 .results {
     display: grid;
@@ -142,7 +171,6 @@ export default {
     position: relative;
     font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
 }
-
 .results.chart {
     grid-template-columns: repeat(3,minmax(390px,460px));
     grid-template-rows: repeat(auto-fill,265px);
@@ -156,7 +184,6 @@ export default {
     padding-bottom: 30px;
     text-transform: capitalize;
 }
-
 @media (max-width: 1540px){
     .results.cover  {
         grid-gap: 25px 20px;
@@ -166,7 +193,6 @@ export default {
         grid-template-columns: repeat(2,minmax(390px,760px));
     }
 }
-
 @media (max-width: 1065px){
     .results.cover {
         grid-gap: 25px 14px;
@@ -178,6 +204,16 @@ export default {
 @media (max-width: 1040px){
     .results.cover {
         padding: 0 20px;
+        grid-template-columns: repeat(auto-fill,minmax(125px,1fr));
+        grid-gap: 25px 20px;
+        justify-content: center;
+    }
+    .results {
+        padding: 0 20px;
+        padding-top: 0px;
+        padding-right: 20px;
+        padding-bottom: 0px;
+        padding-left: 20px;
         grid-template-columns: repeat(auto-fill,minmax(125px,1fr));
         grid-gap: 25px 20px;
         justify-content: center;
@@ -207,10 +243,21 @@ export default {
         padding: 0;
     }
 }
-
-
-
 /* ---------Ordering Filter---------*/
+.filter{
+    transition: 0.2s linear;
+    background: rgb(var(--color-blue-600));
+    border-radius: 6px;
+    color: rgb(var(--color-white));
+    cursor: pointer;
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 600;
+    line-height: 13px;
+    margin-right: 12px;
+    padding: 5px 8px;
+    text-transform: capitalize;
+}
 .secondary-filters{
     align-items: center;
     display: grid;
@@ -281,6 +328,48 @@ export default {
     letter-spacing: .01em;
     padding: 25px 20px;
     padding-bottom: 0;
+}
+.dropdown{
+    background: rgb(var(--color-background-100));
+    border-radius: 6px;
+    box-shadow: 0 14px 30px rgba(var(--color-shadow-blue),.15),0 4px 4px rgba(var(--color-shadow-blue),.05);
+    cursor: auto;
+    left: -20px;
+    padding: 10px 16px;
+    position: absolute;
+    top: calc(100% + 10px);
+    width: 150px;
+    z-index: 50;
+}
+.dropdown:before {
+    width: 0;
+    height: 0;
+    content: "";
+    z-index: 2;
+    transform: scale(1.01);
+    border-bottom: .6rem solid currentColor;
+    border-left: .4rem solid transparent;
+    border-right: .4rem solid transparent;
+    bottom: 100%;
+    color: rgb(var(--color-gray-100));
+    left: calc(50% - 6px);
+    position: absolute;
+}
+.option{
+    color: rgb(var(--color-gray-700));
+    cursor: pointer;
+    font-size: 1.3rem;
+    font-weight: 600;
+    padding: 8px 0;
+    transition: color .2s ease;
+}
+.option:hover {
+    color: rgb(var(--color-blue-600));
+}
+.tags-icon {
+    color: rgb(var(--color-gray-500));
+    font-size: 1.5rem;
+    margin-right: 16px;
 }
 @media (max-width: 400px){
     .secondary-filters {

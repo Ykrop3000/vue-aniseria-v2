@@ -15,6 +15,12 @@
                 <span class="label">Профиль</span>
             </router-link>
 
+            <router-link v-if="isLoggedIn" class="secondary-link" :to="{name: 'Logout'}">
+                <i class="fa-sign-out-alt fas"></i>
+               <span class="label">Выйти</span>
+            </router-link>
+
+
             <div class="close" @click="visible = false">
                 <i class="fa-times fas" ></i>
             </div>

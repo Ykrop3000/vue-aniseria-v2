@@ -20,16 +20,17 @@ export default new Router({
 
 
     {
-      path: '/anime/:slug',
-      name: 'Anime',
+      path: '/anime/:slug/',
+
       component: FullPage,
+      meta: { reuse: false },
       children: [{
         name: 'Watch',
         path: 'watch',
         component: Watch
       },
       {
-        name: 'Overview',
+        name: 'Anime',
         path: '',
         component: Overview
       },]
@@ -51,6 +52,13 @@ export default new Router({
       path: '/signup',
       name: 'Signup',
       component: Auth
+    },
+    {
+      path: '/logout',
+      name: 'Logout',
+      component: function () {
+        return import('../views/Auth/Logout.vue')
+      }
     },
     {
       path: '/user/:username',
