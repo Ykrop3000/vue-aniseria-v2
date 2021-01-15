@@ -22,7 +22,9 @@
                 </div>
             </div>
             <SelectItem :title="'Жанры'" @opt="SelectHandler" :type='0' :options="GENRES"/>          
-            <SelectItem :title="'Студии'" @opt="SelectHandler" :type='1' :options="STUDIOS"/>          
+            <SelectItem :title="'Студии'" @opt="SelectHandler" :type='1' :options="STUDIOS"/>
+            <SelectItem :title="'Год'" @opt="SelectHandler" :type='2' :options="years"/>
+            <SelectItem :title="'Тип'" @opt="SelectHandler" :type='3' :options="kind"/>                    
         </div>
     </div>
 </template>
@@ -40,14 +42,48 @@ export default {
         'STUDIOS'
 
     ],
+    computed:{
+        years: () => {
+            let d = []
+            for (let i = 1970; i <= 2022; i += 1){
+                d.push({
+                    id:i,
+                    name:i
+                })
+            }
+            return d
+        }
+    },
     data(){
         return{
             filter: {
                 
             },
-            search: '',
+            search: this.$route.query.search || '',
             width: window.innerWidth,
-            mobileFilters: false
+            mobileFilters: false,
+            kind:[
+                {
+                    id: 1,
+                    name:'tv',
+                    russian:'Тв сериал'
+                },
+                {
+                    id: 2,
+                    name:'movie',
+                    russian:'Фильм'
+                },
+                {
+                    id: 3,
+                    name:'ova',
+                    russian:'OVA'
+                },
+                {
+                    id: 4,
+                    name:'ona',
+                    russian:'ONA'
+                },
+            ]
         }
     },
     methods:{
@@ -77,7 +113,7 @@ export default {
             });
         },
         search(){
-            this.$emit('ss', this.search)
+            this.$router.push({query: { search: this.search }})
         }
     }
 }

@@ -1,15 +1,15 @@
 <template>
-    <div class="media media-page-unscoped media-anime">
+    <div class="media media-page-unscoped media-anime" >
         <div class="header-wrap">
-            <div class="banner" :style="{'background-image': `url(https://st.kp.yandex.net/images/film_big/${ANIME.kp_id}.jpg`}">
+            <div class="banner" :style="{'background-image':`url(https://st.kp.yandex.net/images/film_big/${ANIME.kp_id}.jpg`}" >
                 <div class="shadow"></div>
             </div>
             <div class="header">
 
-                <div class="container">
+                <div class="container" style="min-height: 250px;">
                     <div class="cover-wrap overlap-banner">
-                        <div class="cover-wrap-inner">
-                            <img :src="SHIKIURL+ ANIME.image.original" alt="" class="cover">
+                        <div class="cover-wrap-inner" v-lazy-container="{ selector: 'img' }">
+                            <img :data-src="SHIKIURL+ ANIME.image.original" alt="" class="cover">
                             <div class="actions">
                                 <div class="list">
                                     <div class="add">
@@ -23,7 +23,7 @@
                         </div>
                     </div>
                     <div class="content">
-                        <h1 v-text="ANIME.russian"></h1>
+                        <h1 v-text="ANIME.russian.slice(1,-1)"></h1>
                         <p class="description" v-text="ANIME.description"></p>
                         <div class="description-length-toggle">
                             Читать Больше
@@ -31,6 +31,8 @@
                         <div class="nav">
                             <router-link :to="{ name: 'Anime'}" replace class="link">Обзор</router-link>
                             <router-link :to="{ name: 'Watch'}" replace class="link">Просмотр</router-link>
+                            <router-link :to="{ name: 'Characters'}" replace class="link">Персонажи</router-link>
+                            
                         </div>
                     </div>
                 </div>
@@ -83,9 +85,7 @@
                     
                 </div>
             </div>
-            <router-view :anime="ANIME">
-                <Overview  :anime="ANIME"/>
-            </router-view>
+            <router-view :anime="ANIME"></router-view>
         </div>
     </div>
 </template>
@@ -94,13 +94,8 @@
 import {mapGetters} from 'vuex';
 import { mapActions } from 'vuex'
 
-import Overview from '@/views/FullPage/Overview'
-
 export default {
     name: 'Single',
-    components:{
-        Overview
-    },
     data(){
         return{
             width: window.innerWidth,
@@ -110,17 +105,17 @@ export default {
         ...mapActions([
             'CLEAR_ANIME',
             'GET_ANIME',
-            'GET_RELATED',
             'GET_ROLES',
+            'GET_RELATED',
+            'GET_SIMILAR',
             'GET_GENRES'
         ]),
         setfavorite(){
             this.$store.dispatch('SET_FAVORITES',this.ANIME.id);
         }
     },
-    beforeMount(){
-    },
     mounted() {
+        this.$store.dispatch('SET_TRANSPARENT',true)
         this.GET_ANIME(this.$route.params.slug);
         this.GET_GENRES();
     },
@@ -129,12 +124,14 @@ export default {
             'ANIME',
             'SHIKIURL',
             'GENRES',
+            'STATUS',
         ]),
     },
     watch:{
         ANIME(){
-            this.GET_RELATED(this.ANIME.id);
             this.GET_ROLES(this.ANIME.id);
+            this.GET_RELATED(this.ANIME.id);
+            this.GET_SIMILAR(this.ANIME.id);
         },
         '$route.params.slug'(){
             this.CLEAR_ANIME();
@@ -146,10 +143,7 @@ export default {
 
 
 <style scoped>
-.container {
-    padding-left: 20px !important;
-    padding-right: 20px !important;
-}
+
 .media{
     display: block;
 }
@@ -170,7 +164,7 @@ export default {
     background-size: cover;
     height: 400px;
     margin-top: -58px;
-    filter: blur(2px);
+   
 }
 .description-length-toggle{
     background: linear-gradient(0deg,rgb(var(--color-foreground)) 30%,rgba(var(--color-foreground),.4));
@@ -386,6 +380,12 @@ export default {
     .value{
         color: rgb(var(--color-text));
         font-size: 1.4rem;
+    }
+}
+
+@media (max-width: 1040px){
+    .container {
+        padding: 20px !important;
     }
 }
 </style>

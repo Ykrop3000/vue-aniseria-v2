@@ -1,6 +1,7 @@
 <template>
-  <div id="app">
-    <Header v-if="width>=1040" :isLoggedIn="isLoggedIn"/>
+  <div id="app" :class="{'transparent':TRANSPARENT}">
+    <Progress :status="STATUS"/>
+    <Header v-if="width>=1040" :isLoggedIn="isLoggedIn" :TRANSPARENT="TRANSPARENT"/>
     <MobileNav v-if="width<1040" :isLoggedIn="isLoggedIn"/>
     <div class="page-content">
       
@@ -13,12 +14,16 @@
 <script>
 import Header from "@/components/base/Header/Header"
 import MobileNav from"@/components/base/MobileNav"
+import Progress from '@/components/items/ProgressItem'
+
 import {mapGetters} from 'vuex';
 
 export default {
+    name: 'App',
     components:{
       Header,
-      MobileNav
+      MobileNav,
+      Progress
     },
     data(){
         return{
@@ -55,11 +60,13 @@ export default {
         'isLoggedIn',
         'STUDIOS',
         'GENRES',
+        'STATUS',
         'USER',
         'ERRORS',
         'SUCSESS',
         'REG_ERROR',
-        'LOGIN_ERROR'
+        'LOGIN_ERROR',
+        'TRANSPARENT'
       ]),
 
 
@@ -80,7 +87,11 @@ export default {
           this.error(`${item}`)
           this.$store.dispatch('DEL_SUCSESS',i)
         });
+      },
+      '$route.name'(){
+        this.$store.dispatch('SET_TRANSPARENT',false)
       }
+
     }
 }
 </script>
@@ -242,7 +253,9 @@ export default {
   .media-page-unscoped h2 {
     margin-bottom: 10px;
   }
-
+  #app.transparent {
+      margin-top: 0;
+  }
   h2 {
       font-size: 1.4rem;
       font-weight: 500;
@@ -250,13 +263,19 @@ export default {
   @media (min-width: 1540px){
     .container {
       max-width: 1520px !important;
-      padding-left: 100px !important;
-      padding-right: 100px !important;
+      padding-left: 100px ;
+      padding-right: 100px ;
     }
   }
   @media (max-width: 1040px){
     #app {
       margin-top: 0 !important
+    }
+  }
+  @media (max-width: 1040px) and (min-width: 760px){
+    .container {
+        padding-left: 30px;
+        padding-right: 30px;
     }
   }
   @media (max-height: 920px){

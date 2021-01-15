@@ -5,7 +5,7 @@
 <script>
 
 export default {
-    props:['j',"GENRES"],
+    props:['j',],
     computed: {
     },
 }

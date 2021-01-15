@@ -12,7 +12,7 @@
             </div>
             <div class="nav-wrap">
                 <div class="nav container">
-
+                    
                 </div>
             </div>
         </div>
@@ -31,7 +31,10 @@ export default {
     computed:{
         ...mapGetters(['USER']),
         ...mapGetters(['APIURL'])
-    }
+    },
+    mounted() {
+        this.$store.dispatch('SET_TRANSPARENT',true)
+    },
 }
 </script>
 

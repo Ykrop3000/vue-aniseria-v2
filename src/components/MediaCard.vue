@@ -1,8 +1,8 @@
 <template>
-    <div class="media-card">
+    <div class="media-card" v-lazy-container="{ selector: 'img' }">
 
-        <router-link  :to="{name: 'Anime', params:{slug: Anime.url.split('/')[2]}}" class="cover" :class="{'loading':loading}">
-            <img :src="SHIKIURL + Anime.image.preview" alt="poster" class="image" :class="{'loaded':!loading}" @load="loading = false">
+        <router-link  :to="{name: 'Anime', params:{slug: slug}}" class="cover" :class="{'loading':loading}">
+            <img :data-src="SHIKIURL + Anime.image.preview" alt="poster" class="image" :class="{'loaded':!loading}" @load="loading = false">
 
             <div class="wrap list-btns-wrap"  v-show="ViewMode == '0' && isLoggedIn" >
                 <div label="Open List Editor" class="btn open">
@@ -15,7 +15,7 @@
             </div>
             
             <div class="overlay" v-show="ViewMode == '1'">
-                <router-link :to="{name: 'Anime', params:{slug: Anime.url.split('/')[2]}}" class="title"  v-text="Anime.russian"></router-link>
+                <router-link :to="{name: 'Anime', params:{slug: slug}}" class="title"  v-text="Anime.russian.slice(1,-1)"></router-link>
                 <div class="studio">
                     <span v-for="(i,id) in Anime.studios" :key="id" v-text="i.name"></span>
                 </div>
@@ -23,7 +23,7 @@
 
         </router-link>
 
-        <router-link :to="{name: 'Anime', params:{slug: Anime.url.split('/')[2]}}" v-if="ViewMode == '0'" class="title" :class="{'loading':loading}" v-text="Anime.russian"></router-link>
+        <router-link :to="{name: 'Anime', params:{slug: slug}}" v-if="ViewMode == '0'" class="title" :class="{'loading':loading}" v-text="Anime.russian.slice(1,-1)"></router-link>
 
         <div class="hover-data right">
             <div class="header">
@@ -37,7 +37,13 @@
                 <span v-text="Anime.episodes + ' серий'"></span>
             </div>
             <div class="genres">
-                <GenerItem v-for="(j,id) in Anime.genres" :key="id" :j="j" :GENRES="GENRES"/>
+                 <router-link
+                        :key="id"
+                        v-for="(j,id) in Anime.genres"
+                        class="genre"
+                        :to="{name:'Genre',params:{slug:j.name}}">
+                            {{j.russian}} 
+                    </router-link>
             </div>
         </div>
 
@@ -65,7 +71,13 @@
             </div>
             <div class="footer">
                 <div class="genres">
-                    <GenerItem v-for="(j,id) in Anime.genres" :key="id" :j="j" :GENRES="GENRES"/>
+                    <router-link
+                        :key="id"
+                        v-for="(j,id) in Anime.genres"
+                        class="genre"
+                        :to="{name:'Genre',params:{slug:j.name}}">
+                            {{j.russian}} 
+                    </router-link>
                 </div>
             </div>
         </div>
@@ -76,20 +88,19 @@
 
 <script>
 import {mapGetters} from 'vuex';
-import GenerItem from'@/components/items/GenerItem'
 export default {
     components:{
-        GenerItem
+        
     },
     props:[
         'Anime',
-        'GENRES',
         'ViewMode',
         'isLoggedIn'
     ],
     data(){
         return{
-            loading: true
+            loading: true,
+            slug: this.Anime.url.split('/')[2]
         }
     },
     computed:{
@@ -324,6 +335,19 @@ export default {
 .overlay a{
     position: relative;
     z-index: 10;
+}
+.genre{
+    background: var(--media-background);
+    border-radius: 10px;
+    color: var(--media-background-text);
+    display: inline-block;
+    font-size: 1.2rem;
+    font-weight: 700;
+    height: 20px;
+    line-height: 2rem;
+    margin-right: 11px;
+    padding: 0 12px;
+    text-transform: lowercase;
 }
 .studio {
     color: var(--media-overlay-text);

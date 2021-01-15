@@ -1,10 +1,11 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import List from '../views/List' 
+import List from '../views/List/List' 
 import FullPage from '../views/FullPage/FullPage' 
-import Overview from '../views/FullPage/Overview'
-import Watch from '../views/FullPage/Watch'
+import Overview from '../views/FullPage/contents/Overview'
+import Watch from '../views/FullPage/contents/Watch'
 import Auth from '../views/Auth/Auth'
+import Home from '../views/Home/Home'
 
 Vue.use(Router)
 
@@ -13,18 +14,33 @@ export default new Router({
   routes:
   [
     {
+      path: '',
+      name: 'Home',
+      component: Home
+    },
+    {
       path: '/animes',
       name: 'Animes',
-      component: List
+      component: List,
+      props:{
+        type: 'animes'
+      },
+      children:[
+        {
+          name: 'Animes_Section',
+          path: ':section',
+          component: List
+        }
+      ]
     },
 
 
     {
       path: '/anime/:slug/',
-
       component: FullPage,
       meta: { reuse: false },
-      children: [{
+      children: [
+      {
         name: 'Watch',
         path: 'watch',
         component: Watch
@@ -33,14 +49,25 @@ export default new Router({
         name: 'Anime',
         path: '',
         component: Overview
-      },]
+      },
+      {
+        name: 'Characters',
+        path: 'characters',
+        component:function () {
+          return import('../views/FullPage/contents/Characters.vue')
+        }
+      },
+    ]
     },
 
     
     {
       path: '/genre/:slug',
       name: 'Genre',
-      component: List
+      component: List,
+      props:{
+        type: 'genre'
+      }
     },
 
     {
@@ -66,7 +93,8 @@ export default new Router({
       component: function () {
         return import('../views/Profile.vue')
       }
-    }
+    },
+    
 
   ]
 })

@@ -13,26 +13,26 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   state: {
-      status: '',
+      status: 'success',
       token: localStorage.getItem('token') || '',
       user : {},
       someuser: {},
 
-      animesType: null,
-      animes: [],
+      animes: {},
+      nextPage: true,
 
       anime:{},
       related:[],
+      similar:[],
       roles:[],
 
       genres: [],
       studios: [],
-      animes_status: 'loading',
 
       nav:[
         {
           to: 'Home',
-          text: 'home',
+          text: 'Домой',
           svg: 'fas fa-home',
           auth: 'nd'
         },
@@ -68,12 +68,14 @@ export default new Vuex.Store({
       shikiUrl: 'https://shikimori.one',
       APIurl: 'http://127.0.0.1:8000',
 
+
+      transparent: false
   },
   getters: {
     NAV: state =>{
       return state.nav
     },
-    ANIMES: state =>{
+    ANIMES: state  => {
         return state.animes;
     },
     ANIME: state =>{
@@ -81,6 +83,9 @@ export default new Vuex.Store({
     },
     RELATED: state =>{
       return state.related
+    },
+    SIMILAR: state =>{
+      return state.similar
     },
     ROLES: state =>{
       return state.roles
@@ -109,21 +114,30 @@ export default new Vuex.Store({
     },
     token: state => state.token,
     isLoggedIn: state => !!state.token,
-    authStatus: state => state.status,
 
     REG_ERROR: state => state.reg_error,
     LOGIN_ERROR: state => state.login_error,
-    ANIMESSTATUS: state => state.animes_status,
+    STATUS: state => state.status,
     ERRORS: state => state.errors,
-    SUCSESS: state => state.sucsess
+    SUCSESS: state => state.sucsess,
+
+    TRANSPARENT: state => state.transparent
   },
   mutations: {
       SET_ANIMES: (state, payload) =>{
-        state.animes = payload;
+        
+        let animes = {[payload.key]:payload.val}
+
+        if(state.animes[payload.key]){
+          state.animes[payload.key] = payload.val;
+        }else{
+          state.animes = Object.assign(animes, state.animes)
+        }
+              
       },
-      
+
       ADD_ANIMES: (state, payload) =>{
-        state.animes = state.animes.concat(payload);
+        state.animes.main = state.animes.concat(payload);
       },
       SET_GENRES: (state, payload) =>{
         state.genres = payload;
@@ -137,6 +151,9 @@ export default new Vuex.Store({
       },
       SET_ANIME_RELATED:(state, payload) =>{
         state.related = payload;
+      },
+      SET_ANIME_SIMILAR:(state, payload) =>{
+        state.similar = payload;
       },
       SET_ANIME_ROLES:(state, payload) =>{
         state.roles = payload;
@@ -154,14 +171,15 @@ export default new Vuex.Store({
       },
 
       ANIME_REQUEST(state){
-        state.animes_status = 'loading'
+        state.status = 'loading'
       },
       ANIME_SUCCESS(state){
-        state.animes_status = 'success'
+        state.status = 'success'
       },
-      ANIME_ERROR(state){
-        state.animes_status = 'error'
-        state.errors.push('anime')
+      ANIME_ERROR(state, err){
+        state.status = 'error'
+        console.log(err.request)
+        state.errors.push(err.message )
       },
 
       auth_request(state){
@@ -193,6 +211,10 @@ export default new Vuex.Store({
         state.token = ''
       },
 
+      SET_TRANSPARENT(state,val){
+        state.transparent = val
+      },
+
   },
   actions: {
       DEL_ERROR({commit},i){
@@ -201,40 +223,49 @@ export default new Vuex.Store({
       DEL_SUCSESS({commit},i){
         commit('del_sucsess',i);
       },
+      SET_TRANSPARENT({commit},val){
+        commit('SET_TRANSPARENT',val);
+      },
+
+
+
       GET_ANIMES({commit}, payload){
         return new Promise((resolve, reject) => {
           commit('ANIME_REQUEST')
+          let params = payload
 
-          let params = {
-            ordering:payload.ordering,
-            search:payload.search,
-            page:payload.page,
-            year_start:payload.year_start,
-            year_end:payload.year_end,
-            gf: payload.gf
-          }
+
           if (payload.genres){
             params.genres = payload.genres.map(g => g.id).join(',')
           }
+          if (payload.ids){
+            params.ids = payload.ids.join(',')
+          }
+          if(!payload.key){
+            params.key = 'main'
+          }
+          
 
-
-          axios({url: `${this.state.APIurl}/api/v2/${payload.type}`, params:params, method: 'GET' })
+          axios({url: `${this.state.APIurl}/api/v2/animes`, params:params, method: 'GET' })
           .then(resp => {
           
-            
-            if(payload.page > 1){
-              commit('ADD_ANIMES', resp.data.results);
-            }
-            else{
-              commit('SET_ANIMES', {});
-              commit('SET_ANIMES', resp.data.results);
+            if(payload.dispatchTo){
+              commit(payload.dispatchTo, resp.data.results);
+            }else{
+              if(payload.page > 1){
+                commit('ADD_ANIMES', resp.data.results);
+              }
+              else{
+                commit('SET_ANIMES', {key:params.key,val:[]});
+                commit('SET_ANIMES', {key:params.key,val:resp.data.results});
+              }
             }
 
             commit('ANIME_SUCCESS');
             resolve(resp)
           })
           .catch(err => {
-            commit('ANIME_ERROR');
+            commit('ANIME_ERROR',err);
             reject(err)
           })
         })
@@ -243,7 +274,32 @@ export default new Vuex.Store({
         return new Promise((resolve, reject) => {
           axios({url: `${this.state.shikiUrl}/api/animes/${id}/related`, method: 'GET' })
           .then(resp => {
-            commit('SET_ANIME_RELATED',resp.data)
+
+            commit('SET_ANIME_RELATED',{})
+            this.dispatch('GET_ANIMES',{
+              ids: resp.data.filter(d => d.anime).map(d => d.anime.id),
+              dispatchTo: 'SET_ANIME_RELATED'
+            })
+            
+            
+            resolve(resp)
+          })
+          .catch(err => {
+            reject(err)
+          })
+        })
+      },
+      GET_SIMILAR({commit}, id){
+        return new Promise((resolve, reject) => {
+          axios({url: `${this.state.shikiUrl}/api/animes/${id}/similar`, method: 'GET' })
+          .then(resp => {
+
+            commit('SET_ANIME_SIMILAR',{})
+            this.dispatch('GET_ANIMES',{
+              ids: resp.data.map(d => d.id),
+              dispatchTo: 'SET_ANIME_SIMILAR'
+            })
+
             resolve(resp)
           })
           .catch(err => {
@@ -270,13 +326,13 @@ export default new Vuex.Store({
           commit('ANIME_REQUEST')
           axios({url: `${this.state.APIurl}/api/v2/favorite`, method: 'GET' })
           .then(resp => {
-            commit('SET_ANIMES', {});
-            commit('SET_ANIMES', resp.data.results);
+            commit('SET_ANIMES', {key:'favorite',val:[]});
+            commit('SET_ANIMES', {key:'favorite',val:resp.data.results});
             commit('ANIME_SUCCESS');
             resolve(resp)
           })
           .catch(err => {
-            commit('ANIME_ERROR');
+            commit('ANIME_ERROR',err);
             reject(err)
           })
         })
@@ -290,7 +346,7 @@ export default new Vuex.Store({
             resolve(resp)
           })
           .catch(err => {
-            commit('ANIME_ERROR');
+            commit('ANIME_ERROR',err);
             reject(err)
           })
         })
@@ -300,6 +356,11 @@ export default new Vuex.Store({
       },
       CLEAR_ANIME({commit}){
         commit('SET_ANIME', {});
+        commit('SET_ANIME_ROLES', []);
+        commit('SET_ANIME_SIMILAR',[])
+        commit('SET_ANIME_RELATED',[])
+
+
       },
       
       GET_GENRES({commit}){
@@ -328,14 +389,18 @@ export default new Vuex.Store({
       },
       GET_ANIME({commit},payload){
         return new Promise((resolve, reject) => {
-          axios({url: `${this.state.APIurl}/api/v2/anime/${payload}`, method: 'GET' })
-          .then(resp => {
-            commit('SET_ANIME',resp.data.anime);
-            resolve(resp)
-          })
-          .catch(err => {
-            reject(err)
-          })
+          if(this.state.animes.filter(a => a.url == '/animes/'+ payload).length == 1){
+            commit('SET_ANIME',this.state.animes.filter(a => a.url == '/animes/'+ payload)[0]);
+          }else{
+            axios({url: `${this.state.APIurl}/api/v2/anime/${payload}`, method: 'GET' })
+            .then(resp => {
+              commit('SET_ANIME',resp.data.anime);
+              resolve(resp)
+            })
+            .catch(err => {
+              reject(err)
+            })
+          }
         })
       },
       GET_SOME_USER ({commit},slug){

@@ -1,5 +1,5 @@
 <template>
-    <div id="nav" class="nav" style="transition: background 0.8s ease 0s, top 0.5s ease 0s;">
+    <div id="nav" class="nav" :class="{'hide':hide,'transparent':TRANSPARENT}" style="transition: background 0.8s ease 0s, top 0.5s ease 0s;">
         <div class="wrap">
             <router-link :to="{name:'home'}" ></router-link>
             <Links :isLoggedIn="isLoggedIn"/>
@@ -23,8 +23,33 @@ export default {
         User,
         Search
     },
+    data(){
+        return{
+            hide: false,
+            lastScrollTop: 0,
+            
+        }
+    },
+    methods: {
+        updateScroll() {
+            var st = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (st < this.lastScrollTop){
+               this.hide = false
+            } else {
+               this.hide = true
+            }
+
+            this.lastScrollTop = st <= 0 ? 0 : st; // For Mobile or negative scrolling
+        }
+    },
+  
+    mounted() {
+        window.addEventListener('scroll', this.updateScroll);
+    },
     props:[
-        'isLoggedIn'
+        'isLoggedIn',
+        'TRANSPARENT'
     ]
 
 }
@@ -58,6 +83,10 @@ export default {
     width: 100%;
     z-index: 999;
 }
+.transparent{
+    background: rgba(35,38,67,.5);
+    color: #e5e7ea;
+}
 @media (max-height: 920px){
     .nav{
         height: 68px;
@@ -65,5 +94,9 @@ export default {
 }
 .hide {
     top: -97px;
+}
+.solid, .transparent:hover {
+    background: #2b2d42;
+    color: #bcbedc;
 }
 </style>

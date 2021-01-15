@@ -8,9 +8,11 @@ import infiniteScroll from 'vue-infinite-scroll'
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 
+import VueLazyload from 'vue-lazyload'
 
-
+Vue.use(VueLazyload)
 Vue.use(ElementUI);
+
 
 
 import '@fortawesome/fontawesome-free/css/all.css'

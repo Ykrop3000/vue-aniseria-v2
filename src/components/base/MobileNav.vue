@@ -3,9 +3,9 @@
         <div class="hamburger" @click="visible = true" :class="{'dpn':visible}">
             <i class="fa-bars fas"></i>
         </div>
-        <div class="menu" :class="{'visible':visible}">
+        <div class="menu" :class="{'visible':visible,'login':isLoggedIn}">
 
-            <router-link v-for="i in NAV" :key="i.text" :to="{name:i.to}" class="link">
+            <router-link v-for="i in NAV" :key="i.text" :to="{name:i.to}" :class="i.auth"  class="link">
                 <i :class="i.svg"></i>
                 <span class="label" v-text="i.text" @click="visible = false"></span>
             </router-link>
@@ -50,6 +50,9 @@ export default {
 <style scoped>
 .label{
     text-transform: lowercase;
+}
+.login .nli{
+    display: none;
 }
 .mobile-nav {
     -webkit-tap-highlight-color: transparent;

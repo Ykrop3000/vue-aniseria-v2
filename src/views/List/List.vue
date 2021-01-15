@@ -10,7 +10,7 @@
             </div>
         </div>
 
-        <Filters :GENRES="GENRES" :STUDIOS="STUDIOS" @fs="filter_send" @ss="search_send"/>
+        <Filters :GENRES="GENRES" :STUDIOS="STUDIOS" @fs="filter_send" />
 
         <!------------------------------------->
         <div class="secondary-filters">
@@ -38,22 +38,22 @@
             </div>
         </div>
         <!------------------------------------->
-        <div class="results" :class="{ cover:ViewMode==0, chart:ViewMode==1, table:ViewMode==2}">
-            <MediaCard v-for="i in ANIMES" :key="i.id" :Anime="i" :ViewMode="ViewMode" :GENRES="GENRES" :isLoggedIn="isLoggedIn"/>
-        </div>
+        <FullList :ViewMode="ViewMode" :ANIMES="animes" :isLoggedIn="isLoggedIn"/>
+        
     </div>
 </template>
+
 <script>
 import {mapGetters} from 'vuex';
-import MediaCard from '@/components/MediaCard'
 import Filters from "@/components/modules/Filters"
 import ClickOutside from 'vue-click-outside'
+import FullList from './components/FullList'
 
 
 export default {
     components:{
-        MediaCard,
-        Filters
+        Filters,
+        FullList
     },
     directives:{
         ClickOutside
@@ -65,6 +65,7 @@ export default {
     ],
     data(){
         return{
+            animes: [],
             ViewMode: 0,
             pretype: this.$attrs.type,
             page: 1,
@@ -76,7 +77,7 @@ export default {
             stateFilter:true,
 
             searchActive: false,
-            search: '',
+            search: this.$route.query.search  || '',
 
             sortTr: false,
             sortVal: '-year',
@@ -92,13 +93,13 @@ export default {
             return d.getMinutes()*60 + d.getSeconds()
         },
         get_animes(t = true){
-            if (this.ANIMES.length == 0 || this.$attrs.type != this.pretype || t) {
-                let page = Math.ceil(this.ANIMES.length/24)+1 || 1;
+            if (this.animes.length == 0 || this.$attrs.type != this.pretype || t) {
+                let page = Math.ceil(this.animes.length/24)+1 || 1;
                 let params = {
                     type: this.$attrs.type || 'animes',
                     ordering: this.sortVal,
                     page: page,
-                    search: this.search
+                    search: this.search,
                 }
                 if (this.filterActive){
                     params.genres =  this.filter.genres;
@@ -119,23 +120,13 @@ export default {
             }
         },
         handleScroll: function() {
-            if (this.pagination && (this.get_time() - this.lastRequest  >= 3) && this.ANIMESSTATUS == 'success' ){
+            if (this.pagination && (this.get_time() - this.lastRequest  >= 3) && this.STATUS == 'success' ){
                 this.get_animes()
             }
         },
         filter_send: function(d){
             this.filterActive = true;
             this.filter = d;
-            this.$store.dispatch('CLEAR_ANIMES');
-            this.get_animes()
-        },
-        search_send: function(d){
-            this.search = d;
-            if (this.search){
-                this.searchActive = true
-            }else{
-                this.searchActive = false
-            }
             this.$store.dispatch('CLEAR_ANIMES');
             this.get_animes()
         },
@@ -146,22 +137,41 @@ export default {
         this.get_studios();
     },
     computed: {
-        ...mapGetters(['ANIMES']),
-        ...mapGetters(['ANIMESSTATUS']),
+        ...mapGetters([
+            'ANIMES',
+            'STATUS'
+        ]),
         lastRequest: () =>{
             let d =  new Date();
             return d.getMinutes()*60 + d.getSeconds()
         }
     },
     watch: {
+        'ANIMES.main'(){
+            this.animes = this.ANIMES.main
+        },
         sortVal() {
             this.$store.dispatch('CLEAR_ANIMES');
             this.get_animes(true)
+        },
+        '$route.query'(){
+            if (this.$route.query.search){
+                this.search = this.$route.query.search;
+                if (this.search){
+                    this.searchActive = true
+                }else{
+                    this.searchActive = false
+                }
+                this.$store.dispatch('CLEAR_ANIMES');
+                this.get_animes()
+            }
         }
     }
 }
 </script>
-<style scoped>
+
+
+<style>
 .results {
     display: grid;
     grid-gap: 28px 30px;

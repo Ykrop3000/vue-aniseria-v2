@@ -1,11 +1,11 @@
 <template>
     <div>
-        <h2>Связанные</h2>
+        <h2 v-text="title"></h2>
         <div class="grid-wrap" >
             <div class="role-card view-character-staff" v-for="(i,id) in roles" :key="id">
 
                 <div class="character">
-                    <div class="cover" :style="{'background-image': `url(${SHIKIURL+i.character.image.preview})`}"></div>
+                    <div class="cover" v-lazy:background-image="SHIKIURL + i.character.image.preview"></div>
                     <div class="content">
                         <div class="name" v-text="i.character.russian"></div>
                         <div class="role" v-text="i.roles.join(',')"></div>
@@ -24,7 +24,7 @@
 import {mapGetters} from 'vuex'
 export default {
     name: 'Roles',
-    props:['roles'],
+    props:['roles','title'],
     computed:{
         ...mapGetters(['SHIKIURL'])
     }
