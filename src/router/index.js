@@ -9,9 +9,7 @@ import Home from '../views/Home/Home'
 
 Vue.use(Router)
 
-export default new Router({
-  mode:'history',
-  routes:
+const routes =
   [
     {
       path: '',
@@ -25,11 +23,28 @@ export default new Router({
       props:{
         type: 'animes'
       },
+      meta:{
+        order: '-aired_on',
+        name: 'year'
+      },
       children:[
         {
-          name: 'Animes_Section',
-          path: ':section',
-          component: List
+          name: 'Animes_rating',
+          path: 'rating',
+          component: List,
+          meta:{
+            order: '-user_rate',
+            name: 'raiting'
+          }
+        },
+        {
+          name: 'Animes_id',
+          path: 'new',
+          component: List,
+          meta:{
+            order: '-id',
+            name: 'id'
+          }
         }
       ]
     },
@@ -97,7 +112,7 @@ export default new Router({
     
 
   ]
-})
+
 
 /*
 component: function () {
@@ -105,3 +120,10 @@ component: function () {
 }
 */
 
+const router = new Router({
+  mode: 'history',
+  base: process.env.BASE_URL,
+  routes
+})
+
+export default router

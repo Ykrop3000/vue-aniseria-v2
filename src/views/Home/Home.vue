@@ -2,8 +2,8 @@
     <div class="container" >
 
         <Carousel v-if="ANIMES.carousel != []" :animes="ANIMES.carousel" :key="key"/>
-        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'top'" :sectionLink="''" :ANIMES="ANIMES.raiting.slice(0,6)"/>
-        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'new'" :sectionLink="''" :ANIMES="ANIMES.new.slice(0,6)"/>
+        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'top'" :sectionLink="'Animes_rating'" :ANIMES="ANIMES.raiting.slice(0,6)"/>
+        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'new'" :sectionLink="'Animes_id'" :ANIMES="ANIMES.id.slice(0,6)"/>
     </div>
 
 </template>
@@ -33,7 +33,7 @@ export default {
         }
     },
     methods:{
-        get_animes(key, ordering){
+        get_animes(key, ordering,limit=24){
             let anime = this.ANIMES[key] || []
        
             if ( anime.length == 0) {
@@ -42,6 +42,7 @@ export default {
                     type: this.$attrs.type || 'animes',
                     ordering: ordering || '-id',
                     page: page,
+                    limit: limit,
                     key: key
                 }
                 this.$store.dispatch('GET_ANIMES', params);                
@@ -49,9 +50,9 @@ export default {
         },
     },
     mounted(){
-        this.get_animes('carousel')
+        this.get_animes('carousel', '-id', 6)
         this.get_animes('raiting','-user_rate')
-        this.get_animes('new','-id')
+        this.get_animes('id','-id')
         
     },
     watch:{

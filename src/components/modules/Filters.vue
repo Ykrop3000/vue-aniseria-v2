@@ -33,14 +33,13 @@
 
 import SelectItem from '@/components/items/SelectItem'
 
+import {mapGetters} from 'vuex'
+
 export default {
     components:{
         SelectItem
     },
     props:[
-        'GENRES',
-        'STUDIOS'
-
     ],
     computed:{
         years: () => {
@@ -52,7 +51,11 @@ export default {
                 })
             }
             return d
-        }
+        },
+        ...mapGetters([
+            'STUDIOS',
+            'GENRES'
+        ])
     },
     data(){
         return{
@@ -104,7 +107,10 @@ export default {
             "resize",
             this.handleWidthChange
         );
-         this.FilterOptions = this.options
+        this.FilterOptions = this.options
+        this.$store.dispatch('GET_GENRES');
+        this.$store.dispatch('GET_STUDIOS');
+
     },
     watch:{
         GENRES(){

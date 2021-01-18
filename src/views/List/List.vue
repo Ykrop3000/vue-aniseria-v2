@@ -10,7 +10,7 @@
             </div>
         </div>
 
-        <Filters :GENRES="GENRES" :STUDIOS="STUDIOS" @fs="filter_send" />
+        <Filters @fs="filter_send" />
 
         <!------------------------------------->
         <div class="secondary-filters">
@@ -25,7 +25,7 @@
                     <i class="fas fa-sort icon"></i>
                     <span @click="sortTr = !sortTr" class="label" v-text="sortText"></span>
                     <div v-if="sortTr"  class="dropdown">
-                        <div class="option"  @click="sortVal = '-year'; sortText = 'Дате выхода'; sortTr = false" v-text="'Дате выхода'"></div>
+                        <div class="option"  @click="sortVal = '-aired_on'; sortText = 'Дате выхода'; sortTr = false" v-text="'Дате выхода'"></div>
                         <div class="option"  @click="sortVal = '-user_rate'; sortText = 'Рейтингу'; sortTr = false " v-text="'Рейтингу'"></div>
                         <div class="option"  @click="sortVal = '-id'; sortText = 'Дате добавления'; sortTr = false" v-text="'Дате добавления'"></div>
                     </div>
@@ -38,7 +38,11 @@
             </div>
         </div>
         <!------------------------------------->
-        <FullList :ViewMode="ViewMode" :ANIMES="animes" :isLoggedIn="isLoggedIn"/>
+        <div class="results" :class="{ cover:ViewMode==0, chart:ViewMode==1, table:ViewMode==2}">
+            <MediaCard v-for="i in animes" :key="i.id" :Anime="i" :ViewMode="ViewMode" :isLoggedIn="isLoggedIn"/>
+        </div>
+        
+        <Spinner v-if="animes.length == 0"/>
         
     </div>
 </template>
@@ -47,27 +51,27 @@
 import {mapGetters} from 'vuex';
 import Filters from "@/components/modules/Filters"
 import ClickOutside from 'vue-click-outside'
-import FullList from './components/FullList'
+import MediaCard from '@/components/MediaCard'
+import Spinner from '@/components/items/SpinnerItem'
 
 
 export default {
     components:{
         Filters,
-        FullList
+        MediaCard,
+        Spinner
     },
     directives:{
         ClickOutside
     },
     props:[
-        'GENRES',
-        'STUDIOS',
-        'isLoggedIn'
+        'isLoggedIn',
     ],
     data(){
         return{
             animes: [],
+
             ViewMode: 0,
-            pretype: this.$attrs.type,
             page: 1,
             pagination: true,
             width: window.innerWidth,
@@ -80,8 +84,10 @@ export default {
             search: this.$route.query.search  || '',
 
             sortTr: false,
-            sortVal: '-year',
-            sortText: 'Дате выхода'
+            sortVal:  this.$route.meta.order || "-aired_on",
+            sortText: 'Дате выхода',
+
+            sectionName: this.$route.meta.name || "year",
         }
     },
     methods: {
@@ -93,30 +99,30 @@ export default {
             return d.getMinutes()*60 + d.getSeconds()
         },
         get_animes(t = true){
-            if (this.animes.length == 0 || this.$attrs.type != this.pretype || t) {
-                let page = Math.ceil(this.animes.length/24)+1 || 1;
+            
+            if (this.animes.length == 0 || t) {
+               
+                let page = 0
+                if (this.ANIMES[this.sectionName]){
+                    page = Math.ceil(this.ANIMES[this.sectionName].length/24)+1;
+                }else{
+                    page = 1
+                }
+                
+                
                 let params = {
                     type: this.$attrs.type || 'animes',
                     ordering: this.sortVal,
                     page: page,
                     search: this.search,
+                    key: this.sectionName
                 }
+                
                 if (this.filterActive){
                     params.genres =  this.filter.genres;
                 }
-                    
-                this.$store.dispatch('GET_ANIMES', params);                
-                this.pretype = this.$attrs.type;
-            }
-        },
-        get_genres(){
-            if (this.GENRES.length == 0) {
-                this.$store.dispatch('GET_GENRES');
-            }
-        },
-        get_studios(){
-            if (this.GENRES.length == 0) {
-                this.$store.dispatch('GET_STUDIOS');
+                this.$store.dispatch('GET_ANIMES', params);
+                this.lastRequest = this.get_time()               
             }
         },
         handleScroll: function() {
@@ -133,8 +139,7 @@ export default {
     },
     mounted() {
         this.get_animes();
-        this.get_genres();
-        this.get_studios();
+        this.animes = this.ANIMES[this.sectionName] || []
     },
     computed: {
         ...mapGetters([
@@ -147,8 +152,11 @@ export default {
         }
     },
     watch: {
-        'ANIMES.main'(){
-            this.animes = this.ANIMES.main
+        '$route.name'(){
+            this.animes = this.ANIMES[this.sectionName]
+        },
+        'ANIMES'(){
+            this.animes = this.ANIMES[this.sectionName]
         },
         sortVal() {
             this.$store.dispatch('CLEAR_ANIMES');
@@ -250,7 +258,7 @@ export default {
    .results.chart {
         grid-template-columns: 1fr;
         grid-gap: 20px 0;
-        padding: 0;
+        padding: 0 10px;
     }
 }
 /* ---------Ordering Filter---------*/

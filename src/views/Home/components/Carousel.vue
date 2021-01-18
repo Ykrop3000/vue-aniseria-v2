@@ -5,7 +5,7 @@
      :dots="false"
      :autoplay="false"
      :loop="true"
-     :margin="30"
+     :margin="20"
      :items="items"
      :nav="false"
      class="carousel"
@@ -14,7 +14,7 @@
             v-for="(i, id) in animes"
             :key="id"
             :to="{name: 'Anime', params:{slug: i.url.split('/')[2]}}"
-            class="cover" :style="{'background-image': `url(${SHIKIURL + i.image.original})`}">
+            class="cover image" :style="{'background-image': `url(${SHIKIURL + i.image.original})`}" :class="{'loaded':!loading}" @load="i.loading = false">
             <div class="image-text">
                 <div v-text="i.russian"></div>
             </div>
@@ -57,7 +57,7 @@ export default {
         },
         setItems(){
             if (this.width<=400){
-                this.items = 1
+                this.items = 2
             }else if (this.width <= 760){
                 this.items = 2
             }
@@ -77,6 +77,19 @@ export default {
 </style>
 
 <style scoped>
+.cover {
+    background: rgba(var(--color-background-300),.8);
+    border-radius: 4px;
+    box-shadow: 0 14px 30px rgba(var(--color-shadow-blue),.15),0 4px 4px rgba(var(--color-shadow-blue),.05);
+    cursor: pointer;
+    display: inline-block;
+    height: 265px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    z-index: 5;
+    background-repeat: no-repeat;
+}
 .carousel{
     margin-bottom: 60px;
     padding-top: 20px;
@@ -107,18 +120,5 @@ export default {
     position: absolute;
     transition: .3s ease;
     width: 100%;
-}
-.cover{
-    background: rgba(var(--color-background-300),.8);
-    border-radius: 4px;
-    box-shadow: 0 14px 30px rgba(var(--color-shadow-blue),.15),0 4px 4px rgba(var(--color-shadow-blue),.05);
-    cursor: pointer;
-    display: inline-block;
-    height: 265px;
-    overflow: hidden;
-    position: absolute;
-    background-repeat: no-repeat;
-    width: 100%;
-    z-index: 999;
 }
 </style>

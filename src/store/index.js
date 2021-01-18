@@ -8,6 +8,13 @@ Vue.use(Vuex);
  li  --> Logged In
  nli --> Not Logged In
  nd  --> No Difference
+
+raiting --> -user_rate
+id --> -id
+year --> -year
+
+
+
 */
 
 
@@ -66,7 +73,7 @@ export default new Vuex.Store({
       sucsess: [],
 
       shikiUrl: 'https://shikimori.one',
-      APIurl: 'http://127.0.0.1:8000',
+      APIurl: 'https://anivideo24.herokuapp.com',
 
 
       transparent: false
@@ -137,7 +144,7 @@ export default new Vuex.Store({
       },
 
       ADD_ANIMES: (state, payload) =>{
-        state.animes.main = state.animes.concat(payload);
+        state.animes[payload.key] = state.animes[payload.key].concat(payload.val)
       },
       SET_GENRES: (state, payload) =>{
         state.genres = payload;
@@ -242,7 +249,7 @@ export default new Vuex.Store({
             params.ids = payload.ids.join(',')
           }
           if(!payload.key){
-            params.key = 'main'
+            params.key = 'year'
           }
           
 
@@ -253,7 +260,7 @@ export default new Vuex.Store({
               commit(payload.dispatchTo, resp.data.results);
             }else{
               if(payload.page > 1){
-                commit('ADD_ANIMES', resp.data.results);
+                commit('ADD_ANIMES', {key:params.key,val:resp.data.results});
               }
               else{
                 commit('SET_ANIMES', {key:params.key,val:[]});
@@ -389,8 +396,19 @@ export default new Vuex.Store({
       },
       GET_ANIME({commit},payload){
         return new Promise((resolve, reject) => {
-          if(this.state.animes.filter(a => a.url == '/animes/'+ payload).length == 1){
-            commit('SET_ANIME',this.state.animes.filter(a => a.url == '/animes/'+ payload)[0]);
+          
+          let keys = Object.keys(this.state.animes);
+          let obj = {};
+          
+          keys.every(key => {
+            if (this.state.animes[key].filter(a => a.url == '/animes/'+ payload).length == 1){
+              obj = this.state.animes[key].filter(a => a.url == '/animes/'+ payload)[0]
+              return false
+            }
+          })
+
+          if(Object.keys(obj).length != 0){
+            commit('SET_ANIME',obj);
           }else{
             axios({url: `${this.state.APIurl}/api/v2/anime/${payload}`, method: 'GET' })
             .then(resp => {

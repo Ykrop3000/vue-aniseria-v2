@@ -79,6 +79,11 @@
                             {{j.russian}} 
                     </router-link>
                 </div>
+                <div class="wrap list-btns-wrap">
+                    <div class="btn open">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -156,16 +161,6 @@ export default {
     width: 100%;
     z-index: 5;
 }
-.background-color, .image{
-    height: 100%;
-    left: 0;
-    object-fit: cover;
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    transition: opacity .3s ease-in-out;
-    width: 100%;
-}
 .title{
     color: rgb(var(--color-gray-700));
     font-size: 1.4rem;
@@ -180,9 +175,6 @@ export default {
 }
 .media-card:hover .title{
     color: var(--media-text);
-}
-.image.loaded {
-    opacity: 1;
 }
 .data{
     display: grid;
@@ -233,7 +225,7 @@ export default {
 .wrap{
     position: relative;
 }
-.list-btns-wrap{
+.cover .list-btns-wrap{
     position: absolute;
     right: 14px;
     bottom: 14px;
@@ -264,6 +256,17 @@ export default {
     opacity: .9;
     font-size: 2rem;
     transform: scale(.7);
+}
+.list-btns-wrap .btn.open:not([status]) {
+    background: rgb(var(--color-gray-300));
+    color: rgb(var(--color-gray-700));
+}
+.list-btns-wrap .btn.open {
+    box-shadow: none;
+    color: rgb(var(--color-background-200));
+    opacity: 1;
+    transform: none;
+    transform: scale(.9);
 }
 .quick-actions{
     pointer-events: none;
@@ -358,16 +361,7 @@ a.image-link {
     display: block;
     opacity: 1;
 }
-.background-color, .image-link, .image{
-    height: 100%;
-    left: 0;
-    object-fit: cover;
-    opacity: 0;
-    position: absolute;
-    top: 0;
-    transition: opacity .3s ease-in-out;
-    width: 100%;
-}
+
 .chart .media-card{
     animation: in .3s linear;
     -webkit-backface-visibility: hidden;

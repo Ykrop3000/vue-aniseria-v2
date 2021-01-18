@@ -2,9 +2,9 @@
     <div class="search-landing">
         <div class="landing-section">
 
-            <router-link :to="{name: 'Animes_Section', params:{section: 'sectionLink'}}" class="title link">
+            <router-link :to="{name: sectionLink}" class="title link">
                 <h3 v-text="sectionName"></h3>
-                <div class="expand"></div>
+                <div class="expand">Посмотреть все</div>
             </router-link>
 
             <div class="results cover">
