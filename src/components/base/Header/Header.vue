@@ -1,7 +1,9 @@
 <template>
     <div id="nav" class="nav" :class="{'hide':hide,'transparent':TRANSPARENT && tr}" style="transition: background 0.8s ease 0s, top 0.5s ease 0s;">
         <div class="wrap">
-            <router-link :to="{name:'Home'}" ></router-link>
+            <router-link :to="{name:'Home'}" class="logo">
+                <img src="@/assets/img/logo.svg" alt="logo"/>
+            </router-link>
             <Links :isLoggedIn="isLoggedIn"/>
             <Search v-if="isLoggedIn"/>
             <User  v-if="isLoggedIn"/>
@@ -64,7 +66,10 @@ export default {
 
 
 <style scoped>
-
+.logo img {
+    height: 50px;
+    width: 50px;
+}
 .wrap {
     align-items: center;
     display: flex;

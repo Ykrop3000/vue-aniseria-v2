@@ -499,6 +499,9 @@ a.image-link {
         height: auto;
         border-radius: 5px;
     }
+    .hover-data{
+        display: none;
+    }
 }
 @media (max-width: 760px){
     .footer{
