@@ -5,23 +5,27 @@
            <div class="title" v-if="$route.name == 'Login'">Вход</div>
             <div class="title" v-if="$route.name == 'Signup'">Регистрация</div>
 
-            <div v-if="$route.name == 'Login'" >
-                <input v-model="login.username" type="text" placeholder="Логин" class="al-input">
-                <input v-model="login.password" type="password" placeholder="Пароль" class="al-input">
-                <button  :disabled='login.empty()' class="submit" @click="submitLogin">Войти</button >
-            </div>
+            <form @submit.prevent="submitLogin" v-if="$route.name == 'Login'" data-vv-scope="login">
+
+                <input v-validate="'required|min:5'" name="username" data-vv-as="Логин" v-model="login.username" type="text" placeholder="Логин" class="al-input">
+                
+                <input v-validate="'required|min:5'" name="password" data-vv-as="Пароль" v-model="login.password" type="password" placeholder="Пароль" class="al-input">
+    
+                <input type="submit" value="Войти"  class="submit">
+                
+            </form>
             <router-link v-if="$route.name == 'Login'" :to="{name:'Signup'}" class="link signup">
                 Не зарегистрированы? 
                 <span>Создать аккаунт</span>
             </router-link>
 
-             <div v-if="$route.name == 'Signup'">
-                <input v-model="signup.username" type="text" placeholder="Логин " class="al-input">
-                <input v-model="signup.email" type="email" placeholder="E-mail" class="al-input">
-                <input v-model="signup.password" type="password" placeholder="Пароль" class="al-input">
-                <input v-model="signup.password_confirmation" type="password" placeholder="Повторите пароль" class="al-input">
-                <button  :disabled='signup.empty()' class="submit" @click="submitSignup"> Зарегистрироваться </button>
-            </div>
+             <form @submit.prevent="submitSignup" v-if="$route.name == 'Signup'" data-vv-scope="signup" >
+                <input  v-validate="'required|min:5'" v-model="signup.username" name="username"  data-vv-as="Логин" type="text" placeholder="Логин " class="al-input">
+                <input  v-validate="'required|min:5'" v-model="signup.email" name="email"  data-vv-as="E-mail" type="email" placeholder="E-mail" class="al-input">
+                <input  v-validate="'required|min:5'" v-model="signup.password" name="password" data-vv-as="Пароль" type="password" placeholder="Пароль" class="al-input">
+                <input  v-validate="'required|min:5|confirmed:password'" v-model="signup.password_confirmation" name="password_confirmation" data-vv-as="Пароль" type="password" placeholder="Повторите пароль" class="al-input">
+                <input type="submit" value="Зарегистрироваться" class="submit">
+            </form>
 
        </div>
 
@@ -29,76 +33,68 @@
 </template>
 
 <script>
-import form from 'vuejs-form'
 
 export default {
     name: 'Auth',
-    data: () => ({
-        login: form({
-            username: '', 
-            password: '', 
-        })
-        .rules({
-            username: 'min:5|required',
-            password: 'required|min:5'
-        })
-        .messages({
-            'email.email': 'Поле электронной почты должно быть адресом электронной почты',
-        }),
-        signup: form({
-            username: '', 
-            email: '',
-            password: '', 
-            password_confirmation: '',  
-        })
-        .rules({
-            username: 'min:5|required',
-            email: 'email|min:5|required',
-            password: 'required|min:5|confirmed'
-        })
-        .messages({
-            'email.email': 'Поле электронной почты должно быть адресом электронной почты',
-            'password.confirmed': 'Упс, пароли не совпадают',
-        }),
-   }),
+    data(){
+        return {
+            login:{
+                username: '', 
+                password: '', 
+            },
+            signup: {
+                username: '', 
+                email: '',
+                password: '', 
+                password_confirmation: '',  
+            }
+   }},
  
     methods: {
         submitLogin() {
-            if (this.login.validate().errors().any()){
-                let e =''
-                e = this.login.validate().errors().list().join('<br/>')
-                this.$message.error(e);
-                return
-            }
-            let data ={
-              username: this.login.data.username,
-              password: this.login.data.password
-            }
-            console.log(data)
-            this.$store.dispatch('LOGIN', data)
-            .then(() => this.$router.push('/'))
-            .catch(err => console.log(err))
+            this.$validator.validateAll('login').then((result) => {
+                if (result) {
+                
+                let data ={
+                    username: this.login.username,
+                    password: this.login.password
+                }
+
+                this.$store.dispatch('LOGIN', data)
+                .then(() => this.$router.push('/'))
+                .catch(err => console.log(err))
+
+                return;
+                }
+        
+                this.$message.error(this.errors.all().join('<br/>'));
+                
+            });
         },
         submitSignup() {
-            if (this.signup.validate().errors().any()){
-                let e =''
-                e = this.signup.validate().errors().list().join('  ')
-                this.$message.error(e);
-                return
-            }
+            this.$validator.validateAll('signup').then((result) => {
+                if (result) {
+                
+                    let data = {
+                        username: this.signup.username,
+                        email: this.signup.email,
+                        password: this.signup.password,
+                    }
+                    
+                    this.$store.dispatch('REGISTER', data)
+                    .then(() => this.$router.push('/'))
+                    .catch(err => console.log(err))
 
-            let data = {
-                username: this.signup.data.username,
-                email: this.signup.data.email,
-                password: this.signup.data.password,
-            }
-            this.$store.dispatch('REGISTER', data)
-            .then(() => this.$router.push('/'))
-            .catch(err => console.log(err))
-        },
+                    return;
+                }
+        
+                this.$message.error(this.errors.all().join('<br/>'));
+                
+            });
+        }
     },
     computed:{
-    }
+    },
 }
 </script>
 

@@ -1,7 +1,7 @@
 <template>
-    <div id="nav" class="nav" :class="{'hide':hide,'transparent':TRANSPARENT}" style="transition: background 0.8s ease 0s, top 0.5s ease 0s;">
+    <div id="nav" class="nav" :class="{'hide':hide,'transparent':TRANSPARENT && tr}" style="transition: background 0.8s ease 0s, top 0.5s ease 0s;">
         <div class="wrap">
-            <router-link :to="{name:'home'}" ></router-link>
+            <router-link :to="{name:'Home'}" ></router-link>
             <Links :isLoggedIn="isLoggedIn"/>
             <Search v-if="isLoggedIn"/>
             <User  v-if="isLoggedIn"/>
@@ -26,6 +26,7 @@ export default {
     data(){
         return{
             hide: false,
+            tr: true,
             lastScrollTop: 0,
             
         }
@@ -33,6 +34,12 @@ export default {
     methods: {
         updateScroll() {
             var st = window.pageYOffset || document.documentElement.scrollTop;
+
+            if (st <= 20){
+                this.tr = true    
+            }else{
+                this.tr = false
+            }
 
             if (st < this.lastScrollTop){
                this.hide = false

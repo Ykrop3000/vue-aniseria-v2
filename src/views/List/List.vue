@@ -12,32 +12,8 @@
 
         <Filters @fs="filter_send" />
 
-        <!------------------------------------->
-        <div class="secondary-filters">
-            <div class="active-filters">
-                <i class="fas fa-tags tags-icon" v-if="filterActive || searchActive"></i>
-                <div class="filter" v-if="searchActive">
-                    <span class="lable" v-text="'Поиск: '+ search"></span>
-                </div>
-            </div>
-            <div class="selects-wrap">
-                <div class="sort-wrap sort-select" v-click-outside="tr">
-                    <i class="fas fa-sort icon"></i>
-                    <span @click="sortTr = !sortTr" class="label" v-text="sortText"></span>
-                    <div v-if="sortTr"  class="dropdown">
-                        <div class="option"  @click="sortVal = '-aired_on'; sortText = 'Дате выхода'; sortTr = false" v-text="'Дате выхода'"></div>
-                        <div class="option"  @click="sortVal = '-user_rate'; sortText = 'Рейтингу'; sortTr = false " v-text="'Рейтингу'"></div>
-                        <div class="option"  @click="sortVal = '-id'; sortText = 'Дате добавления'; sortTr = false" v-text="'Дате добавления'"></div>
-                    </div>
-                </div>
-                <div class="wrap">
-                    <div class="icon-wrap cover" :class="{ active: ViewMode==0}" @click="ViewMode=0"><i class="fas fa-th icon"></i></div>
-                    <div class="icon-wrap chart" :class="{ active: ViewMode==1}" @click="ViewMode=1"><i class="fas fa-th-large icon"></i></div>
-                    <div class="icon-wrap" :class="{ active: ViewMode==2}" @click="ViewMode=2"><i class="fas fa-th-list icon" ></i></div>
-                </div>
-            </div>
-        </div>
-        <!------------------------------------->
+        <SecondaryFilters/>
+
         <div class="results" :class="{ cover:ViewMode==0, chart:ViewMode==1, table:ViewMode==2}">
             <MediaCard v-for="i in animes" :key="i.id" :Anime="i" :ViewMode="ViewMode" :isLoggedIn="isLoggedIn"/>
         </div>
@@ -50,16 +26,18 @@
 <script>
 import {mapGetters} from 'vuex';
 import Filters from "@/components/modules/Filters"
+import SecondaryFilters from '@/components/modules/SecondaryFilters'
+
 import ClickOutside from 'vue-click-outside'
 import MediaCard from '@/components/MediaCard'
 import Spinner from '@/components/items/SpinnerItem'
-
 
 export default {
     components:{
         Filters,
         MediaCard,
-        Spinner
+        Spinner,
+        SecondaryFilters
     },
     directives:{
         ClickOutside
@@ -69,9 +47,8 @@ export default {
     ],
     data(){
         return{
-            animes: [],
 
-            ViewMode: 0,
+            ViewMode: this.$route.query.vm || 0,
             page: 1,
             pagination: true,
             width: window.innerWidth,
@@ -79,32 +56,27 @@ export default {
             filterActive: false,
             filter: {},
             stateFilter:true,
-
-            searchActive: false,
             search: this.$route.query.search  || '',
 
-            sortTr: false,
-            sortVal:  this.$route.meta.order || "-aired_on",
-            sortText: 'Дате выхода',
 
-            sectionName: this.$route.meta.name || "year",
+            sortVal:  this.$route.query.order || "-aired_on",
         }
     },
     methods: {
-        tr(){
-            this.sortTr = false
-        },  
+
         get_time(){
             let d =  new Date();
             return d.getMinutes()*60 + d.getSeconds()
         },
+
         get_animes(t = true){
             
             if (this.animes.length == 0 || t) {
                
                 let page = 0
-                if (this.ANIMES[this.sectionName]){
-                    page = Math.ceil(this.ANIMES[this.sectionName].length/24)+1;
+
+                if (this.ANIMES[this.sortVal]){
+                    page = Math.ceil(this.ANIMES[this.sortVal].length/24)+1;
                 }else{
                     page = 1
                 }
@@ -115,7 +87,8 @@ export default {
                     ordering: this.sortVal,
                     page: page,
                     search: this.search,
-                    key: this.sectionName
+                    key: this.sortVal,
+                    field: 'description studios airedOn genres episodes kind score'
                 }
                 
                 if (this.filterActive){
@@ -125,11 +98,13 @@ export default {
                 this.lastRequest = this.get_time()               
             }
         },
+
         handleScroll: function() {
             if (this.pagination && (this.get_time() - this.lastRequest  >= 3) && this.STATUS == 'success' ){
                 this.get_animes()
             }
         },
+
         filter_send: function(d){
             this.filterActive = true;
             this.filter = d;
@@ -139,41 +114,55 @@ export default {
     },
     mounted() {
         this.get_animes();
-        this.animes = this.ANIMES[this.sectionName] || []
+        this.animes = this.ANIMES[this.sortVal] || []
     },
     computed: {
         ...mapGetters([
             'ANIMES',
             'STATUS'
         ]),
-        lastRequest: () =>{
-            let d =  new Date();
-            return d.getMinutes()*60 + d.getSeconds()
+        lastRequest: {
+            get(){
+                let d =  new Date();
+                return d.getMinutes()*60 + d.getSeconds()
+            },
+            set(val){
+                return val
+           }
+        },
+        animes:{
+            get(){
+                return this.ANIMES[this.sortVal] || []
+            },
+            set(val){
+                return val
+            }
         }
     },
     watch: {
-        '$route.name'(){
-            this.animes = this.ANIMES[this.sectionName]
-        },
-        'ANIMES'(){
-            this.animes = this.ANIMES[this.sectionName]
-        },
-        sortVal() {
-            this.$store.dispatch('CLEAR_ANIMES');
-            this.get_animes(true)
-        },
         '$route.query'(){
+            let update = false;
+
             if (this.$route.query.search){
                 this.search = this.$route.query.search;
-                if (this.search){
-                    this.searchActive = true
-                }else{
-                    this.searchActive = false
-                }
-                this.$store.dispatch('CLEAR_ANIMES');
+                update = true
+            }
+            if(this.$route.query.order){
+                this.sortVal = this.$route.query.order
+                update = true
+            }
+
+            if(update){
+                this.$store.dispatch('CLEAR_ANIMES', this.sortVal);
                 this.get_animes()
             }
-        }
+
+
+            if(this.$route.query.vm){
+                this.ViewMode = this.$route.query.vm
+            }
+
+        },
     }
 }
 </script>
@@ -201,6 +190,15 @@ export default {
     margin-top: 35px;
     padding-bottom: 30px;
     text-transform: capitalize;
+}
+.mobile-header{
+    cursor: pointer;
+    display: inline-block;
+    font-size: 3.2rem;
+    font-weight: 900;
+    letter-spacing: .01em;
+    padding: 25px 20px;
+    padding-bottom: 0;
 }
 @media (max-width: 1540px){
     .results.cover  {
@@ -261,57 +259,7 @@ export default {
         padding: 0 10px;
     }
 }
-/* ---------Ordering Filter---------*/
-.filter{
-    transition: 0.2s linear;
-    background: rgb(var(--color-blue-600));
-    border-radius: 6px;
-    color: rgb(var(--color-white));
-    cursor: pointer;
-    display: inline-block;
-    font-size: 1.2rem;
-    font-weight: 600;
-    line-height: 13px;
-    margin-right: 12px;
-    padding: 5px 8px;
-    text-transform: capitalize;
-}
-.secondary-filters{
-    align-items: center;
-    display: grid;
-    grid-template-columns: auto -webkit-min-content;
-    grid-template-columns: auto min-content;
-    margin-bottom: 30px;
-    min-height: 23px;
-    position: relative;
-}
-.active-filters, .landing .title {
-    z-index: 5;
-    position: relative;
-}
-.active-filters{
-    align-items: center;
-    display: flex;
-    flex-wrap: wrap;
-}
-.secondary-filters .selects-wrap{
-    display: flex;
-    align-items: center;
-}
-.sort-select{
-    border-right: solid 1px rgb(var(--color-gray-400));
-    padding-right: 10px;
-    margin-right: 12px;
-}
-.sort-wrap{
-    align-items: center;
-    cursor: pointer;
-    display: flex;
-    position: relative;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-}
+
 .label {
     color: rgb(var(--color-gray-600));
     font-size: 1.3rem;
@@ -319,88 +267,9 @@ export default {
     padding-left: 8px;
     white-space: nowrap;
 }
-.secondary-filters .wrap {
-    align-items: center;
-    cursor: pointer;
-    display: grid;
-    grid-gap: 10px;
-    grid-template-columns: 1fr 1fr 1fr;
-}
+
 .icon{
     font-size: 1.8rem;
 }
-.icon-wrap.active .icon{
-    color: rgb(var(--color-gray-600));
-}
-.icon-wrap .icon{
-    cursor: pointer;
-    color: rgb(var(--color-gray-500));
-    transition: color .3s ease;
-    font-size: 1.8rem;
-}
-.mobile-header{
-    cursor: pointer;
-    display: inline-block;
-    font-size: 3.2rem;
-    font-weight: 900;
-    letter-spacing: .01em;
-    padding: 25px 20px;
-    padding-bottom: 0;
-}
-.dropdown{
-    background: rgb(var(--color-background-100));
-    border-radius: 6px;
-    box-shadow: 0 14px 30px rgba(var(--color-shadow-blue),.15),0 4px 4px rgba(var(--color-shadow-blue),.05);
-    cursor: auto;
-    left: -20px;
-    padding: 10px 16px;
-    position: absolute;
-    top: calc(100% + 10px);
-    width: 150px;
-    z-index: 50;
-}
-.dropdown:before {
-    width: 0;
-    height: 0;
-    content: "";
-    z-index: 2;
-    transform: scale(1.01);
-    border-bottom: .6rem solid currentColor;
-    border-left: .4rem solid transparent;
-    border-right: .4rem solid transparent;
-    bottom: 100%;
-    color: rgb(var(--color-gray-100));
-    left: calc(50% - 6px);
-    position: absolute;
-}
-.option{
-    color: rgb(var(--color-gray-700));
-    cursor: pointer;
-    font-size: 1.3rem;
-    font-weight: 600;
-    padding: 8px 0;
-    transition: color .2s ease;
-}
-.option:hover {
-    color: rgb(var(--color-blue-600));
-}
-.tags-icon {
-    color: rgb(var(--color-gray-500));
-    font-size: 1.5rem;
-    margin-right: 16px;
-}
-@media (max-width: 400px){
-    .secondary-filters {
-        padding: 0 10px  !important;
-    }
-}
-@media (max-width: 1040px){
-    .secondary-filters {
-        padding: 0 20px !important;
-    }
-    .container{
-        padding: 0 !important;
-    }
-}
-/*----------------------------------*/
+
 </style>

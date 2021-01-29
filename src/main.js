@@ -5,10 +5,21 @@ import store from './store'
 import Axios from 'axios'
 import infiniteScroll from 'vue-infinite-scroll'
 
+
+
 import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
-
 import VueLazyload from 'vue-lazyload'
+
+
+
+import ru from 'vee-validate/dist/locale/ru';
+import * as VeeValidate from 'vee-validate';
+import { Validator } from 'vee-validate';
+Vue.use(VeeValidate)
+Validator.localize('ru', ru);
+
+
 
 Vue.use(VueLazyload)
 Vue.use(ElementUI);

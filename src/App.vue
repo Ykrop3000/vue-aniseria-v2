@@ -1,3 +1,6 @@
+
+
+
 <template>
   <div id="app" :class="{'transparent':TRANSPARENT}">
     <Progress :status="STATUS"/>
@@ -5,7 +8,7 @@
     <MobileNav v-if="width<1040" :isLoggedIn="isLoggedIn"/>
     <div class="page-content">
       
-        <router-view :isLoggedIn="isLoggedIn"/>
+      <router-view :isLoggedIn="isLoggedIn"/>
       
     </div>
   </div>
@@ -41,6 +44,7 @@ export default {
         }
 
     },
+
     methods:{
         handleWidthChange() {
             this.width =  window.innerWidth;
@@ -62,11 +66,11 @@ export default {
         'USER',
         'ERRORS',
         'SUCSESS',
+        'MESSAGE',
         'REG_ERROR',
         'LOGIN_ERROR',
         'TRANSPARENT'
       ]),
-
 
     },
     watch:{
@@ -82,9 +86,14 @@ export default {
         if (this.SUCSESS.length === 0) return
         this.SUCSESS.forEach((item,i) => {
           
-          this.error(`${item}`)
+          this.sucsess(`${item}`)
           this.$store.dispatch('DEL_SUCSESS',i)
         });
+      },
+      MESSAGE(){
+        if (this.MESSAGE === null) return
+         this.sucsess(`${this.MESSAGE}`)
+         this.$store.dispatch('DEL_MESSAGE')
       },
       '$route.name'(){
         this.$store.dispatch('SET_TRANSPARENT',false)
@@ -99,3 +108,5 @@ export default {
 @import url('https://fonts.googleapis.com/css2?family=Overpass&display=swap');
 
 </style>
+
+

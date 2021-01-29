@@ -6,11 +6,12 @@
             <div class="description content-wrap" v-text="anime.description"></div>
         </div>
         <Player v-if="anime.video_link" :src="anime.video_link" />
-        <Roles v-if="ROLES" :roles="ROLES.filter(r => r.roles[0] === 'Main')" :title="'Главные герои'"/>
+        <Roles v-if="ROLES" :roles="roles" :title="'Главные герои'"/>
         <Screenshots v-if="anime.screenshots" :images="anime.screenshots"/>
-        <Trailer v-if="anime.videos.filter(v => v.hosting === 'youtube')[0]" :src="anime.videos.filter(v => v.hosting === 'youtube')[0].player_url "/>
-        <Related v-if="RELATED.filter(r => r.anime != null)" :width="width"  :related="RELATED" :key="rkey" :class="{'small':width>=1040}"/>
-        <Similar v-if="SIMILAR"  :similar="SIMILAR" :key="rkey + 1" />
+        <Trailer v-if="trailer" :src="trailer.player_url "/>
+        <Related v-if="related"  :width="width"  :related="related" :class="{'small':width>=1040}"/>
+        <Similar v-if="similar"  :similar="similar"/>
+
     </div>
 </template>
 
@@ -34,7 +35,6 @@ export default {
     ],
     data(){
         return{
-            rkey: 0,
             width: window.innerWidth,
         }
     },
@@ -43,10 +43,45 @@ export default {
             'RELATED',
             'ROLES',
             'SIMILAR'
-        ])
+        ]),
+        roles:{
+            get(){
+                if (this.ROLES){
+                    return this.ROLES.filter(r => r.roles[0] === 'Main')
+                }else{
+                    return []
+                }
+            }
+        },
+        trailer:{
+            get(){
+                if (this.anime.videos){
+                    return (this.anime.videos.filter(v => v.hosting === 'youtube').length == 0 )? false: this.anime.videos.filter(v => v.hosting === 'youtube')[0]
+                }else{
+                    return false
+                }
+            }
+        },
+        related:{
+            get(){
+                if (this.RELATED){
+                    return (this.RELATED.length == 0 )? false: this.RELATED
+                }else{
+                    return false
+                }
+            }
+        },
+        similar:{
+            get(){
+                if (this.SIMILAR){
+                    return (this.SIMILAR.length == 0 )? false: this.SIMILAR
+                }else{
+                    return false
+                }
+            }
+        }
     },
     mounted(){
-        this.rkey += 1,
         window.addEventListener(
             "resize",
             this.handleWidthChange

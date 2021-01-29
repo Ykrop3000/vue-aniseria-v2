@@ -1,9 +1,9 @@
 <template>
     <div class="container" >
 
-        <Carousel v-if="ANIMES.carousel != []" :animes="ANIMES.carousel" :key="key"/>
-        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'top'" :sectionLink="'Animes_rating'" :ANIMES="ANIMES.raiting.slice(0,6)"/>
-        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'new'" :sectionLink="'Animes_id'" :ANIMES="ANIMES.id.slice(0,6)"/>
+        <Carousel :animes="carousel" :key="key"/>
+        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'top'" :order="'-score'" :ANIMES="raiting.slice(0,6)"/>
+        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'new'" :order="'-aired_on'" :ANIMES="aired_on.slice(0,6)"/>
     </div>
 
 </template>
@@ -22,6 +22,21 @@ export default {
     ],
     computed:{
         ...mapGetters(['ANIMES']),
+        raiting:{
+            get(){
+                return this.ANIMES.raiting || []
+            }
+        },
+        aired_on:{
+            get(){
+                return this.ANIMES.aired_on || []
+            }
+        },
+        carousel:{
+            get(){
+                return this.ANIMES.carousel || []
+            }
+        }
     },
     components:{
         Carousel,
@@ -33,7 +48,7 @@ export default {
         }
     },
     methods:{
-        get_animes(key, ordering,limit=24){
+        get_animes(key, ordering, limit=24){
             let anime = this.ANIMES[key] || []
        
             if ( anime.length == 0) {
@@ -43,16 +58,17 @@ export default {
                     ordering: ordering || '-id',
                     page: page,
                     limit: limit,
-                    key: key
+                    key: key,
+                    field: 'description studios airedOn genres episodes kind kpId' 
                 }
                 this.$store.dispatch('GET_ANIMES', params);                
             }
         },
     },
     mounted(){
-        this.get_animes('carousel', '-id', 6)
-        this.get_animes('raiting','-user_rate')
-        this.get_animes('id','-id')
+        this.get_animes('carousel', '-aired_on', 6)
+        this.get_animes('raiting','-score')
+        this.get_animes('aired_on','-aired_on')
         
     },
     watch:{
@@ -63,3 +79,11 @@ export default {
     
 }
 </script>
+
+<style>
+@media (max-width: 1040px){
+    .container{
+        padding: 0 !important;
+    }
+}
+</style>

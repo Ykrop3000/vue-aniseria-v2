@@ -18,7 +18,7 @@
         </div>
 
         <div class="content container">
-
+            <Lists v-for="(list,id) in LISTS" :list="list" :key="id"/>
         </div>
 
     </div>
@@ -27,13 +27,23 @@
 <script>
 
 import {mapGetters} from 'vuex';
+import Lists from "./components/Lists";
+
 export default {
     computed:{
-        ...mapGetters(['USER']),
-        ...mapGetters(['APIURL'])
+        ...mapGetters([
+            'USER',
+            'APIURL',
+            'LISTS'
+            ]),
+
+    },
+    components:{
+        Lists
     },
     mounted() {
         this.$store.dispatch('SET_TRANSPARENT',true)
+        this.$store.dispatch('GET_LISTS')
     },
 }
 </script>

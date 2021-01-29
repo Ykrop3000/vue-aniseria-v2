@@ -14,7 +14,7 @@
             v-for="(i, id) in animes"
             :key="id"
             :to="{name: 'Anime', params:{slug: i.url.split('/')[2]}}"
-            class="cover image" :style="{'background-image': `url(${SHIKIURL + i.image.original})`}" :class="{'loaded':!loading}" @load="i.loading = false">
+            class="cover image" :style="{'background-image':`url(https://st.kp.yandex.net/images/film_big/${i.kpId}.jpg`}" :class="{'loaded': !i.load}"  @load="i.load = false">
             <div class="image-text">
                 <div v-text="i.russian"></div>
             </div>
@@ -39,7 +39,7 @@ export default {
     data(){
         return{
             width: window.innerWidth,
-            items: 5
+            items: 2
         }
     },
     beforeMount(){
@@ -56,10 +56,8 @@ export default {
             this.width =  window.innerWidth;
         },
         setItems(){
-            if (this.width<=400){
-                this.items = 2
-            }else if (this.width <= 760){
-                this.items = 2
+            if (this.width <= 760){
+                this.items = 1
             }
         }
     },
@@ -74,12 +72,16 @@ export default {
 .owl-carousel .owl-stage-outer{
     overflow: inherit !important;
 }
+@media (max-width: 1040px){
+    .carousel{
+        padding-top: 0 !important;
+    }
+}
 </style>
 
 <style scoped>
 .cover {
     background: rgba(var(--color-background-300),.8);
-    border-radius: 4px;
     box-shadow: 0 14px 30px rgba(var(--color-shadow-blue),.15),0 4px 4px rgba(var(--color-shadow-blue),.05);
     cursor: pointer;
     display: inline-block;
@@ -89,6 +91,8 @@ export default {
     width: 100%;
     z-index: 5;
     background-repeat: no-repeat;
+    background-position: center;
+    background-size: cover;
 }
 .carousel{
     margin-bottom: 60px;

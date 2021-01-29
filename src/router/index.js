@@ -106,7 +106,7 @@ const routes =
       path: '/user/:username',
       name: 'User',
       component: function () {
-        return import('../views/Profile.vue')
+        return import('../views//Profile/Profile.vue')
       }
     },
     

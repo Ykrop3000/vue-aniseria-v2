@@ -205,4 +205,10 @@
   .image.loaded {
       opacity: 1;
   }
+  img {
+    vertical-align: text-top;
+  }
+  [lazy="loaded"]{
+    opacity: 1!important;
+  }
 /*----------------------------------*/

@@ -1,5 +1,28 @@
 <template>
     <div class="media media-page-unscoped media-anime" >
+
+
+        <el-dialog
+        :visible.sync="listDilog"
+        width = '70%' 
+        :fullscreen="true"
+        class="list-editor-wrap dilog"
+        >
+        <div class="header" :style="{'background-image':`url(https://st.kp.yandex.net/images/film_big/${ANIME.kp_id}.jpg`}">
+            <div class="content">
+                <div class="cover" v-lazy-container="{ selector: 'img' }">
+                    <img  :data-src="poster" alt="poster" >
+                </div>
+                <div class="title" v-text="ANIME.russian"></div>
+                <div class="favourite outline"><i class="fa-heart fas"></i></div>
+                <div class="save-btn">Сохранить</div>
+            </div>
+        </div>
+        
+        </el-dialog>
+
+
+
         <div class="header-wrap">
             <div class="banner" :style="{'background-image':`url(https://st.kp.yandex.net/images/film_big/${ANIME.kp_id}.jpg`}" >
                 <div class="shadow"></div>
@@ -9,10 +32,10 @@
                 <div class="container" style="min-height: 250px;">
                     <div class="cover-wrap overlap-banner">
                         <div class="cover-wrap-inner" v-lazy-container="{ selector: 'img' }">
-                            <img :data-src="SHIKIURL+ ANIME.image.original" alt="" class="cover">
+                            <img  :data-src="poster" alt="poter" class="cover">
                             <div class="actions">
                                 <div class="list">
-                                    <div class="add">
+                                    <div class="add" @click="listDilog = true">
                                         Добавить в список
                                     </div>
                                 </div>
@@ -23,7 +46,7 @@
                         </div>
                     </div>
                     <div class="content">
-                        <h1 v-text="ANIME.russian.slice(1,-1)"></h1>
+                        <h1 v-text="ANIME.russian"></h1>
                         <p class="description" v-text="ANIME.description"></p>
                         <div class="description-length-toggle">
                             Читать Больше
@@ -99,8 +122,10 @@ export default {
     data(){
         return{
             width: window.innerWidth,
+            listDilog: false
         }
     },
+    props: ['isLoggedIn'],
     methods:{
         ...mapActions([
             'CLEAR_ANIME',
@@ -111,7 +136,9 @@ export default {
             'GET_GENRES'
         ]),
         setfavorite(){
-            this.$store.dispatch('SET_FAVORITES',this.ANIME.id);
+            if(this.isLoggedIn){
+                this.$store.dispatch('SET_FAVORITES',this.ANIME.id);
+            }
         }
     },
     mounted() {
@@ -126,12 +153,23 @@ export default {
             'GENRES',
             'STATUS',
         ]),
+        poster:{
+            get(){
+                if(this.ANIME.image){
+                    return this.SHIKIURL + this.ANIME.image.original
+                }else{
+                    return ''
+                }
+            }
+        }
     },
     watch:{
         ANIME(){
-            this.GET_ROLES(this.ANIME.id);
-            this.GET_RELATED(this.ANIME.id);
-            this.GET_SIMILAR(this.ANIME.id);
+            if (this.ANIME.id){
+                this.GET_ROLES(this.ANIME.id);
+                this.GET_RELATED(this.ANIME.id);
+                this.GET_SIMILAR(this.ANIME.id);
+            }
         },
         '$route.params.slug'(){
             this.CLEAR_ANIME();
@@ -142,7 +180,115 @@ export default {
 </script>
 
 
+<style>
+
+.list-editor-wrap .el-dialog__header {
+    padding: 0;
+    position: relative;
+    z-index: 20;
+}
+.el-dialog__body, .el-dialog__header, .el-dialog__title {
+    color: rgb(var(--color-text));
+}
+.el-dialog__header {
+    background: rgb(var(--color-foreground));
+    border-radius: 3px 3px 0 0;
+}
+
+.list-editor-wrap .el-dialog__body {
+    background: 0 0;
+    color: rgb(var(--color-text));
+    font-size: 1.3rem;
+    line-height: normal;
+    padding: 0;
+}
+.el-dialog__body {
+    background: rgb(var(--color-background));
+    border-radius: 3px;
+}
+.list-editor-wrap .header .cover img {
+    width: 100%;
+}
+</style>
+
 <style scoped>
+
+
+.list-editor-wrap .header {
+    background-position: 50%;
+    background-repeat: no-repeat;
+    background-size: cover;
+    box-shadow: inset 0 0 250px #2f3133;
+    height: 180px;
+    position: relative;
+}
+
+.list-editor-wrap .header .content {
+    align-items: flex-end;
+    display: flex;
+    height: 100%;
+    padding: 50px;
+    padding-bottom: 0;
+    position: relative;
+    z-index: 10;
+    grid-column-gap: initial;
+    margin-top: auto;
+}
+.list-editor-wrap .header:after {
+    background: rgba(31,40,53,.65);
+    bottom: 0;
+    content: "";
+    height: 100%;
+    left: 0;
+    position: absolute;
+    width: 100%;
+    z-index: 5;
+}
+.list-editor-wrap .header .cover {
+    border-radius: 2px;
+    margin-bottom: -30px;
+    max-width: 100px;
+    overflow: hidden;
+}
+.list-editor-wrap .header .title {
+    color: rgba(var(--color-white),.9);
+    font-size: 1.6rem;
+    padding: 20px;
+}
+.list-editor-wrap .header .favourite {
+    margin-left: auto;
+    margin-bottom: 13px;
+    margin-right: 10px;
+}
+.outline.isFavourite{
+    color: rgb(var(--color-red));
+}
+.favourite.isFavourite{
+    color: #ffaebc;
+}
+.outline{
+    background: 0 0;
+    color: rgb(var(--color-white));
+    font-size: 1.6rem;
+    opacity: .9;
+}
+.list-editor-wrap .header .save-btn {
+    background: rgb(var(--color-blue));
+    border-radius: 3px;
+    color: rgb(var(--color-white));
+    cursor: pointer;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    padding: 8px 14px;
+}
+@media (max-width: 760px){
+    .list-editor-wrap .header .content {
+        padding: 30px;
+        padding-bottom: 0;
+    }
+}
+
+
 
 .media{
     display: block;
@@ -166,6 +312,7 @@ export default {
     margin-top: -58px;
    
 }
+
 .description-length-toggle{
     background: linear-gradient(0deg,rgb(var(--color-foreground)) 30%,rgba(var(--color-foreground),.4));
     color: rgb(var(--color-text-lighter));
@@ -236,6 +383,9 @@ export default {
     margin-top: 15px;
     width: 100%;
 }
+.header .cover img{
+    opacity: 0;
+}
 .favourite{
     align-items: center;
     background: rgb(var(--color-red-400));
@@ -251,6 +401,9 @@ export default {
     padding-left: 1px;
     transition: .2s;
     padding: 0 14px;
+}
+.favourite.isFavourite{
+    color: #ffaebc;
 }
 .list {
     align-items: center;

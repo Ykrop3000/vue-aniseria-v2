@@ -30,7 +30,7 @@ export default {
     height: 4px;
     left: 0;
     opacity: 0;
-    position: absolute;
+    position: fixed;
     right: 0;
     top: 0;
     transition: width .3s ease,opacity .2s;

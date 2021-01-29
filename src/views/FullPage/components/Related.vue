@@ -4,22 +4,22 @@
 
         <Spinner v-if="related.length == 0" />
 
-        <div :class="{'grid-wrap':width<760}" >
-            <div class="media-preview-card" v-for="i in related.filter(r => r.anime != null)" :class="{'small':width>=760}" :key="i.id">
-                <router-link :to="{name: 'Anime', params:{slug: i.anime.url.split('/')[2]}}" class="cover" v-lazy:background-image="SHIKIURL + i.anime.image.preview">
+        <div v-else :class="{'grid-wrap':width<760}" >
+            <div class="media-preview-card" v-for="i in related" :class="{'small':width>=760}" :key="i.id">
+                <router-link :to="{name: 'Anime', params:{slug: i.url.split('/')[2]}}" class="cover" v-lazy:background-image="SHIKIURL + i.image.preview">
                     <div class="image-text">
-                        <div v-text="i.relation_russian"></div>
+                        <div v-text="i.russian"></div>
                     </div>
                 </router-link>
                 <div class="content">
 
                     <div class="info-header">
-                        <div v-text="i.relation_russian"></div>
+                        <div v-text="i.russian"></div>
                     </div>
-                    <router-link :to="{name: 'Anime', params:{slug: i.anime.url.split('/')[2]}}" class="title" v-text="i.anime.russian">
+                    <router-link :to="{name: 'Anime', params:{slug: i.url.split('/')[2]}}" class="title" v-text="i.russian">
                     </router-link>
                     <div class="info">
-                        {{i.anime.kind + ' · ' + i.anime.status}}
+                        {{i.kind + ' · ' + i.status}}
                     </div>
 
                 </div>
@@ -63,13 +63,28 @@ export default {
     margin-bottom: 15px;
     margin-right: 20px;
     position: relative;
-    width: 85px;
+    width: 130px;
+    height: 180px;
+    max-height: 180px;
 }
 .cover {
     background-position: 50%;
     background-repeat: no-repeat;
     background-size: cover;
     border-radius: 3px 0 0 3px;
+}
+.small .cover{
+    background-size: cover;
+    border-radius: 4px;
+    box-shadow: 0 4px 4px rgba(var(--color-shadow-blue),.05);
+    display: grid;
+    grid-template-rows: 1fr auto;
+    height: 180px;
+    margin-bottom: 10px;
+    overflow: hidden;
+    position: relative;
+    transition: box-shadow .2s ease-in-out;
+    width: 130px;
 }
 .content{
     background: rgb(var(--color-foreground));

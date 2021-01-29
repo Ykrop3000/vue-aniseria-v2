@@ -2,7 +2,7 @@
     <div class="screenshots-wrapp">
         <h2>Скриншоты</h2>
         <div class="screenshots">
-            <enlargeable-image v-for="(i, id) in images.slice(0,3)" animation_duration="1000"  :key="id" :src="SHIKIURL + i.preview" :src_large="SHIKIURL + i.original" />
+            <enlargeable-image v-for="(i, id) in images.slice(0,3)" animation_duration="500"  :key="id" :src="SHIKIURL + i.preview" :src_large="SHIKIURL + i.original" />
         </div>
     </div>
 </template>

@@ -2,12 +2,12 @@
     <div class="media-card" v-lazy-container="{ selector: 'img' }">
 
         <router-link  :to="{name: 'Anime', params:{slug: slug}}" class="cover" :class="{'loading':loading}">
-            <img :data-src="SHIKIURL + Anime.image.preview" alt="poster" class="image" :class="{'loaded':!loading}" @load="loading = false">
+            <img :data-src="SHIKIURL + Anime.image.original" alt="poster" class="image" :class="{'loaded':!loading}" @load="loading = false">
 
             <div class="wrap list-btns-wrap"  v-show="ViewMode == '0' && isLoggedIn" >
                 <div label="Open List Editor" class="btn open">
                     <i class="fa fa-plus"></i>
-                </div>
+                </div> 
                 <div class="quick-actions">
                     <div label="Add to Watching" class="btn"><i class="fas fa-play"></i></div>
                     <div label="Add to Planning" class="btn"><i class="fas fa-calendar"></i></div>
@@ -27,14 +27,14 @@
 
         <div class="hover-data right">
             <div class="header">
-                <div class="date" v-text="Anime.aired_on.split('-')[0]"></div>
+                <div class="date" v-text="Anime.airedOn.split('-')[0]"></div>
                 <div class="score" v-text="Anime.score"></div>
             </div>
             <div class="studios" v-text="Anime.studios.map(e => e.name).join(', ')"></div>
             <div class="info">
                 <span v-text="Anime.kind"></span>
                 <span class="separator" > • </span>
-                <span v-text="Anime.episodes + ' серий'"></span>
+                <span v-text="Anime.episodes +  (Anime.episodes === 1) ?'серия':'серий'"></span>
             </div>
             <div class="genres">
                  <router-link
@@ -49,10 +49,10 @@
 
         <div class="data" v-show="ViewMode == '1'"> 
             <div class="body">
-                <div class="scroll-wrap">
+                <div class="scroll-wrap" :class="{'loading':loading}">
                     <div class="header">
                         <div>
-                            <div class="date" v-text="Anime.aired_on.split('-')[0]"></div>
+                            <div class="date" v-text="Anime.airedOn.split('-')[0]"></div>
                             <div class="typings">
                                 <span v-text="Anime.kind"></span>
                                 <span class="separator" > • </span>
@@ -66,7 +66,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="description" v-text="Anime.description"></div>
+                    <div class="description"  v-text="Anime.description || '(~_~;)'"></div>
                 </div>
             </div>
             <div class="footer">
@@ -112,9 +112,6 @@ export default {
         ...mapGetters(['SHIKIURL'])
     },
     watch:{
-        Anime(){
-            this.loading = false
-        }
     }
 }
 </script>
@@ -396,6 +393,7 @@ a.image-link {
 }
 .score .icon{
     color: #7bd555;
+    margin-right: 8px;
 }
 .date{
     color: rgb(var(--color-gray-800));
@@ -481,6 +479,10 @@ a.image-link {
     color: rgb(var(--color-gray-800));
     font-size: 1.6rem;
     padding: 0;
+}
+
+.cover .list-btns-wrap{
+    display: none;
 }
 @media (max-width: 1040px){
     .media-card {
