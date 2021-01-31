@@ -11,7 +11,7 @@
         <div class="header" :style="{'background-image':`url(https://st.kp.yandex.net/images/film_big/${ANIME.kp_id}.jpg`}">
             <div class="content">
                 <div class="cover" v-lazy-container="{ selector: 'img' }">
-                    <img  :data-src="poster" alt="poster" >
+                    <img  :src="poster" alt="poster" >
                 </div>
                 <div class="title" v-text="ANIME.russian"></div>
                 <div class="favourite outline"><i class="fa-heart fas"></i></div>
@@ -29,10 +29,10 @@
             </div>
             <div class="header">
 
-                <div class="container" style="min-height: 250px;">
+                <div class="container" >
                     <div class="cover-wrap overlap-banner">
-                        <div class="cover-wrap-inner" v-lazy-container="{ selector: 'img' }">
-                            <img  :data-src="poster" alt="poter" class="cover">
+                        <div class="cover-wrap-inner" >
+                            <img  :src="poster" alt="poter" class="cover">
                             <div class="actions">
                                 <div class="list">
                                     <div class="add" @click="listDilog = true">
@@ -116,6 +116,8 @@
 <script>
 import {mapGetters} from 'vuex';
 import { mapActions } from 'vuex'
+import Preloader from '@/components/Preloader'
+
 
 export default {
     name: 'Single',
@@ -125,6 +127,7 @@ export default {
             listDilog: false
         }
     },
+
     props: ['isLoggedIn'],
     methods:{
         ...mapActions([
@@ -139,12 +142,26 @@ export default {
             if(this.isLoggedIn){
                 this.$store.dispatch('SET_FAVORITES',this.ANIME.id);
             }
+        },
+        setTitle(){
+            if(this.ANIME){
+                document.title = this.ANIME.russian + ' смотреть онлайн бесплатно в хорошем качестве - AniSeria'
+            }
         }
     },
     mounted() {
+        this.$preloaders.open({
+                "component": Preloader,
+                "overlayStyle": {
+                    "backgroundColor": "#2b2d42",
+                    "opacity": 1
+                }
+            })
+        
         this.$store.dispatch('SET_TRANSPARENT',true)
         this.GET_ANIME(this.$route.params.slug);
         this.GET_GENRES();
+        document.title = 'Смотреть Аниме онлайн бесплатно в хорошем качестве - AniSeria'
     },
     computed: {
         ...mapGetters([
@@ -166,6 +183,8 @@ export default {
     watch:{
         ANIME(){
             if (this.ANIME.id){
+                this.$preloaders.close(/*{ options: { container } }*/)
+                this.setTitle()
                 this.GET_ROLES(this.ANIME.id);
                 this.GET_RELATED(this.ANIME.id);
                 this.GET_SIMILAR(this.ANIME.id);
@@ -297,7 +316,7 @@ export default {
     position: relative;
     z-index: 997;
 }
-.content {
+.container.content {
     display: grid;
     grid-column-gap: 40px;
     grid-template-columns: 208px auto;
@@ -380,7 +399,7 @@ export default {
     background-color: rgba(212,230,245,.5);
     border-radius: 2px;
     box-shadow: 0 0 29px rgba(49,54,68,.25);
-    margin-top: 15px;
+    margin-top: 23px;
     width: 100%;
 }
 .header .cover img{
@@ -465,11 +484,13 @@ export default {
     line-height: 1.4;
 }
 .header .content {
-    display: block;
+    display: inline-grid;
+    grid-template-rows: -webkit-min-content -webkit-min-content auto;
+    grid-template-rows: min-content min-content auto;
     padding-top: 25px;
 }
 @media (max-width: 760px){
-    .content {
+    .container.content {
         display: block;
     }
     .banner{
@@ -492,6 +513,9 @@ export default {
         max-width: 100px;
     }
     .description{
+        display: none;
+    }
+    .description-length-toggle{
         display: none;
     }
     .actions{
@@ -534,11 +558,16 @@ export default {
         color: rgb(var(--color-text));
         font-size: 1.4rem;
     }
+    .container h1 {
+        font-size: 1.8rem;
+        font-weight: 500;
+    }
 }
 
 @media (max-width: 1040px){
     .container {
-        padding: 20px !important;
+        padding-left: 20px !important;
+        padding-right: 20px !important;
     }
 }
 </style>

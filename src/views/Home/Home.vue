@@ -69,6 +69,7 @@ export default {
         this.get_animes('carousel', '-aired_on', 6)
         this.get_animes('raiting','-score')
         this.get_animes('aired_on','-aired_on')
+        document.title = 'Смотреть Аниме онлайн бесплатно в хорошем качестве - AniSeria'
         
     },
     watch:{

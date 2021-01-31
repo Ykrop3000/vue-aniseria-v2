@@ -158,7 +158,7 @@ export default {
     width: 100%;
     z-index: 5;
 }
-.title{
+.cover .title{
     color: rgb(var(--color-gray-700));
     font-size: 1.4rem;
     font-weight: 600;
@@ -511,7 +511,7 @@ a.image-link {
     .description{
         line-height: 1.6rem;
     }
-    .title{
+    .cover .title{
         font-size: 1.2rem;
         line-height: 17px;
     }

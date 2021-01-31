@@ -115,6 +115,7 @@ export default {
     mounted() {
         this.get_animes();
         this.animes = this.ANIMES[this.sortVal] || []
+        document.title = 'Смотреть Аниме онлайн бесплатно в хорошем качестве - AniSeria'
     },
     computed: {
         ...mapGetters([

@@ -19,6 +19,10 @@ import { Validator } from 'vee-validate';
 Vue.use(VeeValidate)
 Validator.localize('ru', ru);
 
+import 'vue-preloaders/dist/vue-preloaders.css'
+import VuePreloaders from 'vue-preloaders'
+
+Vue.use(VuePreloaders, /*{ options }*/)
 
 
 Vue.use(VueLazyload)
