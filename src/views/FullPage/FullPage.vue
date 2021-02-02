@@ -8,10 +8,10 @@
         :fullscreen="true"
         class="list-editor-wrap dilog"
         >
-        <div class="header" :style="{'background-image':`url(https://st.kp.yandex.net/images/film_big/${ANIME.kp_id}.jpg`}">
+        <div class="header" :style="{'background-image':bigPoster}">
             <div class="content">
                 <div class="cover" v-lazy-container="{ selector: 'img' }">
-                    <img  :src="poster" alt="poster" >
+                    <img  :src="poster || require('@/assets/img/noimage.jpg')" alt="poster" >
                 </div>
                 <div class="title" v-text="ANIME.russian"></div>
                 <div class="favourite outline"><i class="fa-heart fas"></i></div>
@@ -23,8 +23,8 @@
 
 
 
-        <div class="header-wrap">
-            <div class="banner" :style="{'background-image':`url(https://st.kp.yandex.net/images/film_big/${ANIME.kp_id}.jpg`}" >
+        <div class="header-wrap" :class="{'loading': !ANIME.id}">
+            <div class="banner" :style="{'background-image':bigPoster}" >
                 <div class="shadow"></div>
             </div>
             <div class="header">
@@ -32,7 +32,7 @@
                 <div class="container" >
                     <div class="cover-wrap overlap-banner">
                         <div class="cover-wrap-inner" >
-                            <img  :src="poster" alt="poter" class="cover">
+                            <img  :src="poster || require('@/assets/img/noimage.jpg')" alt="poter" class="cover">
                             <div class="actions">
                                 <div class="list">
                                     <div class="add" @click="listDilog = true">
@@ -147,16 +147,21 @@ export default {
             if(this.ANIME){
                 document.title = this.ANIME.russian + ' смотреть онлайн бесплатно в хорошем качестве - AniSeria'
             }
+        },
+        Preload(){
+            this.$preloaders.open({
+                    "component": Preloader,
+                    "overlayStyle": {
+                        "backgroundColor": "rgb(255 255 255 / 36%)",
+                        "opacity": 1
+                    }
+                })
         }
     },
+    created(){
+        this.Preload()
+    },
     mounted() {
-        this.$preloaders.open({
-                "component": Preloader,
-                "overlayStyle": {
-                    "backgroundColor": "#2b2d42",
-                    "opacity": 1
-                }
-            })
         
         this.$store.dispatch('SET_TRANSPARENT',true)
         this.GET_ANIME(this.$route.params.slug);
@@ -178,12 +183,21 @@ export default {
                     return ''
                 }
             }
+        },
+        bigPoster:{
+            get(){
+                if(this.ANIME.kp_id){
+                    return `url(https://st.kp.yandex.net/images/film_big/${this.ANIME.kp_id}.jpg`
+                }else{
+                    return ''
+                }
+            }
         }
     },
     watch:{
         ANIME(){
             if (this.ANIME.id){
-                this.$preloaders.close(/*{ options: { container } }*/)
+                this.$preloaders.close()
                 this.setTitle()
                 this.GET_ROLES(this.ANIME.id);
                 this.GET_RELATED(this.ANIME.id);
@@ -191,6 +205,7 @@ export default {
             }
         },
         '$route.params.slug'(){
+            this.Preload()
             this.CLEAR_ANIME();
             this.GET_ANIME(this.$route.params.slug);
         }
@@ -231,8 +246,27 @@ export default {
 </style>
 
 <style scoped>
-
-
+.loading .content .description, .loading .content h1{
+    background: rgba(var(--color-background-300),.8);
+    box-shadow: none;
+    opacity: 1;
+    overflow: hidden;
+    height: 100%;
+    border-radius: 4px;
+}
+.loading .content .description{
+    padding: 0 !important;
+    margin-top: 15px;
+}
+.loading .content .description::before, .loading .content h1::before{
+    animation: loading-pulse-data-v-758c163c 2s linear infinite;
+    background: linear-gradient(90deg,rgba(var(--color-gray-300),0) 0,rgba(var(--color-blue-700),.06) 40%,rgba(var(--color-blue-700),.06) 60%,rgba(var(--color-gray-300),0));
+    content: "";
+    display: block;
+    height: 100%;
+    transform: translateX(0);
+    width: 200%;
+}
 .list-editor-wrap .header {
     background-position: 50%;
     background-repeat: no-repeat;
@@ -325,6 +359,7 @@ export default {
 }
 .banner{
     background-position: 50% 35%;
+    background-color: #242538;
     background-repeat: no-repeat;
     background-size: cover;
     height: 400px;

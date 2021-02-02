@@ -1,17 +1,23 @@
+
+
 <template>
-    <div class='wrapper'>
-        <i class='layer'></i>
-        <i class='layer'></i>
-        <i class='layer'></i>
-    </div>
+  <div class="preloader loading">
+    <span class="slice"></span>
+    <span class="slice"></span>
+    <span class="slice"></span>
+    <span class="slice"></span>
+    <span class="slice"></span>
+    <span class="slice"></span>
+  </div>
 </template>
 
 <script>
 
 export default {
-  name: 'SquareFill',
+  name: 'Preloader',
 };
 </script>
+
 
 <style>
 :where(body) .preloaders {margin: 0; height: 100%; overflow: hidden}
@@ -19,106 +25,95 @@ export default {
 </style>
 
 <style lang="scss" scoped>
-@-webkit-keyframes moveup {
-  0%, 60%, 100% {
-    -webkit-transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(0);
-            transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(0);
+@for $i from 1 through 6 {
+  @keyframes preload-show-#{$i} {
+    from {
+      transform: rotateZ(60 * $i + deg) rotateY(-90deg) rotateX(0deg);
+      border-left-color: #9c2f2f;
+    }
   }
-  25% {
-    -webkit-transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(1em);
-            transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(1em);
+  @keyframes preload-hide-#{$i} {
+    to {
+      transform: rotateZ(60 * $i + deg) rotateY(-90deg) rotateX(0deg);
+      border-left-color: #9c2f2f;
+    }
   }
-}
-@keyframes moveup {
-  0%, 60%, 100% {
-    -webkit-transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(0);
-            transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(0);
+
+  @keyframes preload-cycle-#{$i} {
+    $startIndex: $i * 5;
+    $reverseIndex: (80 - $i * 5);
+
+    #{$startIndex * 1%} {
+      transform: rotateZ(60 * $i + deg) rotateY(90deg) rotateX(0deg);
+      border-left-color: #9c2f2f;
+    }
+    #{$startIndex + 5%},
+    #{$reverseIndex * 1%} {
+      transform: rotateZ(60 * $i + deg) rotateY(0) rotateX(0deg);
+      border-left-color: #f7484e;
+    }
+
+    #{$reverseIndex + 5%},
+    100% {
+      transform: rotateZ(60 * $i + deg) rotateY(90deg) rotateX(0deg);
+      border-left-color: #9c2f2f;
+    }
   }
-  25% {
-    -webkit-transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(1em);
-            transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(1em);
-  }
-}
-@-webkit-keyframes movedown {
-  0%, 60%, 100% {
-    -webkit-transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(0);
-            transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(0);
-  }
-  25% {
-    -webkit-transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(-1em);
-            transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(-1em);
-  }
-}
-@keyframes movedown {
-  0%, 60%, 100% {
-    -webkit-transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(0);
-            transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(0);
-  }
-  25% {
-    -webkit-transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(-1em);
-            transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg) translateZ(-1em);
-  }
-}
-/**
- * Square layer styles
- */
-.layer {
-  display: block;
-  position: absolute;
-  height: 3em;
-  width: 3em;
-  box-shadow: 3px 3px 2px rgba(0, 0, 0, 0.2);
-  -webkit-transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg);
-          transform: rotateX(50deg) rotateY(0deg) rotateZ(45deg);
-}
-.layer:nth-of-type(1) {
-  background: #534a47;
-  margin-top: 1.5em;
-  -webkit-animation: movedown 1.8s cubic-bezier(0.39, 0.575, 0.565, 1) 0.9s infinite normal;
-          animation: movedown 1.8s cubic-bezier(0.39, 0.575, 0.565, 1) 0.9s infinite normal;
-}
-.layer:nth-of-type(1):before {
-  content: '';
-  position: absolute;
-  width: 85%;
-  height: 85%;
-  background: #37332f;
-}
-.layer:nth-of-type(2) {
-  background: #5a96bc;
-  margin-top: 0.75em;
-}
-.layer:nth-of-type(3) {
-  background: rgba(255, 255, 255, 0.6);
-  -webkit-animation: moveup 1.8s cubic-bezier(0.39, 0.575, 0.565, 1) infinite normal;
-          animation: moveup 1.8s cubic-bezier(0.39, 0.575, 0.565, 1) infinite normal;
 }
 
-/* Stage and link styles */
+@keyframes preload-flip {
+  0% {
+    transform: rotateY(0deg) rotateZ(-60deg);
+  }
+  100% {
+    transform: rotateY(360deg) rotateZ(-60deg);
+  }
+}
+
 body {
-  background: #1c2336;
+  background: #efefef;
 }
 
-.wrapper {
+.preloader {
   position: absolute;
   top: 50%;
   left: 50%;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
-}
+  font-size: 20px;
+  display: block;
+  width: 3.75em;
+  height: 4.25em;
+  margin-left: -1.875em;
+  margin-top: -2.125em;
+  transform-origin: center center;
+  transform: rotateY(180deg) rotateZ(-60deg);
 
-.link {
-  position: absolute;
-  top: 30%;
-  left: 50%;
-  color: rgba(255, 255, 255, 0.5);
-  font: 400 1em Helvetica Neue, Helvetica, sans-serif;
-  -webkit-transform: translate(-50%, -50%);
-          transform: translate(-50%, -50%);
-}
-.link a {
-  color: #ea4c89;
-  text-decoration: none;
-}
+  .slice {
+    border-top: 1.125em solid transparent;
+    border-right: none;
+    border-bottom: 1em solid transparent;
+    border-left: 1.875em solid #f7484e;
+    position: absolute;
+    top: 0px;
+    left: 50%;
+    transform-origin: left bottom;
+    border-radius: 3px 3px 0 0;
+  }
 
+  @for $i from 1 through 6 {
+    .slice:nth-child(#{$i}) {
+      transform: rotateZ(60 * $i + deg) rotateY(0deg) rotateX(0);
+      animation: 0.15s linear 0.9 - $i * 0.08s preload-hide-#{$i} both 1;
+    }
+  }
+
+  &.loading {
+    animation: 2s preload-flip steps(2) infinite both;
+    @for $i from 1 through 6 {
+      .slice:nth-child(#{$i}) {
+        transform: rotateZ(60 * $i + deg) rotateY(90deg) rotateX(0);
+        animation: 2s preload-cycle-#{$i} linear infinite both;
+      }
+    }
+  }
+}
 </style>

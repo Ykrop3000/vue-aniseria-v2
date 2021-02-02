@@ -17,9 +17,7 @@
         <div class="results" :class="{ cover:ViewMode==0, chart:ViewMode==1, table:ViewMode==2}">
             <MediaCard v-for="i in animes" :key="i.id" :Anime="i" :ViewMode="ViewMode" :isLoggedIn="isLoggedIn"/>
         </div>
-        
-        <Spinner v-if="animes.length == 0"/>
-        
+                
     </div>
 </template>
 
@@ -30,13 +28,11 @@ import SecondaryFilters from '@/components/modules/SecondaryFilters'
 
 import ClickOutside from 'vue-click-outside'
 import MediaCard from '@/components/MediaCard'
-import Spinner from '@/components/items/SpinnerItem'
 
 export default {
     components:{
         Filters,
         MediaCard,
-        Spinner,
         SecondaryFilters
     },
     directives:{
@@ -131,9 +127,18 @@ export default {
                 return val
            }
         },
+
         animes:{
             get(){
-                return this.ANIMES[this.sortVal] || []
+                if(this.ANIMES[this.sortVal]  && this.ANIMES[this.sortVal].length != 0){
+                    return this.ANIMES[this.sortVal]
+                }else{
+                    let a = []
+                    for (let i=0;i<24;i++){
+                        a = a.concat(new Object)
+                    }
+                    return a
+                } 
             },
             set(val){
                 return val

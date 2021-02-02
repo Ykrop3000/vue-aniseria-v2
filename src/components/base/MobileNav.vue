@@ -62,7 +62,7 @@ export default {
     position: fixed;
     right: 20px;
     transition: .2s;
-    z-index: 999;
+    z-index: 99999;
     font-weight: 700;
 }
 .hamburger {

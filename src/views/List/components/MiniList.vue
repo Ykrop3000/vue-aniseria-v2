@@ -2,37 +2,45 @@
     <div class="search-landing">
         <div class="landing-section">
 
-            <router-link :to="{name: 'Animes', query:{ order:order }}" class="title link">
+            <router-link :to="{name: 'Animes', query:{ order:order}}" class="title link">
                 <h3 v-text="sectionName"></h3>
                 <div class="expand">Посмотреть все</div>
             </router-link>
 
             <div class="results cover">
-                <MediaCard v-for="i in ANIMES" :key="i.id" :Anime="i" :ViewMode="0" :isLoggedIn="isLoggedIn"/>
+                <MediaCard v-for="i in anime" :key="i.id" :Anime="i" :ViewMode="0" :isLoggedIn="isLoggedIn"/>
             </div>
             
         </div>
-
-
-
-        
-        <Spinner v-if="ANIMES.length == 0"/>
     </div>
 </template>
 <script>
 
 import MediaCard from '@/components/MediaCard'
 import ClickOutside from 'vue-click-outside'
-import Spinner from '@/components/items/SpinnerItem'
 
 
 export default {
     components:{
         MediaCard,
-        Spinner
     },
     directives:{
         ClickOutside
+    },
+    computed:{
+        anime:{
+            get(){
+                if(this.ANIMES && this.ANIMES.length != 0){
+                    return this.ANIMES
+                }else{
+                    let a = []
+                    for (let i=0;i<6;i++){
+                        a = a.concat(new Object)
+                    }
+                    return a
+                }
+            }
+        }
     },
     props:[
         'order',

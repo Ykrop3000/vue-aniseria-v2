@@ -149,7 +149,11 @@
     margin-bottom: 10px;
   }
   .preloaders{
+    position: fixed !important;
     z-index: 999 !important;
+  }
+  .preloaders-overlay{
+    backdrop-filter: blur(10px);
   }
   #app.transparent {
       margin-top: 0;

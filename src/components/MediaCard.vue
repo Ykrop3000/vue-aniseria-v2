@@ -2,7 +2,7 @@
     <div class="media-card" v-lazy-container="{ selector: 'img' }">
 
         <router-link  :to="{name: 'Anime', params:{slug: slug}}" class="cover" :class="{'loading':loading}">
-            <img :data-src="SHIKIURL + Anime.image.original" alt="poster" class="image" :class="{'loaded':!loading}" @load="loading = false">
+            <img :data-src="poster" alt="poster" class="image" :class="{'loaded':!loading}" @load="(poster == '')?loading = true:loading = false">
 
             <div class="wrap list-btns-wrap"  v-show="ViewMode == '0' && isLoggedIn" >
                 <div label="Open List Editor" class="btn open">
@@ -14,8 +14,8 @@
                 </div>
             </div>
             
-            <div class="overlay" v-show="ViewMode == '1'">
-                <router-link :to="{name: 'Anime', params:{slug: slug}}" class="title"  v-text="Anime.russian.slice(1,-1)"></router-link>
+            <div class="overlay" v-show="ViewMode == '1' && !loading">
+                <router-link :to="{name: 'Anime', params:{slug: slug}}" class="title"  v-text="Anime.russian"></router-link>
                 <div class="studio">
                     <span v-for="(i,id) in Anime.studios" :key="id" v-text="i.name"></span>
                 </div>
@@ -23,14 +23,14 @@
 
         </router-link>
 
-        <router-link :to="{name: 'Anime', params:{slug: slug}}" v-if="ViewMode == '0'" class="title" :class="{'loading':loading}" v-text="Anime.russian.slice(1,-1)"></router-link>
+        <router-link :to="{name: 'Anime', params:{slug: slug}}" v-if="ViewMode == '0'" class="title" :class="{'loading':loading}" v-text="Anime.russian"></router-link>
 
-        <div class="hover-data right">
+        <div class="hover-data right" :class="{'loading':loading}">
             <div class="header">
-                <div class="date" v-text="Anime.airedOn.split('-')[0]"></div>
+                <div class="date" v-text="ariedOn"></div>
                 <div class="score" v-text="Anime.score"></div>
             </div>
-            <div class="studios" v-text="Anime.studios.map(e => e.name).join(', ')"></div>
+            <div class="studios" v-text="studios"></div>
             <div class="info">
                 <span v-text="Anime.kind"></span>
                 <span class="separator" > • </span>
@@ -47,12 +47,12 @@
             </div>
         </div>
 
-        <div class="data" v-show="ViewMode == '1'"> 
-            <div class="body">
-                <div class="scroll-wrap" :class="{'loading':loading}">
+        <div class="data" v-show="ViewMode == '1'" :class="{'loading':loading}"> 
+            <div class="body" v-if="!loading">
+                <div class="scroll-wrap">
                     <div class="header">
                         <div>
-                            <div class="date" v-text="Anime.airedOn.split('-')[0]"></div>
+                            <div class="date" v-text="ariedOn"></div>
                             <div class="typings">
                                 <span v-text="Anime.kind"></span>
                                 <span class="separator" > • </span>
@@ -69,7 +69,8 @@
                     <div class="description"  v-text="Anime.description || '(~_~;)'"></div>
                 </div>
             </div>
-            <div class="footer">
+
+            <div class="footer" v-if="!loading">
                 <div class="genres">
                     <router-link
                         :key="id"
@@ -85,6 +86,11 @@
                     </div>
                 </div>
             </div>
+
+            <div v-show="loading && ViewMode=='1'"></div>
+            <div v-show="loading && ViewMode=='1'"></div>
+            <div v-show="loading && ViewMode=='1'"></div>
+
         </div>
 
 
@@ -105,11 +111,48 @@ export default {
     data(){
         return{
             loading: true,
-            slug: this.Anime.url.split('/')[2]
         }
     },
+    mounted(){
+    },
     computed:{
-        ...mapGetters(['SHIKIURL'])
+        ...mapGetters(['SHIKIURL']),
+        poster:{
+            get(){
+                if(this.Anime.image){
+                    return this.SHIKIURL + this.Anime.image.original
+                }else{
+                    return ''
+                }
+            }
+        },
+        ariedOn:{
+            get(){
+                if (this.Anime.airedOn){
+                    return this.Anime.airedOn.split('-')[0]
+                }else{
+                    return ''
+                }
+            }
+        },
+        studios:{
+            get(){
+                if(this.Anime.studios){
+                    return this.Anime.studios.map(e => e.name).join(', ')
+                }else{
+                    return ''
+                }
+            }
+        },
+        slug:{
+            get(){
+                if (this.Anime.url){
+                    return this.Anime.url.split('/')[2]
+                }else{
+                    return ''
+                }
+            }
+        }
     },
     watch:{
     }
@@ -117,7 +160,7 @@ export default {
 </script>
 
 <style scoped>
-.cover.loading, .description.loading div, .title.loading{
+.cover.loading, .data.loading div, .title.loading{
     background: rgba(var(--color-background-300),.8);
     box-shadow: none;
     opacity: 1;
@@ -129,14 +172,41 @@ export default {
     margin-top: 12px;
     width: 80%;
 }
-.cover.loading:before, .title.loading:before {
-    animation: loading-pulse-data-v-758c163c 2s linear infinite;
+.data.loading{
+    display: block !important;
+}
+.data.loading div {
+    border-radius: 4px;
+    height: 12px;
+    margin-bottom: 10px;
+    margin-left: 14px;
+    width: 60%;
+}
+.data.loading div:first-of-type {
+    width: 80%;
+    height: 22px;
+    margin-bottom: 18px;
+    margin-top: 14px;
+}
+.hover-data.loading{
+    display: none !important;
+}
+.cover.loading:before, .title.loading:before , .data.loading div:before {
+    animation: loading-pulse 2s linear infinite;
     background: linear-gradient(90deg,rgba(var(--color-gray-300),0) 0,rgba(var(--color-blue-700),.06) 40%,rgba(var(--color-blue-700),.06) 60%,rgba(var(--color-gray-300),0));
     content: "";
     display: block;
     height: 100%;
     transform: translateX(0);
     width: 200%;
+}
+@keyframes loading-pulse {
+    0% {
+        transform: translateX(-100%)
+    }
+    to {
+        transform: translateX(50%)
+    }
 }
 .cover .media-card {
     transition: 0.3s linear;
