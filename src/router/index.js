@@ -109,7 +109,18 @@ const routes =
         return import('../views//Profile/Profile.vue')
       }
     },
-    
+
+    {
+      path: '/404',
+      name: '404',
+      component: function () {
+        return import('../views//NotFound/NotFound.vue')
+      }
+    },
+    {
+      path: '*',
+      redirect: '/404',
+    }
 
   ]
 

@@ -65,9 +65,16 @@ export default {
             return d.getMinutes()*60 + d.getSeconds()
         },
 
-        get_animes(t = true){
-            
-            if (this.animes.length == 0 || t) {
+        get_animes(update = false){
+            let t = false
+
+            if (!this.ANIMES[this.sortVal]){
+                t = true
+            }else if (this.ANIMES[this.sortVal].length == 0){
+                t = true
+            }
+
+            if (t || update) {
                
                 let page = 0
 
@@ -84,7 +91,7 @@ export default {
                     page: page,
                     search: this.search,
                     key: this.sortVal,
-                    field: 'description studios airedOn genres episodes kind score'
+                    field: 'description studios airedOn genres episodes kind score favoured'
                 }
                 
                 if (this.filterActive){
@@ -97,7 +104,7 @@ export default {
 
         handleScroll: function() {
             if (this.pagination && (this.get_time() - this.lastRequest  >= 3) && this.STATUS == 'success' ){
-                this.get_animes()
+                this.get_animes(true)
             }
         },
 

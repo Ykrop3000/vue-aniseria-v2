@@ -136,7 +136,8 @@ export default {
             'GET_ROLES',
             'GET_RELATED',
             'GET_SIMILAR',
-            'GET_GENRES'
+            'GET_GENRES',
+            'GET_KODIK'
         ]),
         setfavorite(){
             if(this.isLoggedIn){
@@ -171,6 +172,7 @@ export default {
     computed: {
         ...mapGetters([
             'ANIME',
+            'KODIK',
             'SHIKIURL',
             'GENRES',
             'STATUS',
@@ -186,8 +188,8 @@ export default {
         },
         bigPoster:{
             get(){
-                if(this.ANIME.kp_id){
-                    return `url(https://st.kp.yandex.net/images/film_big/${this.ANIME.kp_id}.jpg`
+                if(this.KODIK.kinopoisk_id){
+                    return `url(https://st.kp.yandex.net/images/film_big/${this.KODIK.kinopoisk_id}.jpg`
                 }else{
                     return ''
                 }
@@ -199,6 +201,7 @@ export default {
             if (this.ANIME.id){
                 this.$preloaders.close()
                 this.setTitle()
+                this.GET_KODIK(this.ANIME.id)
                 this.GET_ROLES(this.ANIME.id);
                 this.GET_RELATED(this.ANIME.id);
                 this.GET_SIMILAR(this.ANIME.id);

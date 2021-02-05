@@ -4,6 +4,7 @@ import axios from 'axios';
 import gql from 'graphql-tag';
 import graphqlClient from '../utils/graphql';
 
+
 Vue.use(Vuex);
 
 /*
@@ -18,7 +19,8 @@ year --> -year
 
 
 */
-
+const kodik_key = 'b7cc4293ed475c4ad1fd599d114f4435'
+const kodik_url = 'https://kodikapi.com/search'
 
 export default new Vuex.Store({
   state: {
@@ -40,6 +42,7 @@ export default new Vuex.Store({
 
       lists: [],
 
+      kodik: {},
 
       nav:[
         {
@@ -82,6 +85,7 @@ export default new Vuex.Store({
 
       message: null,
       transparent: false
+      
   },
   getters: {
     NAV: state =>{
@@ -102,7 +106,9 @@ export default new Vuex.Store({
     ROLES: state =>{
       return state.roles
     },
-    
+    KODIK: state =>{
+      return state.kodik
+    },
 
     LISTS: state =>{
       return state.lists
@@ -183,7 +189,9 @@ export default new Vuex.Store({
       SET_ANIME_ROLES:(state, payload) =>{
         state.roles = payload;
       },
-
+      SET_KODIK:(state, payload) =>{
+        state.kodik = payload;
+      },
 
 
       SET_LISTS:(state,payload) =>{
@@ -287,8 +295,8 @@ export default new Vuex.Store({
 
           graphqlClient.query({
             query: gql`
-              query getAnimes($offset:Int, $first:Int, $ids:String, $orderBy:String, $search:String) {
-                animes(orderBy:$orderBy , offset:$offset, first:$first, ids:$ids, search:$search){
+              query getAnimes($offset:Int, $first:Int, $ids:String, $orderBy:String, $search:String, $genres:String) {
+                animes(orderBy:$orderBy , offset:$offset, first:$first, ids:$ids, search:$search, genres:$genres){
                   edges{
                     node{
                       id
@@ -306,7 +314,8 @@ export default new Vuex.Store({
                   offset: (params.page-1)*params.limit || 0,
                   first: params.limit || 24,
                   ids: params.ids,
-                  search: params.search
+                  search: params.search,
+                  genres: params.genres
               }
           })
           .then(resp =>{
@@ -473,7 +482,7 @@ export default new Vuex.Store({
         commit('SET_ANIME_ROLES', []);
         commit('SET_ANIME_SIMILAR',[])
         commit('SET_ANIME_RELATED',[])
-
+        commit('SET_KODIK', {});
 
       },
       
@@ -501,13 +510,27 @@ export default new Vuex.Store({
           })
         })
       },
+      GET_KODIK({commit},payload){
+        return new Promise((resolve, reject) => {
+
+            axios({url: kodik_url, params:{'token':kodik_key, 'shikimori_id':payload}, method: 'GET' })
+            .then(resp => {
+              commit('SET_KODIK',resp.data.results[0]);
+              resolve(resp)
+            })
+            .catch(err => {
+              reject(err)
+            })
+          
+        })
+      },
       GET_ANIME({commit},payload){
         return new Promise((resolve, reject) => {
             this.dispatch('CLEAR_ANIME')
 
-            axios({url: `${this.state.APIurl}/api/v2/anime/${payload}`, method: 'GET' })
+            axios({url: `${this.state.shikiUrl}/api/animes/${payload}`, method: 'GET' })
             .then(resp => {
-              commit('SET_ANIME',resp.data.anime);
+              commit('SET_ANIME',resp.data);
               resolve(resp)
             })
             .catch(err => {
