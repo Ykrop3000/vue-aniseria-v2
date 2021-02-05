@@ -56,7 +56,7 @@ Vue.directive('click-outside', {
 Vue.config.productionTip = false
 
 Vue.prototype.$http = Axios;
-Vue.prototype.$http.defaults.headers = {'User-Agent':'AniSeria'}
+Vue.prototype.$http.defaults.headers.common['User-Agent'] = 'AniSeria'
 
 const token = localStorage.getItem('token')
 if (token) {

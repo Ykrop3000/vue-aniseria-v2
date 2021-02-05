@@ -30,19 +30,20 @@ export default new Vuex.Store({
       someuser: {},
 
       animes: {},
-      nextPage: true,
 
       anime:{},
       related:[],
       similar:[],
       roles:[],
+      kodik: {},
+      screenshots: [],
 
       genres: [],
       studios: [],
 
       lists: [],
 
-      kodik: {},
+
 
       nav:[
         {
@@ -109,6 +110,10 @@ export default new Vuex.Store({
     KODIK: state =>{
       return state.kodik
     },
+    SCREENSHOTS: state =>{
+      return state.screenshots
+    },
+
 
     LISTS: state =>{
       return state.lists
@@ -192,7 +197,9 @@ export default new Vuex.Store({
       SET_KODIK:(state, payload) =>{
         state.kodik = payload;
       },
-
+      SET_SCREENSHOTS:(state, payload) =>{
+        state.screenshots = payload;
+      },
 
       SET_LISTS:(state,payload) =>{
         state.lists = payload
@@ -483,6 +490,7 @@ export default new Vuex.Store({
         commit('SET_ANIME_SIMILAR',[])
         commit('SET_ANIME_RELATED',[])
         commit('SET_KODIK', {});
+        commit('SET_SCREENSHOTS', [])
 
       },
       
@@ -539,6 +547,20 @@ export default new Vuex.Store({
           
         })
       },
+      GET_SCREENSHOTS({commit},payload){
+        return new Promise((resolve, reject) => {
+            axios({url: `${this.state.shikiUrl}/api/animes/${payload}/screenshots`, method: 'GET' })
+            .then(resp => {
+              commit('SET_SCREENSHOTS',resp.data);
+              resolve(resp)
+            })
+            .catch(err => {
+              reject(err)
+            })
+          
+        })
+      },
+
       GET_SOME_USER ({commit},slug){
         return new Promise((resolve,reject) => {
           axios({url: `${this.state.APIurl}/api/user/${slug}`, method: 'GET' })

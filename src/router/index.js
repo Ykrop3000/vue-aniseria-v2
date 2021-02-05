@@ -72,6 +72,13 @@ const routes =
           return import('../views/FullPage/contents/Characters.vue')
         }
       },
+      {
+        name: 'Frames',
+        path: 'frames',
+        component:function () {
+          return import('../views/FullPage/contents/Frames.vue')
+        }
+      },
     ]
     },
 
