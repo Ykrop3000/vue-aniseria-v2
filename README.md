@@ -1,4 +1,5 @@
 # vue-aniseria-v2
+![vue-aniseria-v2](https://nyaa.shikimori.one/system/users/x160/840865.png?1612543037)
 
 ## Project setup
 ```
