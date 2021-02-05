@@ -5,21 +5,21 @@
         <Spinner v-if="related.length == 0" />
 
         <div v-else :class="{'grid-wrap':width<760}" >
-            <div class="media-preview-card" v-for="i in related" :class="{'small':width>=760}" :key="i.id">
-                <router-link :to="{name: 'Anime', params:{slug: i.url.split('/')[2]}}" class="cover" v-lazy:background-image="SHIKIURL + i.image.preview">
+            <div class="media-preview-card" v-for="i in related" :class="{'small':width>=760}" :key="i.anime.id">
+                <router-link :to="{name: 'Anime', params:{slug: i.anime.url.split('/')[2]}}" class="cover" v-lazy:background-image="SHIKIURL + i.anime.image.preview">
                     <div class="image-text">
-                        <div v-text="i.russian"></div>
+                        <div v-text="i.anime.russian"></div>
                     </div>
                 </router-link>
                 <div class="content">
 
                     <div class="info-header">
-                        <div v-text="i.russian"></div>
+                        <div v-text="i.relation_russian"></div>
                     </div>
-                    <router-link :to="{name: 'Anime', params:{slug: i.url.split('/')[2]}}" class="title" v-text="i.russian">
+                    <router-link :to="{name: 'Anime', params:{slug: i.anime.url.split('/')[2]}}" class="title" v-text="i.anime.russian">
                     </router-link>
                     <div class="info">
-                        {{i.kind + ' · ' + i.status}}
+                        {{i.anime.kind + ' · ' + i.anime.status}}
                     </div>
 
                 </div>

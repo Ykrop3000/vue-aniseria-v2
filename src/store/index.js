@@ -357,17 +357,7 @@ export default new Vuex.Store({
           axios({url: `${this.state.shikiUrl}/api/animes/${id}/related`, method: 'GET' })
           .then(resp => {
 
-            commit('SET_ANIME_RELATED',[])
-            let ids =  resp.data.filter(d => d.anime).map(d => d.anime.id)
-            if (ids != ''){
-              this.dispatch('GET_ANIMES',{
-                ids:  ids,
-                field: 'kind status',
-                dispatchTo: 'SET_ANIME_RELATED'
-              })
-            }
-            
-            
+            commit('SET_ANIME_RELATED', resp.data.filter(d => d.anime))
             resolve(resp)
           })
           .catch(err => {
@@ -379,19 +369,7 @@ export default new Vuex.Store({
         return new Promise((resolve, reject) => {
           axios({url: `${this.state.shikiUrl}/api/animes/${id}/similar`, method: 'GET' })
           .then(resp => {
-
-            commit('SET_ANIME_SIMILAR',[])
-
-            let ids = resp.data.map(d => d.id)
-            if (ids){
-              this.dispatch('GET_ANIMES',{
-                ids: ids,
-                limit: 7,
-                field: '',
-                dispatchTo: 'SET_ANIME_SIMILAR'
-              })
-            }
-
+            commit('SET_ANIME_SIMILAR',resp.data)
             resolve(resp)
           })
           .catch(err => {

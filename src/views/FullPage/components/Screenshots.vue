@@ -106,9 +106,9 @@ export default {
   .screenshots-wrapp .screenshots{
       -ms-overflow-style: -ms-autohiding-scrollbar;
       -webkit-overflow-scrolling: touch;
+      grid-template-columns: repeat(auto-fill,42vw) !important;
       overflow-x: auto;
       white-space: nowrap;
-      grid-auto-flow: column;
   }
 }
 </style>
