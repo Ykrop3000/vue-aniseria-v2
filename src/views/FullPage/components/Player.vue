@@ -1,6 +1,5 @@
 <template>
     <div class="trailer">
-        <h2></h2>
         <iframe :src="src" frameborder="0" allowfullscreen="true" class="video"></iframe>
     </div>
 </template>
@@ -17,5 +16,15 @@ export default {
     height: 230px;
     overflow: hidden;
     width: 100%;
+}
+.trailer{
+    position: relative;
+    padding-bottom: 56.2%;
+}
+.trailer>iframe{
+    position: absolute;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
 }
 </style>

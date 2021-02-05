@@ -5,8 +5,9 @@
             <h2>Описание</h2>
             <div class="description content-wrap" v-text="anime.description"></div>
         </div>
-        <Player v-if="anime.video_link" :src="anime.video_link" />
+        <Player v-if="kodik.link" :src="kodik.link" />
         <Roles v-if="ROLES" :roles="roles" :title="'Главные герои'"/>
+        <Stats :statuses="anime.rates_statuses_stats" />
         <Screenshots v-if="anime.screenshots" :images="anime.screenshots"/>
         <Trailer v-if="trailer" :src="trailer.player_url "/>
         <Related v-if="related"  :width="width"  :related="related" :class="{'small':width>=1040}"/>
@@ -23,7 +24,7 @@ import Related from '@/views/FullPage/components/Related'
 import Player from '@/views/FullPage/components/Player'
 import Roles from '@/views/FullPage/components/Roles'
 import Similar from '@/views/FullPage/components/Similar'
-
+import Stats from  '@/components/modules/Stats'
 
 
 import {mapGetters} from 'vuex'
@@ -31,7 +32,8 @@ import {mapGetters} from 'vuex'
 export default {
     name:'Overview',
     props:[
-        'anime'
+        'anime',
+        'kodik'
     ],
     data(){
         return{
@@ -98,7 +100,8 @@ export default {
         Related,
         Player,
         Roles,
-        Similar
+        Similar,
+        Stats
     },
 }
 </script>

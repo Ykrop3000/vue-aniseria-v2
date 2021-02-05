@@ -18,4 +18,14 @@ export default {
     overflow: hidden;
     width: 100%;
 }
+.trailer{
+    position: relative;
+    padding-bottom: 56.2%;
+}
+.trailer>iframe{
+    position: absolute;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+}
 </style>

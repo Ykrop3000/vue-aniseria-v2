@@ -108,7 +108,7 @@
                     
                 </div>
             </div>
-            <router-view :anime="ANIME"></router-view>
+            <router-view :anime="ANIME" :kodik="KODIK"></router-view>
         </div>
     </div>
 </template>

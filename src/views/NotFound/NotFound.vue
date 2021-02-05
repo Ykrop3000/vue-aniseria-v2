@@ -18,12 +18,11 @@
         align-items: center;
         justify-content: center;
         font-family: 'Oswald', sans-serif;
-        padding-top: 100px;
         text-align: center;
         line-height: 140px;
         font-size: 20vw;
         font-weight: 900;
-        background-size: cover;
+        background-size: contain;
         background-position: center;
         background-image: url('https://cs4.pikabu.ru/post_img/big/2016/05/24/10/1464106020145127105.png');
         background-clip: text;
