@@ -5,8 +5,8 @@
                 <div class="shadow"></div>
                 <div class="container">
                     <div class="banner-content">
-                        <img :src="APIURL+USER.avatar" alt="avatar" class="avatar">
-                        <h1 class="name" v-text="USER.username"></h1>
+                        <img :src="SOMEUSER.image.x160" alt="avatar" class="avatar">
+                        <h1 class="name" v-text="SOMEUSER.nickname"></h1>
                     </div>
                 </div>
             </div>
@@ -34,7 +34,8 @@ export default {
         ...mapGetters([
             'USER',
             'APIURL',
-            'LISTS'
+            'LISTS',
+            'SOMEUSER'
             ]),
 
     },
@@ -43,7 +44,8 @@ export default {
     },
     mounted() {
         this.$store.dispatch('SET_TRANSPARENT',true)
-        this.$store.dispatch('GET_LISTS')
+        //this.$store.dispatch('GET_LISTS')
+        this.$store.dispatch('GET_SOME_USER', this.$route.params.username)
     },
 }
 </script>

@@ -1,18 +1,18 @@
 <template>
     <div class="user ">
         <div class="user-wrap" >
-            <div class="avatar" :style="{'background-image': `url(${APIURL + USER.avatar})`}"></div>
+            <div class="avatar" :style="{'background-image': `url(${USER.avatar})`}"></div>
             <i class="chevron fas fa-chevron-down"></i>
             <div class="dropdown" >
 
                 <div class="primary-links">
 
-                    <router-link class="primary-link" :to="{name: 'User', params:{username:USER.username}}">
+                    <router-link class="primary-link" :to="{name: 'User', params:{username:USER.nickname}}">
                         <i class="fa-user icon fas"></i>
                         <div class="label">Профиль</div>
                     </router-link>
 
-                    <router-link class="primary-link" :to="{name: 'Settings', params:{username:USER.username}}">
+                    <router-link class="primary-link" :to="{name: 'Settings', params:{username:USER.nickname}}">
                         <i class="fa-cog icon fas"></i>
                         <div class="label">Настройки</div>
                     </router-link>

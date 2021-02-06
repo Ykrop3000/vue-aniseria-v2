@@ -39,7 +39,7 @@
                                         Добавить в список
                                     </div>
                                 </div>
-                                <div class="favourite" @click="setfavorite">
+                                <div class="favourite" @click="setfavorite" :class="{'isFavourite': ANIME.favoured}">
                                     <i class="fas fa-heart"></i>
                                 </div>
                             </div>
@@ -141,7 +141,7 @@ export default {
         ]),
         setfavorite(){
             if(this.isLoggedIn){
-                this.$store.dispatch('SET_FAVORITES',this.ANIME.id);
+                this.$store.dispatch('SET_FAVORITES',{id:this.ANIME.id, type: this.ANIME.favoured});
             }
         },
         setTitle(){
@@ -476,6 +476,7 @@ export default {
 }
 .list .add {
     align-items: center;
+    text-align: center;
     display: flex;
     height: 100%;
     justify-content: center;

@@ -6,6 +6,7 @@ import Overview from '../views/FullPage/contents/Overview'
 import Watch from '../views/FullPage/contents/Watch'
 import Auth from '../views/Auth/Auth'
 import Home from '../views/Home/Home'
+import OAuth2 from '../views/Auth/OAuth2'
 
 Vue.use(Router)
 
@@ -95,7 +96,7 @@ const routes =
     {
       path: '/login',
       name: 'Login',
-      component: Auth
+      component: OAuth2
     },
     {
       path: '/signup',

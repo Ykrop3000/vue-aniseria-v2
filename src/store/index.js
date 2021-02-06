@@ -22,6 +22,8 @@ year --> -year
 const kodik_key = 'b7cc4293ed475c4ad1fd599d114f4435'
 const kodik_url = 'https://kodikapi.com/search'
 
+
+
 export default new Vuex.Store({
   state: {
       status: 'success',
@@ -43,6 +45,9 @@ export default new Vuex.Store({
 
       lists: [],
 
+      client_id: 'vWH694NVtAjBy5zW6K119ViSypMjuZ3lstEBfGlSSwA',
+      client_secret: '75yh1Jdj6AKwWVHQNaPEQZkdpIWvZlYxqCuo0YI_BPI',
+      redirect_uri: 'https://vue-aniseria-v2.firebaseapp.com/login',
 
 
       nav:[
@@ -407,21 +412,13 @@ export default new Vuex.Store({
           })
         })
        },
-       SET_FAVORITES({commit},id){
+       SET_FAVORITES({commit},params){
         return new Promise((resolve, reject) => {
           commit('ANIME_REQUEST')
-          axios({url: `${this.state.APIurl}/api/v2/favorite`,data:{'id': id}, method: 'POST' })
+          axios({url: `${this.state.shikiUrl}/api/favorites/Anime/${params.id}`, method: (!params.type)? 'POST': 'delete' })
           .then(resp => {
             commit('ANIME_SUCCESS');
-            
-            let message = ''
-
-            if (resp.data.results === "add"){
-               message = 'Добавлено в избранное'
-            }else{
-               message = 'Удалено из избранного'
-            }
-
+            let message = resp.data.notice
             commit('MESSAGE',message);
   
             resolve(resp)
@@ -541,9 +538,9 @@ export default new Vuex.Store({
 
       GET_SOME_USER ({commit},slug){
         return new Promise((resolve,reject) => {
-          axios({url: `${this.state.APIurl}/api/user/${slug}`, method: 'GET' })
+          axios({url: `${this.state.shikiUrl}/api/users/${slug}`, method: 'GET' })
           .then(resp => {
-              commit('SET_SOMEUSER',  Object.assign(resp.data.user,resp.data.profile))
+              commit('SET_SOMEUSER', resp.data)
               resolve(resp)
           })
           .catch(err => {
@@ -554,9 +551,10 @@ export default new Vuex.Store({
 
       GET_USER_BY_TOKEN({commit}){
         return new Promise((resolve,reject) => {
-          axios({url: `${this.state.APIurl}/api/myuser`, method: 'GET' })
+          axios({url: `${this.state.shikiUrl}/api/users/whoami`, method: 'GET' })
           .then(resp => {
-              commit('SET_USER', Object.assign(resp.data.user,resp.data.profile))
+              console.log(resp.data)
+              commit('SET_USER', resp.data)
               resolve(resp)
           })
           .catch(err => {
@@ -566,17 +564,23 @@ export default new Vuex.Store({
           })
         })
        },      
-      LOGIN({commit}, user){
-        
+      LOGIN({commit}, code){
+        let params ={
+          grant_type: "authorization_code",
+          client_id: this.state.client_id,
+          client_secret: this.state.client_secret,
+          code: code,
+          redirect_uri: this.state.redirect_uri
+        }
         return new Promise((resolve, reject) => {
           commit('auth_request')
-          axios({url: `${this.state.APIurl}/api/login`, data: user, method: 'POST' })
+          axios({url: `${this.state.shikiUrl}/oauth/token`, data: params, method: 'POST' })
           .then(resp => {
-            const token = `Token ${resp.data.token}`
-            const user = resp.data.user
+            const token = `${resp.data.token_type} ${resp.data.access_token}`
+
             localStorage.setItem('token', token)
             axios.defaults.headers.common['Authorization'] = `${token}`
-            commit('auth_success', token, user)
+            commit('auth_success', token)
             this.dispatch('GET_USER_BY_TOKEN')
             resolve(resp)
           })
@@ -602,10 +606,10 @@ export default new Vuex.Store({
           axios({url: `${this.state.APIurl}/api/register`, data: user, method: 'POST' })
           .then(resp => {
             const token = `Token ${resp.data.token}`
-            const user = resp.data.user
+
             localStorage.setItem('token', token)
             axios.defaults.headers.common['Authorization'] = `${token}`
-            commit('auth_success', token, user)
+            commit('auth_success', token)
             this.dispatch('GET_USER_BY_TOKEN')
 
             resolve(resp)
