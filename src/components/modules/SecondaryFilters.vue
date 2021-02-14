@@ -11,9 +11,9 @@
                     <i class="fas fa-sort icon"></i>
                     <span @click="sortTr = !sortTr" class="label" v-text="sortText"></span>
                     <div v-if="sortTr"  class="dropdown">
-                        <div class="option"  @click="SetOrder('-aired_on'); sortText = 'Дате выхода'; sortTr = false" v-text="'Дате выхода'"></div>
-                        <div class="option"  @click="SetOrder('-score'); sortText = 'Рейтингу'; sortTr = false " v-text="'Рейтингу'"></div>
-                        <div class="option"  @click="SetOrder('-id'); sortText = 'Дате добавления'; sortTr = false" v-text="'Дате добавления'"></div>
+                        <div class="option"  @click="SetOrder('popularity'); sortText = 'Популярности'; sortTr = false" v-text="'Популярности'"></div>
+                        <div class="option"  @click="SetOrder('id'); sortText = 'Дате выхода'; sortTr = false" v-text="'Дате выхода'"></div>
+                        <div class="option"  @click="SetOrder('ranked'); sortText = 'Рейтингу'; sortTr = false " v-text="'Рейтингу'"></div>
                     </div>
                 </div>
                 <div class="wrap">
@@ -33,8 +33,8 @@ export default {
     data(){
         return{
             sortTr: false,
-            sortText: 'Дате выхода',
-            ViewMode: this.$route.query.vm || 0,
+            sortText: 'Популярности',
+            ViewMode: localStorage.vm || 0,
             searchActive: !!this.$route.query.search || false,
             filterActive: false,
             search: this.$route.query.search || ''
@@ -48,14 +48,21 @@ export default {
             this.sortTr = false
         },
         SetViewMode(vm){
-            if (this.$route.query.vm){
-                this.$router.replace({query:  { vm: vm }})
-            }else{
-                this.$router.push( {path: this.$route.path, query:  { vm: vm } })
-            }
+            localStorage.vm = vm
+            
+            this.ViewMode = vm
         },
         SetOrder(order){
-            this.$router.push({ query: {order: order}});
+            let prevparams = this.$route.query
+
+            if (prevparams.order){
+                prevparams.order = order
+            }else{
+                prevparams = Object.assign({order:order},prevparams)
+            }
+
+            this.$router.replace ({query: {}})
+            this.$router.push({ query:prevparams});
         }
     },
     watch:{

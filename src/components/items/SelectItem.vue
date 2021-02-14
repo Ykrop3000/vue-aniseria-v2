@@ -3,8 +3,8 @@
     <div class="filter filter-select" v-if="options"> 
         <div class="name"  v-text="title"></div>
         <div class="select-wrap" :class="{'dropdown-visible': active}" v-click-outside="af">
-            <div class="select" @click="active = true" >
-                <div class="value-wrap">
+            <div class="select">
+                <div class="value-wrap" @click="active = true">
 
                     <div  v-if="options.filter(opt => opt.active === true).length != 0 " class="tags">
 
@@ -16,8 +16,12 @@
 
                     <input @focus="inputFocuse = true" @blur="inputFocuse = false" type="search" class="filter" v-model="input">
                 </div>
-                <i class="fas fa-chevron-down" v-if="options.filter(opt => opt.active === true).length === 0"></i>
-                <i class="fas fa-times" v-else ></i>
+
+                <div @click="active = false">
+                    <i class="fas fa-chevron-down"   v-if="options.filter(opt => opt.active === true).length === 0"></i>
+                    <i class="fas fa-times" v-else ></i>
+                </div>
+                
             </div>
 
             <div class="mobile-banner" v-if="active && width <= 760">
@@ -60,7 +64,8 @@ export default {
     props:[
         'title',
         'options',
-        'type'
+        'type',
+        'single'
     ],
     data(){
         let data = {
@@ -107,10 +112,18 @@ export default {
                     item.active = !item.active
                 }
             })
-            this.$emit('opt',{
-                opt:this.options.filter(o => o.active === true),
-                type:this.type
-            })
+
+            let params = this.options.filter(o => o.active === true).map(o => o.id).join(',')
+            let prevparams = this.$route.query
+
+            if (prevparams[this.type]){
+                prevparams[this.type] = params
+            }else{
+                prevparams = Object.assign({[this.type]:params},prevparams)
+            }
+            this.$router.replace ({query: {}})
+            this.$router.replace ({query: prevparams})
+            
             this.$forceUpdate();
         }
     },

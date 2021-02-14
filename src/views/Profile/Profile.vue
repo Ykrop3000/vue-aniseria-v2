@@ -5,20 +5,21 @@
                 <div class="shadow"></div>
                 <div class="container">
                     <div class="banner-content">
-                        <img :src="SOMEUSER.image.x160" alt="avatar" class="avatar">
+                        <img :src="avatar" alt="avatar" class="avatar">
                         <h1 class="name" v-text="SOMEUSER.nickname"></h1>
                     </div>
                 </div>
             </div>
             <div class="nav-wrap">
                 <div class="nav container">
-                    
+                    <router-link :to="{name:'User', params:{username:SOMEUSER.nickname}}" class="link">Обзор</router-link>
+                    <router-link :to="{name:'Favorite', params:{username:SOMEUSER.nickname}}" class="link">Избранное</router-link>
                 </div>
             </div>
         </div>
 
-        <div class="content container">
-            <Lists v-for="(list,id) in LISTS" :list="list" :key="id"/>
+        <div v-if="SOMEUSER.nickname" class="content container">
+            <router-view :user="SOMEUSER"></router-view>
         </div>
 
     </div>
@@ -27,7 +28,6 @@
 <script>
 
 import {mapGetters} from 'vuex';
-import Lists from "./components/Lists";
 
 export default {
     computed:{
@@ -35,18 +35,31 @@ export default {
             'USER',
             'APIURL',
             'LISTS',
-            'SOMEUSER'
+            'SOMEUSER',
+            'ANIMES'
             ]),
-
-    },
-    components:{
-        Lists
+        avatar:{
+            get(){
+                if(this.SOMEUSER.image){
+                    return this.SOMEUSER.image.x160
+                }else{
+                    return ''
+                }
+            }
+        }
     },
     mounted() {
         this.$store.dispatch('SET_TRANSPARENT',true)
         //this.$store.dispatch('GET_LISTS')
         this.$store.dispatch('GET_SOME_USER', this.$route.params.username)
     },
+    watch:{
+        '$route.params.username'(){
+            if(this.$route.params.username){
+                this.$store.dispatch('GET_SOME_USER', this.$route.params.username)
+            }
+        }
+    }
 }
 </script>
 
@@ -110,6 +123,14 @@ export default {
     display: inline-block;
     margin: 0 10px;
     padding: 15px;
+}
+.nav .router-link-exact-active {
+    color: rgb(var(--color-blue));
+}
+@media (max-width: 1040px){
+    .content.container {
+        padding: 20px !important;
+    }
 }
 @media (max-width: 760px){
     .banner{

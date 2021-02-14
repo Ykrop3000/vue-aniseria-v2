@@ -23,14 +23,19 @@ import 'vue-preloaders/dist/vue-preloaders.css'
 import VuePreloaders from 'vue-preloaders'
 
 Vue.use(VuePreloaders, /*{ options }*/)
-
-
 Vue.use(VueLazyload)
 Vue.use(ElementUI);
 
 
+import Storage from 'vue-ls';
 
+let options = {
+  namespace: 'vuejs__', // key prefix
+  name: 'ls', // name variable Vue.[ls] or this.[$ls],
+  storage: 'local', // storage name session, local, memory
+};
 
+Vue.use(Storage, options);
 
 import '@fortawesome/fontawesome-free/css/all.css'
 import '@fortawesome/fontawesome-free/js/all.js'
@@ -56,7 +61,7 @@ Vue.directive('click-outside', {
 Vue.config.productionTip = false
 
 Vue.prototype.$http = Axios;
-Vue.prototype.$http.defaults.headers.common['User-Agent'] = 'AniSeria'
+
 
 const token = localStorage.getItem('token')
 if (token) {

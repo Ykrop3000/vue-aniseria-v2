@@ -1,5 +1,5 @@
 <template>
-    <div class="grid-section-wrap">
+    <div class="stats">
         <div class="status-distribution">
             <h2>В списках у людей</h2>
             <div class="status-distribution content-wrap">
@@ -14,7 +14,7 @@
                     
                 </div>
                 <div class="percentage-bar" >
-                    <div v-for="(i, id) in statuses" :key="id" class="percentage" :style="{'background': colors[id], 'width': `${i.value/onePer}%`}"></div>
+                    <div v-for="(i, id) in statuses" :key="id" class="percentage" :style="{'background': colors[id], 'width': `${(i.value || i.size)/onePer}%`}"></div>
                 </div>
             </div>
         </div>
@@ -125,6 +125,11 @@ export default {
         grid-column-gap: 0;
         grid-template-areas: "status";
         grid-template-columns: 1fr;
+    }
+}
+@media (max-width: 500px) {
+    .name{
+        padding: 6px !important;
     }
 }
 </style>

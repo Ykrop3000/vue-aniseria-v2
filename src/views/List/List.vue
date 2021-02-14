@@ -2,19 +2,19 @@
     <div v-infinite-scroll="handleScroll"  class="container" infinite-scroll-disabled="busy" infinite-scroll-distance="10" >
         
         <h1 class="alias-title" v-if="width>=1040">
-            test
+            Список аниме
         </h1>
         <div class="wrap" v-else>
             <div class="mobile-header">
-                test
+                Список аниме
             </div>
         </div>
 
-        <Filters @fs="filter_send" />
+        <Filters />
 
         <SecondaryFilters/>
-
-        <div class="results" :class="{ cover:ViewMode==0, chart:ViewMode==1, table:ViewMode==2}">
+        <div class="not-found" v-show="animes[0] == 404">Ничего не найдено</div>
+        <div class="results" v-show="animes[0] != 404" :class="{ cover:ViewMode==0, chart:ViewMode==1, table:ViewMode==2}">
             <MediaCard v-for="i in animes" :key="i.id" :Anime="i" :ViewMode="ViewMode" :isLoggedIn="isLoggedIn"/>
         </div>
                 
@@ -43,19 +43,12 @@ export default {
     ],
     data(){
         return{
-
-            ViewMode: this.$route.query.vm || 0,
             page: 1,
             pagination: true,
             width: window.innerWidth,
 
-            filterActive: false,
-            filter: {},
-            stateFilter:true,
-            search: this.$route.query.search  || '',
+            ViewMode: localStorage.getItem('vm') || 0
 
-
-            sortVal:  this.$route.query.order || "-aired_on",
         }
     },
     methods: {
@@ -74,45 +67,44 @@ export default {
                 t = true
             }
 
-            if (t || update) {
-               
-                let page = 0
-
-                if (this.ANIMES[this.sortVal]){
-                    page = Math.ceil(this.ANIMES[this.sortVal].length/24)+1;
-                }else{
-                    page = 1
-                }
-                
-                
-                let params = {
-                    type: this.$attrs.type || 'animes',
-                    ordering: this.sortVal,
-                    page: page,
-                    search: this.search,
-                    key: this.sortVal,
-                    field: 'description studios airedOn genres episodes kind score favoured'
-                }
-                
-                if (this.filterActive){
-                    params.genres =  this.filter.genres;
-                }
-                this.$store.dispatch('GET_ANIMES', params);
-                this.lastRequest = this.get_time()               
+            let page = 0
+            if (this.ANIMES[this.sortVal]){
+                page = Math.ceil(this.ANIMES[this.sortVal].length/24)+1;
+            }else{
+                page = 1
             }
+
+            let key = ''
+            if (this.$route.query.search == '' || !this.$route.query.search){
+                key = this.sortVal
+            }else{
+                key = 'search'
+            }
+
+            var self = this
+            if (t  || update) {
+                                
+                let params = {
+                    key: key,
+                    page: page,
+                    type: self.$attrs.type || 'animes',
+                    order: self.$route.query.order || "popularity",
+                    search: self.search,
+                    genres: self.$route.query.genre,
+                    kind: self.$route.query.kind,
+                    season: self.$route.query.season
+                }
+
+                self.$store.dispatch('GET_ANIMES', params);
+                self.lastRequest = self.get_time()               
+            }
+
         },
 
         handleScroll: function() {
             if (this.pagination && (this.get_time() - this.lastRequest  >= 3) && this.STATUS == 'success' ){
                 this.get_animes(true)
             }
-        },
-
-        filter_send: function(d){
-            this.filterActive = true;
-            this.filter = d;
-            this.$store.dispatch('CLEAR_ANIMES');
-            this.get_animes()
         },
     },
     mounted() {
@@ -150,31 +142,28 @@ export default {
             set(val){
                 return val
             }
+        },
+        sortVal:{
+            get(){
+                if(this.$route.query.search == '' || !this.$route.query.search){
+                    return this.$route.query.order || "popularity" 
+                }else{
+                    return 'search'
+                }
+            }
+        },
+        search:{
+            get(){
+                return this.$route.query.search  || ''
+            }
         }
     },
     watch: {
         '$route.query'(){
-            let update = false;
 
-            if (this.$route.query.search){
-                this.search = this.$route.query.search;
-                update = true
-            }
-            if(this.$route.query.order){
-                this.sortVal = this.$route.query.order
-                update = true
-            }
-
-            if(update){
-                this.$store.dispatch('CLEAR_ANIMES', this.sortVal);
-                this.get_animes()
-            }
-
-
-            if(this.$route.query.vm){
-                this.ViewMode = this.$route.query.vm
-            }
-
+            this.$store.dispatch('CLEAR_ANIMES', this.sortVal);
+            this.get_animes(true)
+            
         },
     }
 }
@@ -212,6 +201,13 @@ export default {
     letter-spacing: .01em;
     padding: 25px 20px;
     padding-bottom: 0;
+}
+.not-found{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.8rem;
 }
 @media (max-width: 1540px){
     .results.cover  {

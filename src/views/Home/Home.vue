@@ -2,8 +2,8 @@
     <div class="container" >
 
         <Carousel :animes="carousel" :key="key"/>
-        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'top'" :order="'-score'" :ANIMES="raiting.slice(0,6)"/>
-        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'new'" :order="'-aired_on'" :ANIMES="aired_on.slice(0,6)"/>
+        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'Лучшее'" :order="'ranked'" :ANIMES="raiting.slice(0,6)"/>
+        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'Новое'" :order="'aired_on'" :ANIMES="aired_on.slice(0,6)"/>
     </div>
 
 </template>
@@ -48,27 +48,28 @@ export default {
         }
     },
     methods:{
-        get_animes(key, ordering, limit=24){
+        get_animes(key, ordering, limit=24,season=''){
             let anime = this.ANIMES[key] || []
        
             if ( anime.length == 0) {
                 let page = 1;
                 let params = {
                     type: this.$attrs.type || 'animes',
-                    ordering: ordering || '-id',
+                    order: ordering || 'id',
                     page: page,
                     limit: limit,
                     key: key,
-                    field: 'description studios airedOn genres episodes kind kpId' 
+                    season: season
                 }
+
                 this.$store.dispatch('GET_ANIMES', params);                
             }
         },
     },
     mounted(){
-        this.get_animes('carousel', '-aired_on', 6)
-        this.get_animes('raiting','-score')
-        this.get_animes('aired_on','-aired_on')
+        this.get_animes('carousel', 'popularity',24,2021)
+        this.get_animes('raiting','ranked')
+        this.get_animes('aired_on','popularity',24,'winter_2021')
         document.title = 'Смотреть Аниме онлайн бесплатно в хорошем качестве - AniSeria'
         
     },

@@ -14,7 +14,7 @@
             v-for="(i, id) in animes"
             :key="id"
             :to="{name: 'Anime', params:{slug: i.url.split('/')[2]}}"
-            class="cover image" :style="{'background-image':`url(https://st.kp.yandex.net/images/film_big/${i.kpId}.jpg`}" :class="{'loaded': !i.load}"  @load="i.load = false">
+            class="cover image" :style="{'background-image':`url(${SHIKIURL + i.image.original}`}" :class="{'loaded': !i.load}"  @load="i.load = false">
             <div class="image-text">
                 <div v-text="i.russian"></div>
             </div>
@@ -34,12 +34,13 @@ export default {
         carousel
     },
     computed:{
-        ...mapGetters(['SHIKIURL'])
+        ...mapGetters(['SHIKIURL']),
+        
     },
     data(){
         return{
             width: window.innerWidth,
-            items: 2
+            items: 4
         }
     },
     beforeMount(){
@@ -57,7 +58,10 @@ export default {
         },
         setItems(){
             if (this.width <= 760){
-                this.items = 1
+                this.items = 2
+            }
+            else if (this.width <= 1400){
+                this.items = 3
             }
         }
     },

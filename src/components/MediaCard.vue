@@ -1,4 +1,4 @@
-<template>
+<template >
     <div class="media-card" v-lazy-container="{ selector: 'img' }">
 
         <router-link  :to="{name: 'Anime', params:{slug: slug}}" class="cover" :class="{'loading':loading}">

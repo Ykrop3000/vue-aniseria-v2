@@ -10,7 +10,7 @@
                 <span class="label" v-text="i.text" @click="visible = false"></span>
             </router-link>
 
-            <router-link v-if="isLoggedIn" class="link" :to="{name: 'User', params:{username: USER.username}}">
+            <router-link v-if="isLoggedIn" class="link" :to="{name: 'User', params:{username: USER.nickname}}">
                 <i class="fa-user fas"></i>
                 <span class="label">Профиль</span>
             </router-link>

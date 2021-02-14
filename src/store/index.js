@@ -1,8 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
-import gql from 'graphql-tag';
-import graphqlClient from '../utils/graphql';
+
 
 
 Vue.use(Vuex);
@@ -28,7 +27,7 @@ export default new Vuex.Store({
   state: {
       status: 'success',
       token: localStorage.getItem('token') || '',
-      user : {},
+      user : JSON.parse(localStorage.getItem('user')) || {},
       someuser: {},
 
       animes: {},
@@ -39,8 +38,9 @@ export default new Vuex.Store({
       roles:[],
       kodik: {},
       screenshots: [],
+      comments: [],
 
-      genres: [],
+      genres: JSON.parse(localStorage.getItem('genres')) || [],
       studios: [],
 
       lists: [],
@@ -48,6 +48,15 @@ export default new Vuex.Store({
       client_id: 'vWH694NVtAjBy5zW6K119ViSypMjuZ3lstEBfGlSSwA',
       client_secret: '75yh1Jdj6AKwWVHQNaPEQZkdpIWvZlYxqCuo0YI_BPI',
       redirect_uri: 'https://vue-aniseria-v2.firebaseapp.com/login',
+
+      stats: {
+        planned: 'Запланировано',
+        watching: 'Смотрю',
+        rewatching: 'Пересматриваю',
+        completed: 'Просмотрено',
+        on_hold: 'Отложено',
+        dropped: 'Брошено'
+      },
 
 
       nav:[
@@ -67,14 +76,7 @@ export default new Vuex.Store({
           to: 'Login',
           text: 'войти',
           svg: 'fas fa-sign-in-alt',
-          class: 'login',
-          auth: 'nli'
-        },
-        {
-          to: 'Signup',
-          text: 'регистрация',
-          svg: 'fas fa-user-plus',
-          class: 'signup',
+          class: 'signup login',
           auth: 'nli'
         },
 
@@ -118,7 +120,9 @@ export default new Vuex.Store({
     SCREENSHOTS: state =>{
       return state.screenshots
     },
-
+    COMMENTS: state =>{
+      return state.comments
+    },
 
     LISTS: state =>{
       return state.lists
@@ -205,6 +209,12 @@ export default new Vuex.Store({
       SET_SCREENSHOTS:(state, payload) =>{
         state.screenshots = payload;
       },
+      SET_COMMENTS:(state, payload) =>{
+        state.comments = payload;
+      },
+      ADD_COMMENTS: (state, payload) =>{
+        state.comments = state.comments.concat(payload)
+      },
 
       SET_LISTS:(state,payload) =>{
         state.lists = payload
@@ -216,6 +226,7 @@ export default new Vuex.Store({
         state.someuser = payload;
       },
       SET_USER: (state, payload) =>{
+        localStorage.user = JSON.stringify(payload)
         state.user = payload;
       },
       SET_USER_PROFILE: (state, payload) =>{
@@ -230,7 +241,6 @@ export default new Vuex.Store({
       },
       ANIME_ERROR(state, err){
         state.status = 'error'
-        console.log(err.request)
         state.errors.push(err.message )
       },
 
@@ -293,7 +303,7 @@ export default new Vuex.Store({
 
 
           if (payload.genres){
-            params.genres = payload.genres.map(g => g.id).join(',')
+            params.genre = payload.genres
           }
           if (payload.ids){
             params.ids = payload.ids.join(',')
@@ -305,34 +315,16 @@ export default new Vuex.Store({
             params.limit = 24
           }
 
-          graphqlClient.query({
-            query: gql`
-              query getAnimes($offset:Int, $first:Int, $ids:String, $orderBy:String, $search:String, $genres:String) {
-                animes(orderBy:$orderBy , offset:$offset, first:$first, ids:$ids, search:$search, genres:$genres){
-                  edges{
-                    node{
-                      id
-                      name
-                      russian
-                      image
-                      url
-                      ${params.field}
-                    }
-                  }
-                }
-              }            
-              `,variables: {
-                  orderBy: params.ordering,
-                  offset: (params.page-1)*params.limit || 0,
-                  first: params.limit || 24,
-                  ids: params.ids,
-                  search: params.search,
-                  genres: params.genres
-              }
-          })
+          axios({url: `${this.state.shikiUrl}/api/animes`,params:params, method: 'GET' })
           .then(resp =>{
-            let data = resp.data.animes.edges.map(e => e.node)
-            
+
+            let data = []
+            if (resp.data.length==0){
+              data = [404]
+            }else{
+              data = resp.data
+            }
+                        
             if(payload.dispatchTo){
               commit(payload.dispatchTo, data);
             }else{
@@ -395,14 +387,63 @@ export default new Vuex.Store({
         })
        },
 
-
-      GET_FAVORITES({commit}){
+      GET_ANIME_RATES({commit}, id){
         return new Promise((resolve, reject) => {
           commit('ANIME_REQUEST')
-          axios({url: `${this.state.APIurl}/api/v2/favorite`, method: 'GET' })
+     
+          axios({url: `${this.state.shikiUrl}/api/v2/user_rates`,params:{user_id:id}, method: 'GET' })
+          .then(resp => {
+            this.state.lists = resp.data
+            let params ={
+              key: 'rates',
+              ids: resp.data.map(a => a.target_id)
+            }
+            this.dispatch('GET_ANIMES', params)
+            resolve(resp)
+          })
+          .catch(err => {
+            commit('ANIME_ERROR',err);
+            reject(err)
+          })
+        })
+      },
+      SET_ANIME_RATES({commit}, params){
+        return new Promise((resolve, reject) => {
+          commit('ANIME_REQUEST')
+
+          let data = {
+            target_type: 'Anime',
+            user_id: params.user_id,
+            target_id: params.target_id,
+            status: params.status,
+          }
+
+          axios({url: `${this.state.shikiUrl}/api/v2/user_rates`,data: data, method: 'POST' })
+          .then(resp => {
+
+            let message = 'Добавлено в список'
+            commit('MESSAGE',message);
+
+            commit('SET_ANIMES', {key:'rates',val:[]});
+            commit('SET_ANIMES', {key:'rates',val:resp.data});
+            commit('ANIME_SUCCESS');
+            resolve(resp)
+          })
+          .catch(err => {
+            commit('ANIME_ERROR',err);
+            reject(err)
+          })
+        })
+      },
+      
+      GET_FAVORITES({commit}, id){
+        return new Promise((resolve, reject) => {
+          commit('ANIME_REQUEST')
+     
+          axios({url: `${this.state.shikiUrl}/api/users/${id}/favourites`, method: 'GET' })
           .then(resp => {
             commit('SET_ANIMES', {key:'favorite',val:[]});
-            commit('SET_ANIMES', {key:'favorite',val:resp.data.results});
+            commit('SET_ANIMES', {key:'favorite',val:resp.data});
             commit('ANIME_SUCCESS');
             resolve(resp)
           })
@@ -466,14 +507,63 @@ export default new Vuex.Store({
         commit('SET_ANIME_RELATED',[])
         commit('SET_KODIK', {});
         commit('SET_SCREENSHOTS', [])
-
+        commit('SET_COMMENTS', []);
       },
       
       GET_GENRES({commit}){
         return new Promise((resolve, reject) => {
-          axios({url: `${this.state.shikiUrl}/api/genres`, method: 'GET' })
+          if (localStorage.genres){
+            commit(JSON.parse(localStorage.genres))
+          }else{
+            axios({url: `${this.state.shikiUrl}/api/genres`, method: 'GET' })
+            .then(resp => {
+              let data = resp.data.filter(g => g.kind === 'anime')
+              localStorage.genres = JSON.stringify(data)
+              commit('SET_GENRES', data);
+              resolve(resp)
+            })
+            .catch(err => {
+              reject(err)
+            })
+          }
+        })
+      },
+      GET_COMMENTS({commit},props){
+        return new Promise((resolve, reject) => {
+          let params ={
+            commentable_id: props.id,
+            commentable_type: 'Topic',
+            limit: 10,
+            page: props.page,
+            desc: 1
+          }
+          axios({url: `${this.state.shikiUrl}/api/comments`,params: params, method: 'GET' })
           .then(resp => {
-            commit('SET_GENRES', resp.data.filter(g => g.kind === 'anime'));
+            if (props.page == 0){
+              commit('SET_COMMENTS', resp.data);
+            }else{
+              commit('ADD_COMMENTS', resp.data);
+            }
+            
+            resolve(resp)
+          })
+          .catch(err => {
+            reject(err)
+          })
+        })
+      },
+      SET_COMMENTS({commit},props){
+        return new Promise((resolve, reject) => {
+          let params ={
+            comment:{
+              commentable_id: props.id,
+              commentable_type: 'Topic',
+              body: props.text
+            }
+          }
+          axios({url: `${this.state.shikiUrl}/api/comments`,data: params, method: 'POST' })
+          .then(resp => {
+            commit('ADD_COMMENTS', resp.data);
             resolve(resp)
           })
           .catch(err => {
@@ -496,7 +586,7 @@ export default new Vuex.Store({
       GET_KODIK({commit},payload){
         return new Promise((resolve, reject) => {
 
-            axios({url: kodik_url, params:{'token':kodik_key, 'shikimori_id':payload}, method: 'GET' })
+            axios({url: kodik_url, params:{'token':kodik_key, 'shikimori_id':payload}, method: 'GET', headers:{} })
             .then(resp => {
               commit('SET_KODIK',resp.data.results[0]);
               resolve(resp)
@@ -553,7 +643,6 @@ export default new Vuex.Store({
         return new Promise((resolve,reject) => {
           axios({url: `${this.state.shikiUrl}/api/users/whoami`, method: 'GET' })
           .then(resp => {
-              console.log(resp.data)
               commit('SET_USER', resp.data)
               resolve(resp)
           })
@@ -593,7 +682,7 @@ export default new Vuex.Store({
       },
       LOGOUT({commit}){
         return new Promise((resolve) => {
-          axios({url: `${this.state.APIurl}/api/auth/logout/`, method: 'POST' })
+          axios({url: `${this.state.shikiUrl}/api/users/sign_out`, method: 'GET' })
           commit('logout')
           localStorage.removeItem('token')
           delete axios.defaults.headers.common['Authorization']

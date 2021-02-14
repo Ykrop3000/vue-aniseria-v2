@@ -1,29 +1,24 @@
 <template>
-    <div class="lists">
 
-        <div class="actions">
+    <div class="list-wrap" v-if="list.length != 0" >
+        <h3 class="section-name" v-text="title"></h3>
 
-        </div>
-        <div class="list-wrap">
-            <h3 class="section-name" v-text="list.title"></h3>
-
-            <div class="list-section">
-                <div class="list-entries">
-                    <div class="entry-card" v-for="(anime,id) in animes" :key="id">
-                        <div class="cover">
-                            <div class="image" v-lazy:background-image="SHIKIURL + anime.image.preview"></div>
-                        </div>
-                        <div class="title">
-                            <router-link :to="{name: 'Anime', params:{slug: anime.url.split('/')[2]} }" v-text="anime.russian"></router-link>
-                        </div>
-                        <div class="score" v-text="anime.score"></div>
+        <div class="list-section">
+            <div class="list-entries">
+                <div class="entry-card" v-for="(anime,id) in list" :key="id">
+                    <div class="cover">
+                        <div class="image" v-lazy:background-image="SHIKIURL + anime.image.preview"></div>
                     </div>
+                    <div class="title">
+                        <router-link :to="{name: 'Anime', params:{slug: anime.url.split('/')[2]} }" v-text="anime.russian"></router-link>
+                    </div>
+                    <div class="score" v-text="anime.score"></div>
                 </div>
             </div>
-
         </div>
 
     </div>
+
 </template>
 
 <script>
@@ -31,49 +26,20 @@ import {mapGetters} from 'vuex'
 
 export default {
     name:'lists',
-    props: ['list'],
+    props: ['list','title'],
     computed:{
-        ...mapGetters(['SHIKIURL',
-                        'ANIMES'
-        ]),
-        animes:{
-            get(){
-                if (this.list.animes && this.ANIMES[this.list.id]){
-                    console.log(1)
-                    return this.ANIMES[this.list.id]
-                                        
-                } else if(this.list.animes && !this.ANIMES[this.list.id]){
+        ...mapGetters(['SHIKIURL']),
 
-                    let params = {
-                        ids: this.list.animes,
-                        field: 'score',
-                        key: this.list.id
-                    }
-                    this.$store.dispatch('GET_ANIMES', params);
-                    console.log(2)
-                    return []
-
-                }else{
-                    console.log(3)
-                    return []
-                }
-            }
-        }
     }
 }
 </script>
 
 <style  scoped>
-.lists {
-    position: relative;
-}
-.actions {
-    position: absolute;
-    top: -20px;
-    right: 0;
-}
+
+
  .section-name {
     font-weight: 400;
+    font-size: 1.8rem;
 }
 .list-section {
     display: block;
@@ -165,12 +131,7 @@ a:hover {
     }
 }
 @media (max-width: 760px){
-    .lists {
-        margin-top: 30px;
-    }
-    .actions {
-        top: -10px;
-    }
+
     .list-section .list-entries {
         grid-template-columns: repeat(auto-fill,minmax(105px,1fr));
         grid-gap: 25px 20px;

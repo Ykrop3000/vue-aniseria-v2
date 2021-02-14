@@ -1,11 +1,10 @@
 <template>
     <div class="overview">
 
-        <div class="description-wrap">
+        <div class="description-wrap" v-if="anime.description">
             <h2>Описание</h2>
             <div class="description content-wrap" v-text="anime.description"></div>
         </div>
-        <Player v-if="kodik.link" :src="kodik.link" />
         <Roles v-if="ROLES" :roles="roles" :title="'Главные герои'"/>
         <Stats :statuses="anime.rates_statuses_stats" />
         <Screenshots v-if="anime.screenshots" :images="anime.screenshots"/>
@@ -21,7 +20,6 @@
 import Trailer from '@/views/FullPage/components/Trailer'
 import Screenshots from '@/views/FullPage/components/Screenshots'
 import Related from '@/views/FullPage/components/Related'
-import Player from '@/views/FullPage/components/Player'
 import Roles from '@/views/FullPage/components/Roles'
 import Similar from '@/views/FullPage/components/Similar'
 import Stats from  '@/components/modules/Stats'
@@ -98,7 +96,6 @@ export default {
         Trailer,
         Screenshots,
         Related,
-        Player,
         Roles,
         Similar,
         Stats

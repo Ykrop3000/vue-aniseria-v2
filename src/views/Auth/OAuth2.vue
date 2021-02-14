@@ -24,7 +24,7 @@ export default {
  
     methods: {
        submit(){
-           let url = `https://shikimori.one/oauth/authorize?client_id=${this.client_id}&redirect_uri=https%3A%2F%2Fvue-aniseria-v2.firebaseapp.com%2Flogin&response_type=code&scope=user_rates+comments+topics`
+           let url = `https://shikimori.one/oauth/authorize?client_id=${this.client_id}&redirect_uri=https://vue-aniseria-v2.firebaseapp.com/login&response_type=code&scope=user_rates+comments+topics`
            window.location.href = url
        }
     },

@@ -1,24 +1,50 @@
 <template>
-    <div class="media media-page-unscoped media-anime" >
-
+    <div class="media media-page-unscoped media-anime" 
+    v-infinite-scroll="handleScroll" 
+    infinite-scroll-disabled="busy"
+    infinite-scroll-distance="10">
 
         <el-dialog
         :visible.sync="listDilog"
-        width = '70%' 
-        :fullscreen="true"
         class="list-editor-wrap dilog"
         >
-        <div class="header" :style="{'background-image':bigPoster}">
-            <div class="content">
-                <div class="cover" v-lazy-container="{ selector: 'img' }">
-                    <img  :src="poster || require('@/assets/img/noimage.jpg')" alt="poster" >
+        <div class="list-editor">
+
+            <div class="header" :style="{'background-image':bigPoster}">
+                <div class="content">
+                    <div class="cover" >
+                        <img  :src="poster || require('@/assets/img/noimage.jpg')" alt="poster" style="opacity: 1">
+                    </div>
+                    <div class="title" v-text="ANIME.russian"></div>
+                    <div class="save-btn" @click="setrates">Сохранить</div>
                 </div>
-                <div class="title" v-text="ANIME.russian"></div>
-                <div class="favourite outline"><i class="fa-heart fas"></i></div>
-                <div class="save-btn">Сохранить</div>
             </div>
+            <div class="body">
+                <div class="input-wrap anime">
+                    <div class="form status">
+                        <div class="input-title">Статус</div>
+                        <el-select v-model="list.status" placeholder="Статус">
+                            <el-option
+                            v-for="(val,key) in $store.state.stats"
+                            :key="key"
+                            :label="val"
+                            :value="key">
+                            </el-option>
+                        </el-select>
+                    </div>
+                    <div class="form score">
+                        <div class="input-title">Рейтинг</div>
+                        <el-input-number v-model="list.score" controls-position="right" :min="1" :max="10"></el-input-number>
+                    </div>
+                    <div class="form progress">
+                        <div class="input-title">Эпизод</div>
+                        <el-input-number v-model="list.episodes" controls-position="right" :min="1" :max="ANIME.episodes"></el-input-number>
+                    </div>
+
+                </div>
+            </div>
+                        
         </div>
-        
         </el-dialog>
 
 
@@ -47,7 +73,7 @@
                     </div>
                     <div class="content">
                         <h1 v-text="ANIME.russian"></h1>
-                        <p class="description" v-text="ANIME.description"></p>
+                        <p class="description" v-if="ANIME.description" v-text="ANIME.description"></p>
                         <div class="description-length-toggle">
                             Читать Больше
                         </div>
@@ -74,6 +100,13 @@
                         <div class="type">Жанры</div>
                         <div class="value">
                             <span v-text="ANIME.genres.map(e => e.russian).join(', ')"></span>
+                        </div>
+                    </div>
+
+                    <div class="data-set" v-if="ANIME.aired_on">
+                        <div class="type">Дата выхода</div>
+                        <div class="value">
+                            <span v-text="aired_on"></span>
                         </div>
                     </div>
 
@@ -105,30 +138,57 @@
                             <span v-text="ANIME.status"></span>
                         </div>
                     </div>
+
+                    <div class="data-set" v-if="ANIME.english">
+                        <div class="type">Английский</div>
+                        <div class="value">
+                            <span v-text="ANIME.english.join(', ')"></span>
+                        </div>
+                    </div>
+
+                    <div class="data-set" v-if="ANIME.japanese">
+                        <div class="type">Японский</div>
+                        <div class="value">
+                            <span v-text="ANIME.japanese.join(', ')"></span>
+                        </div>
+                    </div>
                     
                 </div>
             </div>
+            
             <router-view :anime="ANIME" :kodik="KODIK"></router-view>
         </div>
+        <Comments :render="comments_render" :isLoggedIn="isLoggedIn" :id="ANIME.topic_id"/>
     </div>
 </template>
+
 
 <script>
 import {mapGetters} from 'vuex';
 import { mapActions } from 'vuex'
 import Preloader from '@/components/Preloader'
-
+import Comments from './components/Comments'
+import moment from 'moment'
 
 export default {
     name: 'Single',
     data(){
         return{
             width: window.innerWidth,
-            listDilog: false
+            listDilog: false,
+            comments_render: false,
+            list:{
+                status: '',
+                score: 0,
+                episodes: 0
+            }
         }
     },
 
-    props: ['isLoggedIn'],
+    props: ['isLoggedIn','user',],
+    components:{
+        Comments
+    },
     methods:{
         ...mapActions([
             'CLEAR_ANIME',
@@ -137,11 +197,22 @@ export default {
             'GET_RELATED',
             'GET_SIMILAR',
             'GET_GENRES',
-            'GET_KODIK'
+            'GET_KODIK',
+            'SET_ANIME_RATES',
+            'SET_FAVORITES'
         ]),
         setfavorite(){
             if(this.isLoggedIn){
-                this.$store.dispatch('SET_FAVORITES',{id:this.ANIME.id, type: this.ANIME.favoured});
+                this.SET_FAVORITES({id:this.ANIME.id, type: this.ANIME.favoured});
+            }else{
+                this.$message.error('Для этого действия тебе необходима регистрация на сайте.');
+            }
+        },
+        setrates(){
+            if(this.isLoggedIn){
+                this.SET_ANIME_RATES({target_id:this.ANIME.id, status: this.list.status, user_id:this.user.id});
+            }else{
+                this.$message.error('Для этого действия тебе необходима регистрация на сайте.');
             }
         },
         setTitle(){
@@ -157,6 +228,9 @@ export default {
                         "opacity": 1
                     }
                 })
+        },
+        handleScroll(){
+            this.comments_render = true
         }
     },
     created(){
@@ -167,7 +241,9 @@ export default {
         this.$store.dispatch('SET_TRANSPARENT',true)
         this.GET_ANIME(this.$route.params.slug);
         this.GET_GENRES();
+
         document.title = 'Смотреть Аниме онлайн бесплатно в хорошем качестве - AniSeria'
+
     },
     computed: {
         ...mapGetters([
@@ -194,6 +270,11 @@ export default {
                     return ''
                 }
             }
+        },
+        aired_on:{
+            get(){
+                return moment(this.ANIME.aired_on).lang("ru").format('LL')
+            }
         }
     },
     watch:{
@@ -211,7 +292,7 @@ export default {
             this.Preload()
             this.CLEAR_ANIME();
             this.GET_ANIME(this.$route.params.slug);
-        }
+        },
     }    
 }
 </script>
@@ -246,6 +327,84 @@ export default {
 .list-editor-wrap .header .cover img {
     width: 100%;
 }
+.list-editor-wrap .el-dialog {
+    animation: in .25s ease-in-out;
+    background: 0 0;
+    overflow: hidden;
+    border-radius: 4px;
+    box-shadow: 0 2px 33px rgb(0 0 0 / 48%);
+    width: 100%;
+    max-width: 1000px;
+}
+.list-editor-wrap .list-editor .body {
+    background: rgb(var(--color-foreground));
+    display: grid;
+    grid-gap: 50px;
+    grid-template-columns: auto 160px;
+    padding: 50px;
+    padding-top: 70px;
+}
+.list-editor-wrap .list-editor .body .input-wrap {
+    display: grid;
+    grid-gap: 40px;
+    grid-template-areas:
+        "status score progress"
+        "start finish repeat"
+        "notes notes notes"
+        "advanced advanced advanced";
+    justify-content: space-around;
+}
+.list-editor-wrap .list-editor .body .input-title {
+    color: rgba(var(--color-text-light),.9);
+    font-size: 1.3rem;
+    padding-bottom: 8px;
+    padding-left: 1px;
+}
+.list-editor-wrap .list-editor .body .status {
+    grid-area: status;
+}
+.list-editor-wrap .list-editor .body .progress {
+    grid-area: progress;
+}
+.list-editor-wrap .list-editor .body .score {
+    grid-area: score;
+}
+.list-editor-wrap .el-select {
+    box-shadow: none;
+}
+.el-select>.el-input {
+    display: block;
+}
+.list-editor-wrap .el-input, .list-editor-wrap .el-input-number, .list-editor-wrap .el-select, .list-editor-wrap .el-textarea {
+    width: 100%;
+}
+.el-input, .el-textarea {
+    background: rgb(var(--color-foreground));
+    border-radius: 4px;
+    color: rgb(var(--color-text));
+}
+.el-input {
+    position: relative;
+    font-size: 14px;
+    display: inline-block;
+    width: 100%;
+}
+@media (max-width: 1040px){
+    .list-editor-wrap .list-editor .body .input-wrap {
+        display: block;
+    }
+    .list-editor-wrap .list-editor .body .input-wrap .form {
+    margin-bottom: 25px;
+}
+}
+@media (max-width: 760px){
+    .list-editor-wrap .list-editor .body {
+        display: block;
+        padding: 30px;
+        padding-top: 70px;
+    }
+}
+
 </style>
 
 <style scoped>
@@ -362,7 +521,7 @@ export default {
 }
 .banner{
     background-position: 50% 35%;
-    background-color: #242538;
+    background-color: rgba(31,40,53,.65);
     background-repeat: no-repeat;
     background-size: cover;
     height: 400px;

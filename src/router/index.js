@@ -4,7 +4,6 @@ import List from '../views/List/List'
 import FullPage from '../views/FullPage/FullPage' 
 import Overview from '../views/FullPage/contents/Overview'
 import Watch from '../views/FullPage/contents/Watch'
-import Auth from '../views/Auth/Auth'
 import Home from '../views/Home/Home'
 import OAuth2 from '../views/Auth/OAuth2'
 
@@ -99,11 +98,6 @@ const routes =
       component: OAuth2
     },
     {
-      path: '/signup',
-      name: 'Signup',
-      component: Auth
-    },
-    {
       path: '/logout',
       name: 'Logout',
       component: function () {
@@ -112,12 +106,26 @@ const routes =
     },
     {
       path: '/user/:username',
-      name: 'User',
       component: function () {
         return import('../views//Profile/Profile.vue')
-      }
+      },
+      children: [
+        {
+          name: 'User',
+          path: '',
+          component: function () {
+            return import('../views//Profile/contents/Overview')
+          },
+        },
+        {
+          name: 'Favorite',
+          path: 'favorite',
+          component: function () {
+            return import('../views/Profile/contents/Favorite')
+          },
+        },
+      ]
     },
-
     {
       path: '/404',
       name: '404',

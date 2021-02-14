@@ -21,10 +21,9 @@
                     <input v-model="search" type="text" class="search">
                 </div>
             </div>
-            <SelectItem :title="'Жанры'" @opt="SelectHandler" :type='0' :options="GENRES"/>          
-            <SelectItem :title="'Студии'" @opt="SelectHandler" :type='1' :options="STUDIOS"/>
-            <SelectItem :title="'Год'" @opt="SelectHandler" :type='2' :options="years"/>
-            <SelectItem :title="'Тип'" @opt="SelectHandler" :type='3' :options="kind"/>                    
+            <SelectItem :title="'Жанры'" :type="'genre'" :options="GENRES"/>          
+            <SelectItem :title="'Год'" :type="'season'" :options="years"/>
+            <SelectItem :title="'Тип'" :type="'kind'" :options="kind"/>                    
         </div>
     </div>
 </template>
@@ -50,10 +49,10 @@ export default {
                     name:i
                 })
             }
+            d.reverse()
             return d
         },
         ...mapGetters([
-            'STUDIOS',
             'GENRES'
         ])
     },
@@ -67,24 +66,34 @@ export default {
             mobileFilters: false,
             kind:[
                 {
-                    id: 1,
+                    id: 'tv',
                     name:'tv',
-                    russian:'Тв сериал'
+                    russian:'TV Сериал'
                 },
                 {
-                    id: 2,
+                    id: 'movie',
                     name:'movie',
                     russian:'Фильм'
                 },
                 {
-                    id: 3,
+                    id: 'ova',
                     name:'ova',
                     russian:'OVA'
                 },
                 {
-                    id: 4,
+                    id: 'ona',
                     name:'ona',
                     russian:'ONA'
+                },
+                {
+                    id: 'special',
+                    name:'special',
+                    russian:'Спешл'
+                },
+                {
+                    id: 'music',
+                    name:'music',
+                    russian:'Клип'
                 },
             ]
         }
@@ -93,14 +102,6 @@ export default {
         handleWidthChange() {
             this.width =  window.innerWidth;
         },
-        SelectHandler({opt,type}){
-            if(type === 0){
-                this.filter.genres = opt
-            }else if(type === 1){
-                this.filter.studios = opt
-            }
-            this.$emit('fs', this.filter)
-        }
     },
     mounted(){
         window.addEventListener(
@@ -109,7 +110,6 @@ export default {
         );
         this.FilterOptions = this.options
         this.$store.dispatch('GET_GENRES');
-        this.$store.dispatch('GET_STUDIOS');
 
     },
     watch:{
@@ -118,8 +118,17 @@ export default {
                 item.active = false;
             });
         },
-        search(){
-            this.$router.push({query: { search: this.search }})
+        search(val){
+            let prevparams = this.$route.query
+
+            if (prevparams.search){
+                prevparams.search = val
+            }else{
+                prevparams = Object.assign({search:val},prevparams)
+            }
+
+            this.$router.replace ({query: {}})
+            this.$router.push({query:prevparams })
         }
     }
 }

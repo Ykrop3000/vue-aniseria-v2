@@ -2,13 +2,13 @@
 
 
 <template>
-  <div id="app" :class="{'transparent':TRANSPARENT}">
+  <div id="app" :class="{'transparent':TRANSPARENT, 'site-theme-dark': dark}">
     <Progress :status="STATUS"/>
     <Header v-if="width>=1040" :isLoggedIn="isLoggedIn" :TRANSPARENT="TRANSPARENT"/>
     <MobileNav v-if="width<1040" :isLoggedIn="isLoggedIn"/>
     <div class="page-content">
       
-      <router-view :isLoggedIn="isLoggedIn"/>
+      <router-view :isLoggedIn="isLoggedIn" :user="USER"/>
       
     </div>
   </div>
@@ -31,6 +31,7 @@ export default {
     data(){
         return{
             width: window.innerWidth,
+            dark: false
         }
     },
     mounted(){
@@ -39,7 +40,7 @@ export default {
             this.handleWidthChange
         );
 
-        if(this.isLoggedIn && Object.keys(this.USER).length === 0){
+        if(this.isLoggedIn && !this.USER){
             this.$store.dispatch('GET_USER_BY_TOKEN')
         }
 
@@ -102,3 +103,4 @@ export default {
     }
 }
 </script>
+
