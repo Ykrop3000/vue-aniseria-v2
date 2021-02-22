@@ -5,11 +5,11 @@
             <div class="role-card view-character-staff" v-for="(i,id) in roles" :key="id">
 
                 <div class="character">
-                    <div class="cover" v-lazy:background-image="SHIKIURL + i.character.image.preview"></div>
-                    <div class="content">
+                    <router-link :to="{name:'Charapter', params:{id:i.character.id}}" class="cover" v-lazy:background-image="SHIKIURL + i.character.image.preview"></router-link>
+                    <router-link :to="{name:'Charapter', params:{id:i.character.id}}" class="content">
                         <div class="name" v-text="i.character.russian"></div>
                         <div class="role" v-text="i.roles.join(',')"></div>
-                    </div>
+                    </router-link>
                 </div>
                 <div class="staff">
 

@@ -1,8 +1,8 @@
 <template >
-    <div class="media-card" v-lazy-container="{ selector: 'img' }">
+    <div class="media-card">
 
         <router-link  :to="{name: 'Anime', params:{slug: slug}}" class="cover" :class="{'loading':loading}">
-            <img :data-src="poster" alt="poster" class="image" :class="{'loaded':!loading}" @load="(poster == '')?loading = true:loading = false">
+            <img v-lazy="poster" alt="poster" class="image" :class="{'loaded':!loading}" @load="(poster == '')?loading = true:loading = false">
 
             <div class="wrap list-btns-wrap"  v-show="ViewMode == '0' && isLoggedIn" >
                 <div label="Open List Editor" class="btn open">

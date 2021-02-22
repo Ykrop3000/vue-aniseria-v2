@@ -24,8 +24,9 @@ export default {
  
     methods: {
        submit(){
-           let url = `https://shikimori.one/oauth/authorize?client_id=${this.client_id}&redirect_uri=https://vue-aniseria-v2.firebaseapp.com/login&response_type=code&scope=user_rates+comments+topics`
-           window.location.href = url
+            this.$message.error('Эта функция временно отключена сайте.');
+           //let url = `https://shikimori.one/oauth/authorize?client_id=${this.client_id}&redirect_uri=https://vue-aniseria-v2.firebaseapp.com/login&response_type=code&scope=user_rates+comments+topics`
+           //window.location.href = url
        }
     },
     computed:{

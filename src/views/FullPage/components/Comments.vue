@@ -52,15 +52,18 @@
 <script>
 import {mapGetters} from 'vuex'
 import {mapActions} from 'vuex'
-import SpinnerItem from '@/components/items/SpinnerItem'
-import 'quill/dist/quill.core.css'
-import 'quill/dist/quill.snow.css'
-import 'quill/dist/quill.bubble.css'
+
 import moment from 'moment'
+import infiniteScroll from 'vue-infinite-scroll'
+
+const SpinnerItem = () => import('@/components/items/SpinnerItem.vue')
 
 
 export default {
     props: ['id','render','isLoggedIn'],
+    directives:{
+        infiniteScroll
+    },
     computed:{
         ...mapGetters(['COMMENTS'])
     },
@@ -89,22 +92,16 @@ export default {
     components:{
         SpinnerItem,
     },
-    watch:{
-        id(){
-            if(this.render){
-                this.GET_COMMENTS({id:this.id, page:1})
-            }
-        },
-        render(){
-            if(this.id){
-                this.GET_COMMENTS({id:this.id, page:1})
-            }
-        }
+    mounted(){
+        this.GET_COMMENTS({id:this.id, page:1})
     }
 }
 </script>
 
 <style scoped>
+.comments{
+    margin-top: 40px;
+}
 .comment-wrap {
     background: rgb(var(--color-foreground));
     margin-bottom: 20px;

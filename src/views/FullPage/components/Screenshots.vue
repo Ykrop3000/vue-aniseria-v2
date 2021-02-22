@@ -46,7 +46,7 @@ export default {
   width: 100%;
 }
 .enlargeable-image .full.enlarged{
-    z-index: 99 !important;
+    z-index: 99999 !important;
 }
 .enlargeable-image .enlargeable-image-slot {
   display:inline-block;

@@ -21,9 +21,9 @@
                     <input v-model="search" type="text" class="search">
                 </div>
             </div>
-            <SelectItem :title="'Жанры'" :type="'genre'" :options="GENRES"/>          
-            <SelectItem :title="'Год'" :type="'season'" :options="years"/>
-            <SelectItem :title="'Тип'" :type="'kind'" :options="kind"/>                    
+            <SelectItem :title="'Жанры'" :type="'genre'" :_options="GENRES"/>          
+            <SelectItem :title="'Год'" :type="'season'" :_options="years"/>
+            <SelectItem :title="'Тип'" :type="'kind'" :_options="kind"/>                  
         </div>
     </div>
 </template>

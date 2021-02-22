@@ -17,8 +17,8 @@
                     <input @focus="inputFocuse = true" @blur="inputFocuse = false" type="search" class="filter" v-model="input">
                 </div>
 
-                <div @click="active = false">
-                    <i class="fas fa-chevron-down"   v-if="options.filter(opt => opt.active === true).length === 0"></i>
+                <div @click="(options.filter(opt => opt.active === true).length === 0) ? active = false: clear">
+                    <i class="fas fa-chevron-down" v-if="options.filter(opt => opt.active === true).length === 0"></i>
                     <i class="fas fa-times" v-else ></i>
                 </div>
                 
@@ -63,7 +63,7 @@ export default {
     },
     props:[
         'title',
-        'options',
+        '_options',
         'type',
         'single'
     ],
@@ -76,10 +76,27 @@ export default {
             width: window.innerWidth,
             flag: false,
         };
-       
         return data        
     },
     computed:{
+        options:{
+            get(){
+                if (this._options.length == 0){
+                    return []
+                }else{
+                    let actives = [] 
+                    if (this.$route.query[this.type]){
+                        actives = this.$route.query[this.type].split(',').map(el => parseInt(el))
+                    }
+                    this._options.forEach(el => {
+                        if (actives.includes(el.id)){
+                            el.active = true
+                        }
+                    })
+                    return this._options
+                }
+            }
+        }
     },
     mounted(){
         window.addEventListener(
@@ -125,7 +142,7 @@ export default {
             this.$router.replace ({query: prevparams})
             
             this.$forceUpdate();
-        }
+        },
     },
     watch:{
         input(){

@@ -5,11 +5,11 @@
             <h2>Описание</h2>
             <div class="description content-wrap" v-text="anime.description"></div>
         </div>
+        <Related v-if="related"  :width="width"  :related="related" :class="{'small':width>=1040}"/>
         <Roles v-if="ROLES" :roles="roles" :title="'Главные герои'"/>
         <Stats :statuses="anime.rates_statuses_stats" />
         <Screenshots v-if="anime.screenshots" :images="anime.screenshots"/>
         <Trailer v-if="trailer" :src="trailer.player_url "/>
-        <Related v-if="related"  :width="width"  :related="related" :class="{'small':width>=1040}"/>
         <Similar v-if="similar"  :similar="similar"/>
 
     </div>

@@ -17,7 +17,7 @@
         <div class="results" v-show="animes[0] != 404" :class="{ cover:ViewMode==0, chart:ViewMode==1, table:ViewMode==2}">
             <MediaCard v-for="i in animes" :key="i.id" :Anime="i" :ViewMode="ViewMode" :isLoggedIn="isLoggedIn"/>
         </div>
-                
+    
     </div>
 </template>
 
@@ -25,6 +25,7 @@
 import {mapGetters} from 'vuex';
 import Filters from "@/components/modules/Filters"
 import SecondaryFilters from '@/components/modules/SecondaryFilters'
+import infiniteScroll from 'vue-infinite-scroll'
 
 import ClickOutside from 'vue-click-outside'
 import MediaCard from '@/components/MediaCard'
@@ -36,7 +37,8 @@ export default {
         SecondaryFilters
     },
     directives:{
-        ClickOutside
+        ClickOutside,
+        infiniteScroll
     },
     props:[
         'isLoggedIn',
@@ -169,6 +171,13 @@ export default {
 }
 </script>
 
+<style scoped>
+@media (max-width: 1040px){
+    .container{
+        padding: 0 !important;
+    }
+}
+</style>
 
 <style>
 .results {
@@ -178,7 +187,6 @@ export default {
     justify-content: space-between;
     z-index: 5;
     position: relative;
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
 }
 .results.chart {
     grid-template-columns: repeat(3,minmax(390px,460px));

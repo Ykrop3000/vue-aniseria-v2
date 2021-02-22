@@ -19,8 +19,9 @@ year --> -year
 
 */
 const kodik_key = 'b7cc4293ed475c4ad1fd599d114f4435'
+const vcdn_key = 'NNJNGDFMuZZPAvckNgrfvs2JDwwGHTrp'
 const kodik_url = 'https://kodikapi.com/search'
-
+const vcdn_url = 'https://videocdn.tv/api/short'
 
 
 export default new Vuex.Store({
@@ -29,6 +30,7 @@ export default new Vuex.Store({
       token: localStorage.getItem('token') || '',
       user : JSON.parse(localStorage.getItem('user')) || {},
       someuser: {},
+      lists: [],
 
       animes: {},
 
@@ -37,13 +39,16 @@ export default new Vuex.Store({
       similar:[],
       roles:[],
       kodik: {},
+      vcdn: {},
       screenshots: [],
       comments: [],
+      
+      character: {},
 
       genres: JSON.parse(localStorage.getItem('genres')) || [],
       studios: [],
 
-      lists: [],
+      calendar: [],
 
       client_id: 'vWH694NVtAjBy5zW6K119ViSypMjuZ3lstEBfGlSSwA',
       client_secret: '75yh1Jdj6AKwWVHQNaPEQZkdpIWvZlYxqCuo0YI_BPI',
@@ -58,6 +63,7 @@ export default new Vuex.Store({
         dropped: 'Брошено'
       },
 
+      theme: localStorage.getItem('theme') || 'light',
 
       nav:[
         {
@@ -73,13 +79,18 @@ export default new Vuex.Store({
           auth: 'nd'
         },
         {
+          to: 'Calendar',
+          text: 'Календарь',
+          svg: 'far fa-calendar-alt',
+          auth: 'nd'
+        },
+        {
           to: 'Login',
           text: 'войти',
           svg: 'fas fa-sign-in-alt',
           class: 'signup login',
           auth: 'nli'
         },
-
 
       ],
 
@@ -117,6 +128,9 @@ export default new Vuex.Store({
     KODIK: state =>{
       return state.kodik
     },
+    VCDN: state =>{
+      return state.vcdn
+    },
     SCREENSHOTS: state =>{
       return state.screenshots
     },
@@ -127,8 +141,9 @@ export default new Vuex.Store({
     LISTS: state =>{
       return state.lists
     },
-
-
+    CALENDAR: state =>{
+      return state.calendar
+    },
     MESSAGE: state => {
       let mes = state.message
       return mes
@@ -166,7 +181,8 @@ export default new Vuex.Store({
     ERRORS: state => state.errors,
     SUCSESS: state => state.sucsess,
 
-    TRANSPARENT: state => state.transparent
+    TRANSPARENT: state => state.transparent,
+    CHARAPTER: state => state.character
   },
   mutations: {
       SET_ANIMES: (state, payload) =>{
@@ -190,7 +206,9 @@ export default new Vuex.Store({
       SET_STUDIOS: (state, payload) =>{
         state.studios = payload;
       },
-
+      SET_VCDN: (state, payload) =>{
+        state.vcdn = payload;
+      },
       SET_ANIME: (state, payload) =>{
         state.anime = payload;
       },
@@ -216,11 +234,12 @@ export default new Vuex.Store({
         state.comments = state.comments.concat(payload)
       },
 
-      SET_LISTS:(state,payload) =>{
+      SET_LISTS:(state, payload) =>{
         state.lists = payload
       },
-
-
+      SET_CALENDAR: (state, payload) =>{
+        state.calendar = payload
+      },
 
       SET_SOMEUSER: (state, payload) =>{
         state.someuser = payload;
@@ -278,7 +297,10 @@ export default new Vuex.Store({
       },
       MESSAGE(state, mes){
         state.message = mes
-      }
+      },
+      SET_CHARAPTER(state, data){
+        state.character = data
+      },
   },
   actions: {
       DEL_ERROR({commit},i){
@@ -293,7 +315,16 @@ export default new Vuex.Store({
       SET_TRANSPARENT({commit},val){
         commit('SET_TRANSPARENT',val);
       },
-
+      CHANGE_THEME(){
+        let theme = this.state.theme
+        if (theme == 'light'){
+          this.state.theme = 'dark'
+          localStorage.theme = 'dark'
+        }else{
+          this.state.theme = 'light'
+          localStorage.theme = 'light'
+        }
+      },
 
 
       GET_ANIMES({commit}, payload){
@@ -342,6 +373,10 @@ export default new Vuex.Store({
 
           })
           .catch(err => {
+            if(err.response.data.error == "invalid_token"){
+              this.state.token = ''
+              localStorage.removeItem('token')
+            }
             commit('ANIME_ERROR',err);
             reject(err)
           })
@@ -358,6 +393,21 @@ export default new Vuex.Store({
             resolve(resp)
           })
           .catch(err => {
+            reject(err)
+          })
+        })
+      },
+      GET_CALENDAR({commit}){
+        commit('ANIME_REQUEST')
+        return new Promise((resolve, reject) => {
+          axios({url: `${this.state.shikiUrl}/api/calendar`, method: 'GET' })
+          .then(resp => {
+            commit('SET_CALENDAR', resp.data.filter(d => d.anime))
+            commit('ANIME_SUCCESS');
+            resolve(resp)
+          })
+          .catch(err => {
+            commit('ANIME_ERROR',err);
             reject(err)
           })
         })
@@ -386,7 +436,19 @@ export default new Vuex.Store({
           })
         })
        },
-
+       GET_CHARAPTER({commit},id){
+        return new Promise((resolve, reject) => {
+          axios({url: `${this.state.shikiUrl}/api/characters/${id}`, method: 'GET' })
+          .then(resp => {
+            commit('SET_CHARAPTER', resp.data);
+            resolve(resp)
+          })
+          .catch(err => {
+            reject(err)
+          })
+        })
+       },
+       
       GET_ANIME_RATES({commit}, id){
         return new Promise((resolve, reject) => {
           commit('ANIME_REQUEST')
@@ -399,6 +461,7 @@ export default new Vuex.Store({
               ids: resp.data.map(a => a.target_id)
             }
             this.dispatch('GET_ANIMES', params)
+            commit('ANIME_SUCCESS');
             resolve(resp)
           })
           .catch(err => {
@@ -416,6 +479,8 @@ export default new Vuex.Store({
             user_id: params.user_id,
             target_id: params.target_id,
             status: params.status,
+            score: params.score,
+            episodes: params.episodes
           }
 
           axios({url: `${this.state.shikiUrl}/api/v2/user_rates`,data: data, method: 'POST' })
@@ -506,6 +571,7 @@ export default new Vuex.Store({
         commit('SET_ANIME_SIMILAR',[])
         commit('SET_ANIME_RELATED',[])
         commit('SET_KODIK', {});
+        commit('SET_VCDN', {});
         commit('SET_SCREENSHOTS', [])
         commit('SET_COMMENTS', []);
       },
@@ -588,13 +654,25 @@ export default new Vuex.Store({
 
             axios({url: kodik_url, params:{'token':kodik_key, 'shikimori_id':payload}, method: 'GET', headers:{} })
             .then(resp => {
+              
               commit('SET_KODIK',resp.data.results[0]);
               resolve(resp)
             })
             .catch(err => {
               reject(err)
             })
-          
+        })
+      },
+      GET_VCDN({commit},payload){
+        return new Promise((resolve, reject) => {
+            axios({url: vcdn_url, params:{'api_token':vcdn_key, 'kinopoisk_id':payload}, method: 'GET', headers:{} })
+            .then(resp => {
+              commit('SET_VCDN',resp.data.data[0]);
+              resolve(resp)
+            })
+            .catch(err => {
+              reject(err)
+            })
         })
       },
       GET_ANIME({commit},payload){

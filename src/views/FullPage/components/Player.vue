@@ -19,7 +19,7 @@ export default {
 }
 .trailer{
     position: relative;
-
+    padding-bottom: 56%;
 }
 .trailer>iframe{
     position: absolute;

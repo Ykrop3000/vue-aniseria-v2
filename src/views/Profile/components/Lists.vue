@@ -139,7 +139,6 @@ a:hover {
     }
     .medialist.cards .entry-card {
         font-size: 1.2rem;
-        height: 160px;
     }
     .entry-card .score {
         font-size: 1.1rem;

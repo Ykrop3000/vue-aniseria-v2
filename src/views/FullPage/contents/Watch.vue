@@ -1,7 +1,21 @@
 <template>
     <div class="watch">
-        <SelectItem :title="'Плеер'" :type="'player'" :options="players"/>                    
+        <div class="select">
+             <h2 class="input-title">Плеер</h2>
+             <el-select v-model="player" placeholder="Плеер">
+                <el-option
+                v-for="(val,key) in players"
+                :key="key"
+                :label="val.russian"
+                :value="val.id">
+                </el-option>
+            </el-select>
+        </div>
+        
+
         <Player v-if="kodik.link && player == 'kodik'" :src="kodik.link" />
+        <Player v-if="VCDN && player == 'vcdn'" :src="VCDN.iframe_src" />
+        
         <div v-if="player == 'onik'" class="player">
             <div id="onik-player"></div>
         </div>
@@ -11,31 +25,58 @@
 
 <script>
 import Player from '@/views/FullPage/components/Player'
-import SelectItem from '@/components/items/SelectItem'
+import {mapActions, mapGetters} from 'vuex'
 export default {
     name:'Watch',
     data(){
         return{
-            players:[
-                {
-                    id: 'kodik',
-                    name:'Kodik',
-                    russian:'Kodik'
-                },
-                {
-                    id: 'onik',
-                    name:'Onik',
-                    russian:'Onik'
-                },
-            ]
+
         }
     },
+    methods:{
+        ...mapActions(['GET_VCDN']),
+    },
     computed:{
+        ...mapGetters(['VCDN']),
         player:{
             get(){
                 return this.$route.query.player || 'kodik'
+            },
+            set(val){
+
+                let prevparams = this.$route.query
+
+                if (prevparams.player){
+                    prevparams.player = val
+                }else{
+                    prevparams = Object.assign({player:val},prevparams)
+                }
+                this.$router.replace ({query: {}})
+                this.$router.replace ({query: prevparams})
+
+                return val
             }
-        } 
+        },
+        players:{
+            get(){
+                let data = [
+                    {
+                        id: 'kodik',
+                        name:'Kodik',
+                        russian:'Kodik'
+                    },
+                ]
+                if (this.VCDN){
+                    data.push({
+                        id: 'vcdn',
+                        name:'VideoCdn',
+                        russian:'VideoCdn'
+                    })
+                }
+                return data
+                
+            }        
+        }, 
     },
     props:[
         'anime',
@@ -43,15 +84,18 @@ export default {
     ],
     components:{
         Player,
-        SelectItem
+    },
+    mounted(){
+        if (this.kodik.length != 0) {
+            this.GET_VCDN(this.kodik.kinopoisk_id)
+        }
+            
     },
     watch:{
         kodik(val){
             if (val.length == 0) {return}
-            let recaptchaScript = document.createElement('script')
-            recaptchaScript.setAttribute('src',
-            `https://apikino.club/autoreplace/?id=836&width=100%&height=400&title=${this.kodik.title_orig}&year=${this.kodik.year}&kinopoiskId=${this.kodik.kinopoisk_id}`)
-            document.head.appendChild(recaptchaScript)
+            this.GET_VCDN(this.kodik.kinopoisk_id)
+
         },
     }
 }
@@ -75,4 +119,5 @@ iframe {
 .watch>div{
    margin-bottom: 30px;
 }
+
 </style>

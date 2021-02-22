@@ -5,7 +5,7 @@ import FullPage from '../views/FullPage/FullPage'
 import Overview from '../views/FullPage/contents/Overview'
 import Watch from '../views/FullPage/contents/Watch'
 import Home from '../views/Home/Home'
-import OAuth2 from '../views/Auth/OAuth2'
+
 
 Vue.use(Router)
 
@@ -15,6 +15,13 @@ const routes =
       path: '',
       name: 'Home',
       component: Home
+    },
+    {
+      path: '/charapter/:id',
+      name: 'Charapter',
+      component:function () {
+        return import('../views/Charapter/Charapter.vue')
+      }
     },
     {
       path: '/animes',
@@ -49,6 +56,13 @@ const routes =
       ]
     },
 
+    {
+      name: 'Calendar',
+      path: '/calendar',
+      component:function () {
+        return import('../views/Calendar/Calendar.vue')
+      }
+    },
 
     {
       path: '/anime/:slug/',
@@ -82,20 +96,12 @@ const routes =
     ]
     },
 
-    
-    {
-      path: '/genre/:slug',
-      name: 'Genre',
-      component: List,
-      props:{
-        type: 'genre'
-      }
-    },
-
     {
       path: '/login',
       name: 'Login',
-      component: OAuth2
+      component:function () {
+        return import('../views/Auth/OAuth2.vue')
+      }
     },
     {
       path: '/logout',

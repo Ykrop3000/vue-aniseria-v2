@@ -82,7 +82,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 @media (max-width: 1040px){
     .container{
         padding: 0 !important;

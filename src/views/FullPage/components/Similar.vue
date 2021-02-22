@@ -1,6 +1,6 @@
 <template>
     <div>
-        <h2>Похожие</h2>
+        <h2 v-text="title || 'Похожие'"></h2>
 
         <Spinner v-if="similar.length == 0" />
 
@@ -24,7 +24,7 @@ import Spinner from '@/components/items/SpinnerItem'
 
 export default {
     name: 'Similar',
-    props:['similar'],
+    props:['similar','title'],
     computed:{
         ...mapGetters(['SHIKIURL'])
     },

@@ -20,6 +20,11 @@
                <span class="label">Выйти</span>
             </router-link>
 
+            <div class="secondary-link" @click="change_theme">
+                <i class="fas fa-moon" v-if="!dark"></i>
+                <i class="fas fa-sun" v-else></i>
+               <span class="label">Тема</span>
+            </div>
 
             <div class="close" @click="visible = false">
                 <i class="fa-times fas" ></i>
@@ -38,11 +43,17 @@ export default {
         }
     },
     props:[
-        'isLoggedIn'
+        'isLoggedIn',
+        'dark'
     ],
     computed:{
         ...mapGetters(['NAV']),
         ...mapGetters(['USER'])
+    },
+    methods:{
+        change_theme(){
+            this.$store.dispatch('CHANGE_THEME')
+        }
     }
 }
 </script>
@@ -58,7 +69,6 @@ export default {
     -webkit-tap-highlight-color: transparent;
     bottom: 25px;
     cursor: pointer;
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     position: fixed;
     right: 20px;
     transition: .2s;
@@ -94,12 +104,12 @@ export default {
     user-select: none;
     width: 0;
 }
-.menu svg{
+.menu i{
     max-height: 2.1rem;
-    width: 2.4rem;
+    font-size: 2rem;
     height: auto;
 }
-.menu .close svg{
+.menu .close i{
     height: auto;
     width: 1.466rem; 
 }
@@ -116,16 +126,18 @@ export default {
     border-radius: 6px;
     box-shadow: 0 1px 20px rgba(43,50,88,.3);
 }
-.hamburger svg {
+.hamburger i {
     color: rgb(var(--color-blue));
     width: 50%;
     height: auto;
+    font-size: 3rem;
 }
 .label {
     color: rgb(var(--color-gray-600));
     display: block;
     font-size: 1rem;
     padding-top: 8px;
+    padding-left: 0;
 }
 .guest .menu.visible{
     height: 150px;
