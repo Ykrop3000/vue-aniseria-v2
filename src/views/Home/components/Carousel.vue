@@ -5,7 +5,7 @@
      :dots="false"
      :autoplay="false"
      :loop="true"
-     :margin="20"
+     :margin="10"
      :items="items"
      :nav="false"
      class="carousel"

@@ -3,7 +3,6 @@
 
 <template>
   <div id="app" :class="{'transparent':TRANSPARENT}">
-    <Progress :status="STATUS"/>
     <Header v-if="width>=1040" :isLoggedIn="isLoggedIn" :TRANSPARENT="TRANSPARENT"/>
     <MobileNav v-if="width<1040" :isLoggedIn="isLoggedIn" :dark="dark"/>
     <div class="page-content">
@@ -15,7 +14,6 @@
 </template>
 
 <script>
-import Progress from '@/components/items/ProgressItem'
 const Header = () => import('@/components/base/Header/Header.vue')
 const MobileNav = () => import('@/components/base/MobileNav.vue')
 
@@ -26,7 +24,7 @@ export default {
     components:{
       Header,
       MobileNav,
-      Progress
+      
     },
     metaInfo: {
       title: 'AniSeria',

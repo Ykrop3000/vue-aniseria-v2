@@ -1,7 +1,14 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import axios from 'axios';
+// import rateLimit from 'axios-rate-limit';
 
+import gql from 'graphql-tag';
+import graphqlClient from '../utils/graphql';
+import { loadProgressBar } from 'axios-progress-bar'
+loadProgressBar()
+
+// const axios = rateLimit(axioss.create(), { maxRequests: 5,maxRPS: 5 })
 
 
 Vue.use(Vuex);
@@ -35,9 +42,10 @@ export default new Vuex.Store({
       animes: {},
 
       anime:{},
-      related:[],
-      similar:[],
-      roles:[],
+      banner: '-',
+      related: [],
+      similar: [],
+      roles: [],
       kodik: {},
       vcdn: {},
       screenshots: [],
@@ -148,7 +156,9 @@ export default new Vuex.Store({
       let mes = state.message
       return mes
     },
-
+    BANNER: state => {
+      return  state.banner
+    },
 
 
     SHIKIURL: state =>{
@@ -448,7 +458,21 @@ export default new Vuex.Store({
           })
         })
        },
-       
+       async GET_BANNER({commit}, search) {
+        const response = await graphqlClient.query({
+          query: gql`
+            query ($search: String) {
+              Media(search: $search, type: ANIME) {
+                id
+                bannerImage
+              }
+            }
+          `,
+          variables: { search: search },
+        });
+        this.state.banner =  response.data.Media? response.data.Media.bannerImage: NaN
+        commit
+      },
       GET_ANIME_RATES({commit}, id){
         return new Promise((resolve, reject) => {
           commit('ANIME_REQUEST')
@@ -566,6 +590,7 @@ export default new Vuex.Store({
       },
 
       CLEAR_ANIME({commit}){
+        this.state.banner = ''
         commit('SET_ANIME', {});
         commit('SET_ANIME_ROLES', []);
         commit('SET_ANIME_SIMILAR',[])
@@ -579,7 +604,7 @@ export default new Vuex.Store({
       GET_GENRES({commit}){
         return new Promise((resolve, reject) => {
           if (localStorage.genres){
-            commit(JSON.parse(localStorage.genres))
+            commit('SET_GENRES',JSON.parse(localStorage.genres))
           }else{
             axios({url: `${this.state.shikiUrl}/api/genres`, method: 'GET' })
             .then(resp => {

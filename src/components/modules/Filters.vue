@@ -138,7 +138,6 @@ export default {
 .select-wrap{
     position: relative;
     width: 100%;
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
 }
 .select{
     align-items: center;
@@ -216,7 +215,6 @@ export default {
     border: none;
     color: rgb(var(--color-gray-700));
     display: inline-block;
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     margin: 0;
     outline: 0;
     padding: 0;
@@ -281,7 +279,6 @@ export default {
     border-radius: 6px;
     box-shadow: 0 14px 30px rgba(var(--color-shadow-blue),.1),0 4px 4px rgba(var(--color-shadow-blue),.04);
     display: grid;
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     font-size: 1.3rem;
     font-weight: 600;
     grid-gap: 10px;
@@ -298,7 +295,6 @@ export default {
     border: none;
     color: rgb(var(--color-gray-700));
     display: inline-block;
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     margin: 0;
     outline: 0;
     padding: 0;

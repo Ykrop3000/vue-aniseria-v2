@@ -42,7 +42,6 @@ export default {
     justify-content: space-between;
 }
 .recommendation-card{
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     max-width: 100%;
     vertical-align: top;
     width: 130px;

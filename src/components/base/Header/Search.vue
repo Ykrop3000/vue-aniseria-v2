@@ -52,7 +52,6 @@ export default {
 }
 .quick-search{
     background: rgba(var(--color-overlay),.6);
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     height: 100vh;
     left: 0;
     opacity: 0;
@@ -90,7 +89,6 @@ export default {
     background: 0 0;
     border: none;
     color: rgb(var(--color-text));
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     font-size: 1.5rem;
     font-weight: 600;
     letter-spacing: -.01em;

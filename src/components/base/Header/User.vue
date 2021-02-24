@@ -80,7 +80,6 @@ export default {
     background: rgb(var(--color-background-100));
     border-radius: 6px;
     box-shadow: 0 14px 30px rgba(var(--color-shadow-blue),.25),0 4px 4px rgba(var(--color-shadow-blue),.15);
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     opacity: 0;
     pointer-events: none;
     position: absolute;

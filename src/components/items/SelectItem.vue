@@ -26,7 +26,7 @@
 
             <div class="mobile-banner" v-if="active && width <= 760">
                 <div class="title" v-text="title"></div>
-                <div class="fa fa-minus close-icon"></div>
+                <div focusable="false" class="fa fa-minus close-icon"></div>
             </div>
 
             <div class="options" v-if="active" v-click-outside="aff">
@@ -167,7 +167,6 @@ export default {
 .select-wrap{
     position: relative;
     width: 100%;
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
 }
 .select-wrap:focus{
     outline: none;
@@ -275,7 +274,6 @@ export default {
     border: none;
     color: rgb(var(--color-gray-700));
     display: inline-block;
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     margin: 0;
     outline: 0;
     padding: 0;

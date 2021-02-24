@@ -8,11 +8,11 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 import VueLazyload from 'vue-lazyload'
 
+import 'axios-progress-bar/dist/nprogress.css'
+import "@/assets/css/global.css"
+
 Vue.use(VueLazyload)
 Vue.use(ElementUI);
-
-
-import "@/assets/css/global.css"
 
 
 Vue.config.productionTip = false

@@ -66,7 +66,6 @@ export default {
 
 <style scoped>
 .header-wrap{
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     font-weight: 600;
 }
 .banner {

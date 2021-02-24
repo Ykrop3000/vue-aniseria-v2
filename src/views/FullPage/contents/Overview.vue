@@ -9,7 +9,7 @@
         <Roles v-if="ROLES" :roles="roles" :title="'Главные герои'"/>
         <Stats :statuses="anime.rates_statuses_stats" />
         <Screenshots v-if="anime.screenshots" :images="anime.screenshots"/>
-        <Trailer v-if="trailer" :src="trailer.player_url "/>
+        <Trailer v-if="trailer" :src="trailerl_url"/>
         <Similar v-if="similar"  :similar="similar"/>
 
     </div>
@@ -17,12 +17,13 @@
 
 
 <script>
-import Trailer from '@/views/FullPage/components/Trailer'
-import Screenshots from '@/views/FullPage/components/Screenshots'
-import Related from '@/views/FullPage/components/Related'
-import Roles from '@/views/FullPage/components/Roles'
-import Similar from '@/views/FullPage/components/Similar'
-import Stats from  '@/components/modules/Stats'
+
+const Trailer = () => import('@/views/FullPage/components/Trailer')
+const Screenshots = () => import('@/views/FullPage/components/Screenshots')
+const Related = () => import('@/views/FullPage/components/Related')
+const Roles = () => import('@/views/FullPage/components/Roles')
+const Similar = () => import('@/views/FullPage/components/Similar')
+const Stats = () => import('@/components/modules/Stats')
 
 
 import {mapGetters} from 'vuex'
@@ -44,6 +45,14 @@ export default {
             'ROLES',
             'SIMILAR'
         ]),
+        trailerl_url:{
+            get(){
+                if (this.trailer.player_url){
+                    return `https:${this.trailer.player_url.split(':')[1]}`
+                }
+                return ''
+            }
+        },
         roles:{
             get(){
                 if (this.ROLES){

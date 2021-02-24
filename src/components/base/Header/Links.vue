@@ -18,7 +18,6 @@ export default {
 .links{
     align-items: center;
     display: inline-flex;
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     font-size: 1.4rem;
     font-weight: 600;
     justify-content: center;

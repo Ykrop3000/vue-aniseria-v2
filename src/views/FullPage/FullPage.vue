@@ -6,7 +6,7 @@
 
         <SetRates
             :poster="poster"
-            :bigPoster="bigPoster" 
+            :bigPoster="`url(${BANNER})`" 
             :triger="listDilog"
             :ANIME="ANIME"
             :isLoggedIn="isLoggedIn"
@@ -17,7 +17,7 @@
 
 
         <div class="header-wrap" :class="{'loading': !ANIME.id}">
-            <div class="banner" :style="{'background-image':bigPoster}" >
+            <div class="banner" :style="{'background-image':`url(${BANNER })`}" >
                 <div class="shadow"></div>
             </div>
             <div class="header">
@@ -57,71 +57,7 @@
         </div>
         <div class="content container">
                     
-            <div class="sidebar">
-                <div class="rankings">
-
-                </div>
-                <div class="data">
-
-                    <div class="data-set data-list" v-if="ANIME.genres">
-                        <div class="type">Жанры</div>
-                        <div class="value">
-                            <span v-text="ANIME.genres.map(e => e.russian).join(', ')"></span>
-                        </div>
-                    </div>
-
-                    <div class="data-set" v-if="ANIME.aired_on">
-                        <div class="type">Дата выхода</div>
-                        <div class="value">
-                            <span v-text="aired_on"></span>
-                        </div>
-                    </div>
-
-                    <div class="data-set" v-if="ANIME.episodes">
-                        <div class="type">Эпизоды</div>
-                        <div class="value">
-                            <span v-text="ANIME.episodes"></span>
-                        </div>
-                    </div>
-
-                    <div class="data-set" v-if="ANIME.studios">
-                        <div class="type">Студии</div>
-                        <div class="value">
-                            <span v-text="ANIME.studios.map(e => e.name).join(', ')"></span>
-                        </div>
-                    </div>
-
-                    
-                    <div class="data-set" v-if="ANIME.kind">
-                        <div class="type">Формат</div>
-                        <div class="value">
-                            <span v-text="ANIME.kind"></span>
-                        </div>
-                    </div>
-
-                    <div class="data-set" v-if="ANIME.status">
-                        <div class="type">Статус</div>
-                        <div class="value">
-                            <span v-text="ANIME.status"></span>
-                        </div>
-                    </div>
-
-                    <div class="data-set" v-if="ANIME.english">
-                        <div class="type">Английский</div>
-                        <div class="value">
-                            <span v-text="ANIME.english.join(', ')"></span>
-                        </div>
-                    </div>
-
-                    <div class="data-set" v-if="ANIME.japanese">
-                        <div class="type">Японский</div>
-                        <div class="value">
-                            <span v-text="ANIME.japanese.join(', ')"></span>
-                        </div>
-                    </div>
-                    
-                </div>
-            </div>
+            <Sidebar :ANIME="ANIME"/>
             
             <router-view :anime="ANIME" :kodik="KODIK"></router-view>
         </div>
@@ -133,8 +69,8 @@
 <script>
 import {mapGetters} from 'vuex';
 import { mapActions } from 'vuex'
-import moment from 'moment'
 import infiniteScroll from 'vue-infinite-scroll'
+import Sidebar from './components/Sidebar' 
 
 const Comments = () => import('./components/Comments.vue')
 const SetRates = () => import('@/components/SetRates.vue')
@@ -155,7 +91,8 @@ export default {
     props: ['isLoggedIn','user',],
     components:{
         Comments,
-        SetRates
+        SetRates,
+        Sidebar
     },
     methods:{
         ...mapActions([
@@ -166,7 +103,8 @@ export default {
             'GET_SIMILAR',
             'GET_GENRES',
             'GET_KODIK',
-            'SET_FAVORITES'
+            'SET_FAVORITES',
+            'GET_BANNER'
         ]),
         setfavorite(){
             if(this.isLoggedIn){
@@ -203,6 +141,7 @@ export default {
             'SHIKIURL',
             'GENRES',
             'STATUS',
+            'BANNER'
         ]),
         poster:{
             get(){
@@ -216,22 +155,18 @@ export default {
         bigPoster:{
             get(){
                 if(this.KODIK){
-                    return `url(https://st.kp.yandex.net/images/film_big/${this.KODIK.kinopoisk_id}.jpg)`
+                    return `https://st.kp.yandex.net/images/film_big/${this.KODIK.kinopoisk_id}.jpg`
                 }else{
                     return ''
                 }
             }
         },
-        aired_on:{
-            get(){
-                return moment(this.ANIME.aired_on).lang("ru").format('LL')
-            }
-        }
     },
     watch:{
         ANIME(){
             if (this.ANIME.id){
                 this.setTitle()
+                this.GET_BANNER(this.ANIME.english[0] || this.ANIME.japanese[0])
                 this.GET_KODIK(this.ANIME.id)
                 this.GET_ROLES(this.ANIME.id);
                 this.GET_RELATED(this.ANIME.id);
@@ -391,7 +326,6 @@ export default {
     cursor: pointer;
     display: flex;
     font-size: 1.4rem;
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     font-weight: 800;
     height: 35px;
     justify-content: center;
@@ -435,33 +369,7 @@ export default {
     padding-top: 10px;
     width: 100%;
 }
-.data {
-    background: rgb(var(--color-foreground));
-    border-radius: 3px;
-    padding: 18px;
-}
-.tags{
-    margin-top: 20px;
-}
-.data-set {
-    padding-bottom: 14px;
-}
-.data-list .type{
-    padding-bottom: 2px;
-}
-.type{
-    font-size: 1.3rem;
-    font-weight: 500;
-    padding-bottom: 5px;
-}
-.value {
-    color: rgb(var(--color-text-lighter));
-    font-size: 1.2rem;
-    line-height: 1.3;
-}
-.data-list .value{
-    line-height: 1.4;
-}
+
 .header .content {
     display: inline-grid;
     grid-template-rows: -webkit-min-content -webkit-min-content auto;
@@ -511,31 +419,6 @@ export default {
         width: auto;
         justify-self: unset;
         justify-content: unset;
-    }
-     .data {
-        display: flex;
-        margin-bottom: 25px;
-        -ms-overflow-style: -ms-autohiding-scrollbar;
-        -webkit-overflow-scrolling: touch;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-    .data-set{
-        padding-bottom: 0;
-        padding-right: 25px;
-    }
-    .type{
-        color: rgb(var(--color-text-lighter));
-        font-size: 1.3rem;
-        font-weight: 400;
-        padding-bottom: 6px;
-    }
-    .data-list .type{
-        padding-bottom: 6px;
-    }
-    .value{
-        color: rgb(var(--color-text));
-        font-size: 1.4rem;
     }
     .container h1 {
         font-size: 1.8rem;

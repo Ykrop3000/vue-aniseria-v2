@@ -64,7 +64,6 @@ export default {
 
 <style scoped>
 .character-wrap{
-    font-family: Overpass,-apple-system,BlinkMacSystemFont,Segoe UI,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif;
     position: relative;
     margin-bottom: 50px;
 }
