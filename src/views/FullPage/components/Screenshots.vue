@@ -2,7 +2,7 @@
     <div class="screenshots-wrapp">
         <h2>Скриншоты</h2>
         <div class="screenshots">
-            <enlargeable-image v-for="(i, id) in images.slice(0,3)" animation_duration="500"  :key="id" :src="SHIKIURL + i.preview" :src_large="SHIKIURL + i.original" />
+            <enlargeable-image v-for="(i, id) in images.slice(0,3)" animation_duration="250"  :key="id" :src="SHIKIURL + i.preview" :src_large="SHIKIURL + i.original" />
         </div>
     </div>
 </template>
@@ -46,7 +46,8 @@ export default {
   width: 100%;
 }
 .enlargeable-image .full.enlarged{
-    z-index: 99999 !important;
+  z-index: 99999 !important;
+  width: 100%;
 }
 .enlargeable-image .enlargeable-image-slot {
   display:inline-block;
@@ -73,11 +74,17 @@ export default {
   background-size:contain;
   z-index:2000;
   display:none;
+  width: 100%;
+  max-width: 1000px;
 }
 .enlargeable-image .enlargeable-image-full > img {
   object-fit:contain;
-  width:100%;
-  height:100%;
+  width: 100%;
+  max-width: 1000px;
+}
+.enlargeable-image .full>img{
+  width: 100%;
+  max-width: 1000px;
 }
 .enlargeable-image .enlargeable-image-full.enlarging {
   display:flex;

@@ -48,7 +48,6 @@ export default {
         }else{
           this.toggleBodyClass('removeClass', 'site-theme-dark');
         }
-
     },
     methods:{
         handleWidthChange() {

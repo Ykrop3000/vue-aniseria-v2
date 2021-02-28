@@ -40,6 +40,8 @@ export default {
     grid-template-columns: repeat(auto-fill,130px);
     grid-gap: 20px;
     justify-content: space-between;
+    max-height: 1000px;
+    overflow-x: auto;
 }
 .recommendation-card{
     max-width: 100%;

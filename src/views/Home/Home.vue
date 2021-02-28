@@ -67,7 +67,7 @@ export default {
         },
     },
     mounted(){
-        this.get_animes('carousel', 'popularity',24,2021)
+        this.get_animes('carousel', 'popularity',10,2021)
         this.get_animes('raiting','ranked')
         this.get_animes('aired_on','popularity',24,'winter_2021')
         document.title = 'Смотреть Аниме онлайн бесплатно в хорошем качестве - AniSeria'

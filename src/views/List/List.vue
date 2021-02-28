@@ -147,10 +147,11 @@ export default {
         },
         sortVal:{
             get(){
-                if(this.$route.query.search == '' || !this.$route.query.search){
-                    return this.$route.query.order || "popularity" 
-                }else{
+                let query = this.$route.query
+                if(query.search || query.genres  || query.kind  || query.season ){
                     return 'search'
+                }else{
+                    return this.$route.query.order || "popularity" 
                 }
             }
         },
@@ -162,10 +163,8 @@ export default {
     },
     watch: {
         '$route.query'(){
-
             this.$store.dispatch('CLEAR_ANIMES', this.sortVal);
             this.get_animes(true)
-            
         },
     }
 }

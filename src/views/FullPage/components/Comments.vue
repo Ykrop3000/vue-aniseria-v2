@@ -42,7 +42,7 @@
                     </router-link>
                     <div class="time" v-text="date(i.created_at)"></div>
                 </div>
-                <div class="markdown" v-text="i.body"></div>
+                <div class="markdown" v-html="$bbcode.parse(i.body)"></div>
             </div>
 
         </div>

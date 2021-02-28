@@ -16,7 +16,7 @@
             <div class="body container">
                 <div ></div>
                 <div class="description-wrap">
-                    <div class="markdown description" :class="{'expandable':expandable}" v-text="CHARAPTER.description"></div>
+                    <div class="markdown description" :class="{'expandable':expandable}" v-html="$bbcode.parse(CHARAPTER.description)" ></div>
                     <div class="description-length-toggle" @click="expandable = !expandable">Читать Больше </div>
                 </div>
             </div>

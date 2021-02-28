@@ -3,7 +3,7 @@
 
         <div class="description-wrap" v-if="anime.description">
             <h2>Описание</h2>
-            <div class="description content-wrap" v-text="anime.description"></div>
+            <div class="description content-wrap" v-html="$bbcode.parse(anime.description)"></div>
         </div>
         <Related v-if="related"  :width="width"  :related="related" :class="{'small':width>=1040}"/>
         <Roles v-if="ROLES" :roles="roles" :title="'Главные герои'"/>

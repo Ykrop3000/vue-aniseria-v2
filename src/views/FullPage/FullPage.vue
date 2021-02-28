@@ -40,7 +40,7 @@
                     </div>
                     <div class="content">
                         <h1 v-text="ANIME.russian"></h1>
-                        <p class="description" :class="{'full': des}" v-if="ANIME.description" v-text="ANIME.description"></p>
+                        <p class="description" :class="{'full': des}"  v-html="$bbcode.parse(ANIME.description)" v-if="ANIME.description"></p>
                         <div class="description-length-toggle" @click="des = !des">
                             Читать Больше
                         </div>

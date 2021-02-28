@@ -2,7 +2,7 @@
 
     <carousel
      :center="true"
-     :dots="false"
+     :dots="true"
      :autoplay="false"
      :loop="true"
      :margin="10"
@@ -77,9 +77,7 @@ export default {
     overflow: inherit !important;
 }
 @media (max-width: 1040px){
-    .carousel{
-        padding-top: 0 !important;
-    }
+
 }
 </style>
 
@@ -105,11 +103,15 @@ export default {
 .carousel a{
     position: relative;
     display: flex;
-    justify-content: center;  
+    justify-content: center;
+    border-radius: 0 0 3px 3px;  
 }
 
 .image-text{
     display: none;
+}
+.center .image-text div{
+    text-align: center;
 }
 .center .image-text{
     background: rgba(var(--color-overlay),.7);
