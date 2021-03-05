@@ -47,6 +47,7 @@ export default {
     }
     span{
         font-size: 3rem;
+        text-shadow: 1px 0px 110px rgba(var(--color-gray-500),0.25);
     }
     span:first-child{
         font-size: 20rem;

@@ -16,11 +16,13 @@
                         <div class="option"  @click="SetOrder('ranked'); sortText = 'Рейтингу'; sortTr = false " v-text="'Рейтингу'"></div>
                     </div>
                 </div>
+                <!--
                 <div class="wrap">
                     <div class="icon-wrap cover" :class="{ active: ViewMode==0}" @click="SetViewMode(0)"><i class="fas fa-th icon"></i></div>
                     <div class="icon-wrap chart" :class="{ active: ViewMode==1}" @click="SetViewMode(1)"><i class="fas fa-th-large icon"></i></div>
                     <div class="icon-wrap" :class="{ active: ViewMode==2}" @click="SetViewMode(2)"><i class="fas fa-th-list icon" ></i></div>
                 </div>
+                -->
             </div>
         </div>
 </template>
@@ -35,13 +37,28 @@ export default {
             sortTr: false,
             sortText: 'Популярности',
             ViewMode: localStorage.vm || 0,
-            searchActive: !!this.$route.query.search || false,
             filterActive: false,
-            search: this.$route.query.search || ''
+            
         }
     },
     directives:{
         ClickOutside
+    },
+    computed:{
+        searchActive:{
+            get(){
+                if (this.$route.query.search && this.$route.query.search != ''){
+                    return true
+                }else{  
+                    return false
+                }
+            }
+        },
+        search:{
+            get(){
+                return this.$route.query.search || ''
+            }
+        }
     },
     methods: {
         tr(){
@@ -67,15 +84,6 @@ export default {
     },
     watch:{
         '$route.query'(){
-            if (this.$route.query.search){
-                this.search = this.$route.query.search;
-                if (this.search){
-                    this.searchActive = true
-                }else{
-                    this.searchActive = false
-                }
-            }
-            
             if(this.$route.query.vm){
                 this.ViewMode = this.$route.query.vm
             }
@@ -122,11 +130,11 @@ export default {
     display: flex;
     align-items: center;
 }
-.sort-select{
+/* .sort-select{
     border-right: solid 1px rgb(var(--color-gray-400));
     padding-right: 10px;
     margin-right: 12px;
-}
+} */
 .sort-wrap{
     align-items: center;
     cursor: pointer;

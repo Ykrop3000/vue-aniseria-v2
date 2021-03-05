@@ -10,7 +10,7 @@
                 <div class="cover"  v-lazy:background-image="SHIKIURL + i.image.preview" >
 
                 </div>
-                <router-link :to="{name: 'Anime', params:{slug: i.url.split('/')[2]}}">
+                <router-link :to="{name: type, params:{slug: i.url.split('/')[2]}}">
                     <div class="title" v-text="i.russian"></div>
                 </router-link>
             </div>
@@ -24,7 +24,7 @@ import Spinner from '@/components/items/SpinnerItem'
 
 export default {
     name: 'Similar',
-    props:['similar','title'],
+    props:['similar','title','type'],
     computed:{
         ...mapGetters(['SHIKIURL'])
     },

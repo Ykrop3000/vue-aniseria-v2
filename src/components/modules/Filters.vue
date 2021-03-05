@@ -4,8 +4,8 @@
 
         <div class="mobile-filters"  v-if="width < 1040">
             <div class="search-wrap">
-                <i class="icon fas fa-search"></i>
-                <input v-model="search" type="search" placeholder="Поиск" class="search">
+                <i class="icon fas fa-search icon"></i>
+                <input v-model.lazy="search" type="search" placeholder="Поиск" class="search">
             </div>
             <div class="open-btn" :class="{'active': mobileFilters}" @click="mobileFilters = !mobileFilters">
                 <i class="icon fas fa-sliders-h"></i>

@@ -14,7 +14,7 @@
 }
 
 #app {
-  margin-top: 75px;
+  padding-top: 75px;
   overflow: hidden;
 }
 
@@ -99,7 +99,7 @@ h1 {
 }
 
 #app.transparent {
-  margin-top: 0;
+  padding-top: 0;
 }
 
 h2 {
@@ -146,6 +146,12 @@ h2 {
 .owl-theme .owl-dots .owl-dot span {
   background: rgb(var(--color-gray-500)) !important;
 }
+
+::-webkit-scrollbar { width: 4px; height: 4px;}
+
+::-webkit-scrollbar-thumb { height: 50px; background-color: rgb(var(--color-gray-800)); border-radius: 3px;}
+
+
 @media (min-width: 1540px) {
   .container {
     max-width: 1520px;
@@ -156,7 +162,7 @@ h2 {
 
 @media (max-width: 1040px) {
   #app {
-    margin-top: 0 !important;
+    padding-top: 0 !important;
   }
 
 }
@@ -170,7 +176,7 @@ h2 {
 
 @media (max-height: 920px) {
   #app {
-    margin-top: 68px;
+    padding-top: 68px;
   }
 }
 

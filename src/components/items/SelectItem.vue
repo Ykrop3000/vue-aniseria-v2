@@ -13,14 +13,14 @@
 
                     </div>
                     <div class="placeholder" v-if="options.filter(opt => opt.active === true).length === 0 && input === '' && !inputFocuse">Любые</div>
+                    <!-- <input @focus="inputFocuse = true" @blur="inputFocuse = false" type="search" class="filter" v-if="width <= 760" v-model="input">--->
 
-                    <input @focus="inputFocuse = true" @blur="inputFocuse = false" type="search" class="filter" v-model="input">
+                    <div class="filter" ></div> 
                 </div>
 
-                <div @click="(options.filter(opt => opt.active === true).length === 0) ? active = false: clear">
-                    <i class="fas fa-chevron-down" v-if="options.filter(opt => opt.active === true).length === 0"></i>
-                    <i class="fas fa-times" v-else ></i>
-                </div>
+                
+                <i class="fas fa-chevron-down icon" @click="active = true" focusable="false" v-if="options.filter(opt => opt.active === true).length === 0"></i>
+                <i class="fas fa-times icon" focusable="false" @click="clear" v-else ></i>
                 
             </div>
 
@@ -119,9 +119,21 @@ export default {
             if (this.width <= 760) this.active = false
         },
         clear(){
+            console.log(123)
+            this._options.forEach(function(item) {
+                item.active = false;
+            });
             this.options.forEach(function(item) {
                 item.active = false;
             });
+
+            let q = '?'
+            Object.keys(Object.assign(this.$route.query,{[this.type]:''})).forEach( e =>{
+                q += `${e}=${ Object.assign(this.$route.query,{[this.type]:''})[e]}&`
+            })
+            window.history.pushState('', '', q)
+
+            this.$forceUpdate();
         },
         Select(i){
             this.options.forEach(function(item) {
@@ -131,15 +143,12 @@ export default {
             })
 
             let params = this.options.filter(o => o.active === true).map(o => o.id).join(',')
-            let prevparams = this.$route.query
+            let q = '?'
 
-            if (prevparams[this.type]){
-                prevparams[this.type] = params
-            }else{
-                prevparams = Object.assign({[this.type]:params},prevparams)
-            }
-            this.$router.replace ({query: {}})
-            this.$router.replace ({query: prevparams})
+            Object.keys(Object.assign(this.$route.query,{[this.type]:params})).forEach( e =>{
+                q += `${e}=${ Object.assign(this.$route.query,{[this.type]:params})[e]}&`
+            })
+            window.history.pushState('', '', q)
             
             this.$forceUpdate();
         },
@@ -227,6 +236,13 @@ export default {
     z-index: 50;
 
 }
+.icon{
+    color: rgb(var(--color-gray-400));
+    cursor: pointer;
+    font-size: 1.6rem;
+    transition: color .2s ease;
+    text-align: center;
+}
 .option-group:first-of-type .group-title{
     margin-top: 0;
 }
@@ -300,7 +316,7 @@ export default {
     grid-template-columns: auto 42px;
     align-items: center;
 }
-.name{
+.filter>.name{
     color: rgb(var(--color-gray-900));
     font-size: 1.5rem;
     font-weight: 600;

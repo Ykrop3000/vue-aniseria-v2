@@ -22,6 +22,8 @@ bbCodeParser.setCodes({
   '\\[replies=.*\\]': '',
   '\\[comment=.*\\]': '',
   '\\[spoiler=(.+?)\\](.+?)\\[/spoiler\\]': '<span onclick="showSpoiler(this)" class="spoiler"><div class="text">$1</div><br><span>$2</span></span>',
+  '\\[spoiler\\](.+?)\\[/spoiler\\]': '<span onclick="showSpoiler(this)" class="spoiler"><div class="text">спойлер</div><br><span>$1</span></span>',
+
   '\\[character=(.+?)\\](.+?)\\[/character\\]': '<a class="br-link" href="http://localhost:8080/charapter/$1"> $2 </a>',
   '\\[image=(.+?)\\]': '<img class="br-link" src="http://localhost:8080/charapter/$1">',
   '\\[anime=(.+?)\\](.+?)\\[/anime\\]': '<a class="br-link" href="http://localhost:8080/anime/$1"> $2 </a>',

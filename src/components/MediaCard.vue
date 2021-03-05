@@ -1,7 +1,7 @@
 <template >
     <div class="media-card">
 
-        <router-link  :to="{name: 'Anime', params:{slug: slug}}" class="cover" :class="{'loading':loading}">
+        <router-link  :to="{name: type, params:{slug: slug}}" class="cover" :class="{'loading':loading}">
             <img v-lazy="poster" alt="poster" class="image" :class="{'loaded':!loading}" @load="(poster == '')?loading = true:loading = false">
 
             <div class="wrap list-btns-wrap"  v-show="ViewMode == '0' && isLoggedIn" >
@@ -15,7 +15,7 @@
             </div>
             
             <div class="overlay" v-show="ViewMode == '1' && !loading">
-                <router-link :to="{name: 'Anime', params:{slug: slug}}" class="title"  v-text="Anime.russian"></router-link>
+                <router-link :to="{name: type, params:{slug: slug}}" class="title"  v-text="Anime.russian"></router-link>
                 <div class="studio">
                     <span v-for="(i,id) in Anime.studios" :key="id" v-text="i.name"></span>
                 </div>
@@ -23,7 +23,7 @@
 
         </router-link>
 
-        <router-link :to="{name: 'Anime', params:{slug: slug}}" v-if="ViewMode == '0'" class="title" :class="{'loading':loading}" v-text="Anime.russian"></router-link>
+        <router-link :to="{name: type, params:{slug: slug}}" v-if="ViewMode == '0'" class="title" :class="{'loading':loading}" v-text="Anime.russian"></router-link>
 
         <div class="hover-data right" :class="{'loading':loading}">
             <div class="header">
@@ -105,6 +105,7 @@ export default {
     },
     props:[
         'Anime',
+        'type',
         'ViewMode',
         'isLoggedIn'
     ],

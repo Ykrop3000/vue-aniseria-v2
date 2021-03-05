@@ -2,13 +2,13 @@
     <div class="search-landing">
         <div class="landing-section">
 
-            <router-link :to="{name: 'Animes', query:{ order:order}}" class="title link">
+            <router-link :to="{name: 'Animes', query:{ order:order,season:season,status:status}}" class="title link">
                 <h3 v-text="sectionName"></h3>
                 <div class="expand">Посмотреть все</div>
             </router-link>
 
             <div class="results cover">
-                <MediaCard v-for="i in anime" :key="i.id" :Anime="i" :ViewMode="0" :isLoggedIn="isLoggedIn"/>
+                <MediaCard :type="type" v-for="i in anime" :key="i.id" :Anime="i" :ViewMode="0" :isLoggedIn="isLoggedIn"/>
             </div>
             
         </div>
@@ -44,9 +44,12 @@ export default {
     },
     props:[
         'order',
+        'season',
+        'status',
         'sectionName',
         'ANIMES',
-        'isLoggedIn'
+        'isLoggedIn',
+        'type'
     ],
 }
 </script>
@@ -91,5 +94,14 @@ export default {
         padding: 0 20px;
     }
 }
-
+@media (max-width: 890px) and (min-width: 520px){
+    .results .media-card:nth-child(n+6){
+        display: none;
+    }
+}
+@media (max-width: 644px) and (min-width: 520px){
+    .results .media-card:nth-child(n+5){
+        display: none;
+    }
+}
 </style>

@@ -41,9 +41,7 @@
                     <div class="content">
                         <h1 v-text="ANIME.russian"></h1>
                         <p class="description" :class="{'full': des}"  v-html="$bbcode.parse(ANIME.description)" v-if="ANIME.description"></p>
-                        <div class="description-length-toggle" @click="des = !des">
-                            Читать Больше
-                        </div>
+
                         <div class="nav">
                             <router-link :to="{ name: 'Anime'}" replace class="link">Обзор</router-link>
                             <router-link :to="{ name: 'Watch'}" replace class="link">Просмотр</router-link>
@@ -58,8 +56,9 @@
         <div class="content container">
                     
             <Sidebar :ANIME="ANIME"/>
-            
-            <router-view :anime="ANIME" :kodik="KODIK"></router-view>
+            <keep-alive>
+                <router-view :anime="ANIME" :kodik="KODIK" :type="$attrs.link"></router-view>
+            </keep-alive>
         </div>
         <Comments v-if="comments_render && ANIME.topic_id" :render="comments_render" :isLoggedIn="isLoggedIn" :id="ANIME.topic_id"/>
     </div>
@@ -123,12 +122,20 @@ export default {
         },
         listDilog_triger(v){
             this.listDilog = v
+        },
+        get_page(){
+            let type = this.$attrs.type || 'animes'
+    
+            this.GET_ANIME({
+                slug: this.$route.params.slug,
+                type: type
+            });
+
         }
     },
     mounted() {
-        
+        this.get_page()
         this.$store.dispatch('SET_TRANSPARENT',true)
-        this.GET_ANIME(this.$route.params.slug);
         this.GET_GENRES();
 
         document.title = 'Смотреть Аниме онлайн бесплатно в хорошем качестве - AniSeria'
@@ -165,17 +172,19 @@ export default {
     watch:{
         ANIME(){
             if (this.ANIME.id){
+                let type = this.$attrs.type || 'animes'
                 this.setTitle()
                 this.GET_BANNER(this.ANIME.english[0] || this.ANIME.japanese[0])
                 this.GET_KODIK(this.ANIME.id)
-                this.GET_ROLES(this.ANIME.id);
-                this.GET_RELATED(this.ANIME.id);
-                this.GET_SIMILAR(this.ANIME.id);
+                this.GET_ROLES({id:this.ANIME.id, type:type});
+                this.GET_RELATED({id:this.ANIME.id, type:type});
+                this.GET_SIMILAR({id:this.ANIME.id, type:type});
             }
         },
         '$route.params.slug'(){
+            this.$store.dispatch('SET_TRANSPARENT',true)
             this.CLEAR_ANIME();
-            this.GET_ANIME(this.$route.params.slug);
+            this.get_page()
         },
     }    
 }

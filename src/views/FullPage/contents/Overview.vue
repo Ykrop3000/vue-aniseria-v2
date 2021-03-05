@@ -5,12 +5,12 @@
             <h2>Описание</h2>
             <div class="description content-wrap" v-html="$bbcode.parse(anime.description)"></div>
         </div>
-        <Related v-if="related"  :width="width"  :related="related" :class="{'small':width>=1040}"/>
+        <Related v-if="related"  :width="width"  :related="related" :class="{'small':width>=1040}" :type="type"/>
         <Roles v-if="ROLES" :roles="roles" :title="'Главные герои'"/>
         <Stats :statuses="anime.rates_statuses_stats" />
         <Screenshots v-if="anime.screenshots" :images="anime.screenshots"/>
         <Trailer v-if="trailer" :src="trailerl_url"/>
-        <Similar v-if="similar"  :similar="similar"/>
+        <Similar v-if="similar"  :similar="similar" :type="type"/>
 
     </div>
 </template>
@@ -32,7 +32,8 @@ export default {
     name:'Overview',
     props:[
         'anime',
-        'kodik'
+        'kodik',
+        'type'
     ],
     data(){
         return{

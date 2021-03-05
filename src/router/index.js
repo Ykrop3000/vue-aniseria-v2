@@ -7,6 +7,12 @@ import Watch from '../views/FullPage/contents/Watch'
 import Home from '../views/Home/Home'
 
 
+const originalPush = Router.prototype.push
+Router.prototype.push = function push(location) {
+  return originalPush.call(this, location).catch(err => err)
+}
+
+
 Vue.use(Router)
 
 const routes =
@@ -28,32 +34,20 @@ const routes =
       name: 'Animes',
       component: List,
       props:{
-        type: 'animes'
+        type: 'animes',
+        full: 'Anime',
+        title: 'Список аниме'
       },
-      meta:{
-        order: '-aired_on',
-        name: 'year'
+    },
+    {
+      path: '/mangas',
+      name: 'Mangas',
+      component: List,
+      props:{
+        type: 'mangas',
+        full: 'Manga',
+        title: 'Список манги'
       },
-      children:[
-        {
-          name: 'Animes_rating',
-          path: 'rating',
-          component: List,
-          meta:{
-            order: '-user_rate',
-            name: 'raiting'
-          }
-        },
-        {
-          name: 'Animes_id',
-          path: 'new',
-          component: List,
-          meta:{
-            order: '-id',
-            name: 'id'
-          }
-        }
-      ]
     },
 
     {
@@ -68,6 +62,10 @@ const routes =
       path: '/anime/:slug/',
       component: FullPage,
       meta: { reuse: false },
+      props:{
+        type: 'animes',
+        link: 'Anime'
+      },
       children: [
       {
         name: 'Watch',
@@ -95,7 +93,42 @@ const routes =
       },
     ]
     },
-
+    {
+      path: '/manga/:slug/',
+      component: FullPage,
+      meta: { reuse: false },
+      props:{
+        type: 'mangas',
+        link: 'Manga'
+      },
+      children: [
+      {
+        name: 'Watch',
+        path: 'watch',
+        component: Watch
+      },
+      {
+        name: 'Manga',
+        path: '',
+        component: Overview
+      },
+      {
+        name: 'Characters',
+        path: 'characters',
+        component:function () {
+          return import('../views/FullPage/contents/Characters.vue')
+        }
+      },
+      {
+        name: 'Frames',
+        path: 'frames',
+        component:function () {
+          return import('../views/FullPage/contents/Frames.vue')
+        }
+      },
+    ]
+    },
+    
     {
       path: '/login',
       name: 'Login',
@@ -155,6 +188,7 @@ component: function () {
 
 const router = new Router({
   mode: 'history',
+  duplicateNavigationPolicy: 'ignore',
   base: process.env.BASE_URL,
   routes
 })

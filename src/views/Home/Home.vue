@@ -2,8 +2,10 @@
     <div class="container" >
 
         <Carousel :animes="carousel" :key="key"/>
-        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'Лучшее'" :order="'ranked'" :ANIMES="raiting.slice(0,6)"/>
-        <MiniList :isLoggedIn="isLoggedIn" :sectionName="'Новое'" :order="'aired_on'" :ANIMES="aired_on.slice(0,6)"/>
+        <MiniList :type="'Anime'" :isLoggedIn="isLoggedIn" :sectionName="'Лучшее'" :order="'ranked'" :ANIMES="raiting.slice(0,6)"/>
+        <MiniList :type="'Anime'" :isLoggedIn="isLoggedIn" :sectionName="'Новое'" :order="'popularity'" :season="'winter_2021'" :ANIMES="popularity.slice(0,6)"/>
+        <MiniList :type="'Anime'" :isLoggedIn="isLoggedIn" :sectionName="'Анонс'" :order="'popularity'" :status="'anons'" :ANIMES="anons.slice(0,6)"/>
+
     </div>
 
 </template>
@@ -27,9 +29,14 @@ export default {
                 return this.ANIMES.raiting || []
             }
         },
-        aired_on:{
+        popularity:{
             get(){
-                return this.ANIMES.aired_on || []
+                return this.ANIMES.popularity || []
+            }
+        },
+        anons:{
+            get(){
+                return this.ANIMES.anons || []
             }
         },
         carousel:{
@@ -48,7 +55,7 @@ export default {
         }
     },
     methods:{
-        get_animes(key, ordering, limit=24,season=''){
+        get_animes(key, ordering, limit=24,season='',status=''){
             let anime = this.ANIMES[key] || []
        
             if ( anime.length == 0) {
@@ -59,7 +66,8 @@ export default {
                     page: page,
                     limit: limit,
                     key: key,
-                    season: season
+                    season: season,
+                    status: status
                 }
 
                 this.$store.dispatch('GET_ANIMES', params);                
@@ -69,7 +77,8 @@ export default {
     mounted(){
         this.get_animes('carousel', 'popularity',10,2021)
         this.get_animes('raiting','ranked')
-        this.get_animes('aired_on','popularity',24,'winter_2021')
+        this.get_animes('popularity','popularity',24,2021)
+        this.get_animes('anons', 'popularity',24,'','anons')
         document.title = 'Смотреть Аниме онлайн бесплатно в хорошем качестве - AniSeria'
         
     },

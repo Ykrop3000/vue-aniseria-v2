@@ -1,5 +1,5 @@
 <template>
-    <div class="mobile-nav"  :class="{'guest':!isLoggedIn}">
+    <div class="mobile-nav"  ><!--:class="{'guest':!isLoggedIn}"-->
         <div class="hamburger" @click="visible = true" :class="{'dpn':visible}">
             <i class="fa-bars fas"></i>
         </div>

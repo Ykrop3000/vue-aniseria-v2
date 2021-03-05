@@ -1,13 +1,9 @@
 <template>
-    <div v-infinite-scroll="handleScroll"  class="container" infinite-scroll-disabled="busy" infinite-scroll-distance="10" >
+    <div v-infinite-scroll="handleScroll"  class="container"  infinite-scroll-distance="200" >
         
-        <h1 class="alias-title" v-if="width>=1040">
-            Список аниме
-        </h1>
+        <h1 class="alias-title" v-if="width>=1040" v-text="$attrs.title"></h1>
         <div class="wrap" v-else>
-            <div class="mobile-header">
-                Список аниме
-            </div>
+            <div class="mobile-header" v-text="$attrs.title"></div>
         </div>
 
         <Filters />
@@ -15,7 +11,7 @@
         <SecondaryFilters/>
         <div class="not-found" v-show="animes[0] == 404">Ничего не найдено</div>
         <div class="results" v-show="animes[0] != 404" :class="{ cover:ViewMode==0, chart:ViewMode==1, table:ViewMode==2}">
-            <MediaCard v-for="i in animes" :key="i.id" :Anime="i" :ViewMode="ViewMode" :isLoggedIn="isLoggedIn"/>
+            <MediaCard v-for="i in animes" :key="i.id" :Anime="i" :ViewMode="ViewMode" :isLoggedIn="isLoggedIn" :type="$attrs.full"/>
         </div>
     
     </div>
@@ -45,6 +41,7 @@ export default {
     ],
     data(){
         return{
+           
             page: 1,
             pagination: true,
             width: window.innerWidth,
@@ -94,6 +91,7 @@ export default {
                     search: self.search,
                     genres: self.$route.query.genre,
                     kind: self.$route.query.kind,
+                    status: self.$route.query.status,
                     season: self.$route.query.season
                 }
 
@@ -147,19 +145,21 @@ export default {
         },
         sortVal:{
             get(){
-                let query = this.$route.query
-                if(query.search || query.genres  || query.kind  || query.season ){
-                    return 'search'
-                }else{
-                    return this.$route.query.order || "popularity" 
-                }
+                let query = this.$route.query || {}
+                let key = 'main' + this.$attrs.type
+                
+                Object.values(query).forEach((e)=> {
+                    key += e
+                })
+                return key
             }
         },
         search:{
             get(){
                 return this.$route.query.search  || ''
+                
             }
-        }
+        },
     },
     watch: {
         '$route.query'(){

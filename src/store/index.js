@@ -87,6 +87,12 @@ export default new Vuex.Store({
           auth: 'nd'
         },
         {
+          to: 'Mangas',
+          text: 'манга',
+          svg: 'fas fa-book',
+          auth: 'nd'
+        },
+        {
           to: 'Calendar',
           text: 'Календарь',
           svg: 'far fa-calendar-alt',
@@ -356,7 +362,7 @@ export default new Vuex.Store({
             params.limit = 24
           }
 
-          axios({url: `${this.state.shikiUrl}/api/animes`,params:params, method: 'GET' })
+          axios({url: `${this.state.shikiUrl}/api/${payload.type ||'animes'}`,params:params, method: 'GET' })
           .then(resp =>{
 
             let data = []
@@ -394,12 +400,12 @@ export default new Vuex.Store({
           
         })
       },
-      GET_RELATED({commit}, id){
+      GET_RELATED({commit}, params){
         return new Promise((resolve, reject) => {
-          axios({url: `${this.state.shikiUrl}/api/animes/${id}/related`, method: 'GET' })
+          axios({url: `${this.state.shikiUrl}/api/${params.type}/${params.id}/related`, method: 'GET' })
           .then(resp => {
 
-            commit('SET_ANIME_RELATED', resp.data.filter(d => d.anime))
+            commit('SET_ANIME_RELATED', resp.data)
             resolve(resp)
           })
           .catch(err => {
@@ -422,9 +428,9 @@ export default new Vuex.Store({
           })
         })
       },
-      GET_SIMILAR({commit}, id){
+      GET_SIMILAR({commit}, params){
         return new Promise((resolve, reject) => {
-          axios({url: `${this.state.shikiUrl}/api/animes/${id}/similar`, method: 'GET' })
+          axios({url: `${this.state.shikiUrl}/api/${params.type}/${params.id}/similar`, method: 'GET' })
           .then(resp => {
             commit('SET_ANIME_SIMILAR',resp.data)
             resolve(resp)
@@ -434,9 +440,9 @@ export default new Vuex.Store({
           })
         })
       },
-      GET_ROLES({commit},id){
+      GET_ROLES({commit},params){
         return new Promise((resolve, reject) => {
-          axios({url: `${this.state.shikiUrl}/api/animes/${id}/roles`, method: 'GET' })
+          axios({url: `${this.state.shikiUrl}/api/${params.type}/${params.id}/roles`, method: 'GET' })
           .then(resp => {
             commit('SET_ANIME_ROLES', resp.data.filter(d => d.character != null));
             resolve(resp)
@@ -704,7 +710,7 @@ export default new Vuex.Store({
         return new Promise((resolve, reject) => {
             this.dispatch('CLEAR_ANIME')
 
-            axios({url: `${this.state.shikiUrl}/api/animes/${payload}`, method: 'GET' })
+            axios({url: `${this.state.shikiUrl}/api/${payload.type}/${payload.slug}`, method: 'GET' })
             .then(resp => {
               commit('SET_ANIME',resp.data);
               resolve(resp)
