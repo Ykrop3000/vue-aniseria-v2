@@ -70,16 +70,11 @@ export default {
             this.ViewMode = vm
         },
         SetOrder(order){
-            let prevparams = this.$route.query
-
-            if (prevparams.order){
-                prevparams.order = order
-            }else{
-                prevparams = Object.assign({order:order},prevparams)
-            }
-
-            this.$router.replace ({query: {}})
-            this.$router.push({ query:prevparams});
+            this.query({order: order})
+        },
+        query (params) {
+            let query = Object.assign({}, this.$route.query, params)
+            this.$router.push({ query: query })  
         }
     },
     watch:{

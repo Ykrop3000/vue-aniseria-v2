@@ -143,15 +143,22 @@ export default {
             })
 
             let params = this.options.filter(o => o.active === true).map(o => o.id).join(',')
-            let q = '?'
-
-            Object.keys(Object.assign(this.$route.query,{[this.type]:params})).forEach( e =>{
-                q += `${e}=${ Object.assign(this.$route.query,{[this.type]:params})[e]}&`
-            })
-            window.history.pushState('', '', q)
             
+            // let q = '?'
+            // Object.keys(Object.assign(this.$route.query,{[this.type]:params})).forEach( e =>{
+            //     q += `${e}=${ Object.assign(this.$route.query,{[this.type]:params})[e]}&`
+            // })
+            // window.history.pushState('', '', q)
+
+            this.query({[this.type]:params})
+
             this.$forceUpdate();
         },
+        query (params) {
+            let query = Object.assign({}, this.$route.query, params)
+            this.$router.push({ query: query })
+            
+        }
     },
     watch:{
         input(){

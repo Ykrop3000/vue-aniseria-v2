@@ -56,6 +56,7 @@ export default {
 <style scoped>
 .search-landing {
     margin-top: -30px;
+    position: relative;
 }
 .landing-section{
     margin-bottom: 50px;
@@ -80,6 +81,7 @@ export default {
     font-size: 1.6rem;
     font-weight: 700;
     margin: 0;
+    z-index: 10;
 }
 .link .expand{
     color: rgb(var(--color-gray-600));
@@ -88,6 +90,7 @@ export default {
     margin-left: auto;
     text-transform: none;
     transition: color .2s ease;
+    z-index: 10;
 }
 @media (max-width: 1040px){
     .title{

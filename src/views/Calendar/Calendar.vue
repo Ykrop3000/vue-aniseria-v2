@@ -147,8 +147,8 @@ h2{
         transition: transform .2s ease-in-out;
         padding-left: 5vw;
         grid-column-gap: 20px;
-        -ms-scroll-snap-type: x mandatory;
-        scroll-snap-type: x mandatory;
+        -ms-scroll-snap-type: x proximity;
+        scroll-snap-type: x proximity;
         grid-template-columns: repeat(9,80vw);
     }
     .day{

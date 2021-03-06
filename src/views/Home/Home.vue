@@ -90,7 +90,29 @@ export default {
     
 }
 </script>
+<style>    
+.search-landing:nth-child(2n+1)::after{
+    content: '';
+    background-color: rgb(var(--color-background-100));
+    position: absolute;
+    top: 0;
+    right: -10vw;
+    width: 110vw;
+    height: 100%;
+}
+.search-landing:nth-child(2n+1) .landing-section {
+    padding: 15px 0;
+}
 
+.search-landing:nth-child(2n+1){
+    margin-bottom: 30px;
+}
+@media (max-width: 1040px){
+    .search-landing:nth-child(2n+1)::after{
+        right: 0;
+    }
+}
+</style>
 <style scoped>
 @media (max-width: 1040px){
     .container{

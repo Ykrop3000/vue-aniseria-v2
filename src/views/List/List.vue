@@ -45,7 +45,7 @@ export default {
             page: 1,
             pagination: true,
             width: window.innerWidth,
-
+            prevQuery: this.$route.quer,
             ViewMode: localStorage.getItem('vm') || 0
 
         }
@@ -79,7 +79,7 @@ export default {
             }else{
                 key = 'search'
             }
-
+            
             var self = this
             if (t  || update) {
                                 
@@ -156,15 +156,13 @@ export default {
         },
         search:{
             get(){
-                return this.$route.query.search  || ''
-                
+                return this.$route.query.search  || '' 
             }
         },
     },
     watch: {
         '$route.query'(){
-            this.$store.dispatch('CLEAR_ANIMES', this.sortVal);
-            this.get_animes(true)
+            this.get_animes()
         },
     }
 }
