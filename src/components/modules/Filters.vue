@@ -22,8 +22,9 @@
                 </div>
             </div>
             <SelectItem :title="'Жанры'" :type="'genre'" :_options="GENRES"/>          
-            <SelectItem :title="'Год'" :type="'season'" :_options="years"/>
-            <SelectItem :title="'Тип'" :type="'kind'" :_options="kind"/>                  
+            <SelectItem :title="'Год'" :single="true" :type="'season'" :_options="years"/>
+            <SelectItem :title="'Тип'" :single="true" :type="'kind'" :_options="kind"/> 
+            <SelectItem :title="'Статус'" :single="true" :type="'status'" :_options="status"/>                   
         </div>
     </div>
 </template>
@@ -64,6 +65,23 @@ export default {
             search: this.$route.query.search || '',
             width: window.innerWidth,
             mobileFilters: false,
+            status:[
+                {
+                    id: 'anons',
+                    name:'anons',
+                    russian:'Анонсировано'
+                },
+                {
+                    id: 'ongoing',
+                    name:'ongoing',
+                    russian:'Сейчас выходит'
+                },
+                {
+                    id: 'released',
+                    name:'released',
+                    russian:'Вышедшее'
+                },
+            ],
             kind:[
                 {
                     id: 'tv',
@@ -119,16 +137,7 @@ export default {
             });
         },
         search(val){
-            let prevparams = this.$route.query
-
-            if (prevparams.search){
-                prevparams.search = val
-            }else{
-                prevparams = Object.assign({search:val},prevparams)
-            }
-
-            this.$router.replace ({query: {}})
-            this.$router.push({query:prevparams })
+            this.$query({search:val})
         }
     }
 }

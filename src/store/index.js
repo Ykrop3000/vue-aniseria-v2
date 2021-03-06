@@ -70,6 +70,19 @@ export default new Vuex.Store({
         on_hold: 'Отложено',
         dropped: 'Брошено'
       },
+      kind : {
+        'tv': 'TV Сериал',
+        'movie': 'Фильм',
+        'ova': 'OVA',
+        'ona': 'ONA',
+        'special': 'Спешл',
+        'music': 'Клип',
+        "manga": 'Манга',
+        "manhwa": 'Манхва',
+        "manhua": 'Маньхуа',
+        "one_shot": 'Ваншот',
+        "doujin": 'Додзинси'
+      },
 
       theme: localStorage.getItem('theme') || 'light',
 

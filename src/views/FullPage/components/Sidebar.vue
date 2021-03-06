@@ -43,14 +43,14 @@
             <div class="data-set" v-if="ANIME.kind">
                 <div class="type">Формат</div>
                 <div class="value">
-                    <span v-text="ANIME.kind"></span>
+                    <span v-text="kind"></span>
                 </div>
             </div>
 
             <div class="data-set" v-if="ANIME.status">
                 <div class="type">Статус</div>
                 <div class="value">
-                    <span v-text="ANIME.status"></span>
+                    <span v-text="status"></span>
                 </div>
             </div>
 
@@ -90,6 +90,21 @@ export default {
                     return moment(this.ANIME.next_episode_at).lang("ru").endOf('day').fromNow()
                 }
                 return ''
+            }
+        },
+        kind:{
+            get(){
+                return this.$store.state.kind[this.ANIME.kind]
+            }
+        },
+        status:{
+            get(){
+                let data = {
+                    'anons': 'Анонсировано',
+                    'ongoing': 'Сейчас выходит',
+                    'released': 'Вышедшее'
+                }
+                return data[this.ANIME.status] 
             }
         }
     }

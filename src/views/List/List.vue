@@ -72,19 +72,12 @@ export default {
             }else{
                 page = 1
             }
-
-            let key = ''
-            if (this.$route.query.search == '' || !this.$route.query.search){
-                key = this.sortVal
-            }else{
-                key = 'search'
-            }
             
             var self = this
             if (t  || update) {
                                 
                 let params = {
-                    key: key,
+                    key: self.sortVal,
                     page: page,
                     type: self.$attrs.type || 'animes',
                     order: self.$route.query.order || "popularity",

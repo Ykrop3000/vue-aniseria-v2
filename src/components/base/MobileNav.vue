@@ -25,7 +25,7 @@
                 <i class="fas fa-sun" v-else></i>
                <span class="label">Тема</span>
             </div>
-
+            <div></div>
             <div class="close" @click="visible = false">
                 <i class="fa-times fas" ></i>
             </div>

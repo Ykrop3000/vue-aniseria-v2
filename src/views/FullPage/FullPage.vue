@@ -44,9 +44,9 @@
 
                         <div class="nav">
                             <router-link :to="{ name: 'Anime'}" replace class="link">Обзор</router-link>
-                            <router-link :to="{ name: 'Watch'}" replace class="link">Просмотр</router-link>
+                            <router-link v-if="!ANIME.anons" :to="{ name: 'Watch'}" replace class="link">Просмотр</router-link>
                             <router-link :to="{ name: 'Characters'}" replace class="link">Персонажи</router-link>
-                            <router-link :to="{ name: 'Frames'}" replace class="link">Кадры</router-link>
+                            <router-link v-if="!ANIME.anons"  :to="{ name: 'Frames'}" replace class="link">Кадры</router-link>
                         </div>
                     </div>
                 </div>

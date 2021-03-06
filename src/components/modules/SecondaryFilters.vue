@@ -11,10 +11,15 @@
                     <i class="fas fa-sort icon"></i>
                     <span @click="sortTr = !sortTr" class="label" v-text="sortText"></span>
                     <div v-if="sortTr"  class="dropdown">
-                        <div class="option"  @click="SetOrder('popularity'); sortText = 'Популярности'; sortTr = false" v-text="'Популярности'"></div>
-                        <div class="option"  @click="SetOrder('id'); sortText = 'Дате выхода'; sortTr = false" v-text="'Дате выхода'"></div>
-                        <div class="option"  @click="SetOrder('ranked'); sortText = 'Рейтингу'; sortTr = false " v-text="'Рейтингу'"></div>
-                    </div>
+                        <div class="option"  @click="SetOrder('popularity'); sortText = 'По популярности'; sortTr = false" v-text="'По популярности'"></div>
+                        <div class="option"  @click="SetOrder('aired_on'); sortText = 'По дате выхода'; sortTr = false" v-text="'По дате выхода'"></div>
+                        <div class="option"  @click="SetOrder('ranked'); sortText = 'Рейтингу'; sortTr = false " v-text="'По рейтингу'"></div>
+                        <div class="option"  @click="SetOrder('name'); sortText = 'По алфавиту'; sortTr = false " v-text="'По алфавиту'"></div>
+                        <div class="option"  @click="SetOrder('random'); sortText = 'Cлучайный'; sortTr = false " v-text="'Cлучайный'"></div>
+                        <div class="option"  @click="SetOrder('episodes'); sortText = 'По сериям'; sortTr = false " v-text="'По сериям'"></div>
+                        <div class="option"  @click="SetOrder('kind'); sortText = 'По типу'; sortTr = false " v-text="'По типу'"></div>
+                        <div class="option"  @click="SetOrder('status'); sortText = 'По статусу'; sortTr = false " v-text="'По статусу'"></div>
+                    </div> 
                 </div>
                 <!--
                 <div class="wrap">
@@ -35,7 +40,7 @@ export default {
     data(){
         return{
             sortTr: false,
-            sortText: 'Популярности',
+            sortText: 'По популярности',
             ViewMode: localStorage.vm || 0,
             filterActive: false,
             
@@ -70,12 +75,8 @@ export default {
             this.ViewMode = vm
         },
         SetOrder(order){
-            this.query({order: order})
+            this.$query({order: order})
         },
-        query (params) {
-            let query = Object.assign({}, this.$route.query, params)
-            this.$router.push({ query: query })  
-        }
     },
     watch:{
         '$route.query'(){
@@ -170,7 +171,7 @@ export default {
     border-radius: 6px;
     box-shadow: 0 14px 30px rgba(var(--color-shadow-blue),.15),0 4px 4px rgba(var(--color-shadow-blue),.05);
     cursor: auto;
-    left: -20px;
+    right: -15px;
     padding: 10px 16px;
     position: absolute;
     top: calc(100% + 10px);

@@ -1,7 +1,7 @@
 <template >
     <div class="media-card">
 
-        <router-link  :to="{name: type, params:{slug: slug}}" class="cover" :class="{'loading':loading}">
+        <router-link :disabled="!slug"  :to="{name: type, params:{slug: slug}}" class="cover" :class="{'loading':loading}">
             <img v-lazy="poster" alt="poster" class="image" :class="{'loaded':!loading}" @load="(poster == '')?loading = true:loading = false">
 
             <div class="wrap list-btns-wrap"  v-show="ViewMode == '0' && isLoggedIn" >
@@ -14,18 +14,21 @@
                 </div>
             </div>
             
-            <div class="overlay" v-show="ViewMode == '1' && !loading">
+            <!-- <div class="overlay" v-show="ViewMode == '1' && !loading">
                 <router-link :to="{name: type, params:{slug: slug}}" class="title"  v-text="Anime.russian"></router-link>
                 <div class="studio">
                     <span v-for="(i,id) in Anime.studios" :key="id" v-text="i.name"></span>
                 </div>
-            </div>
+            </div> -->
 
         </router-link>
 
-        <router-link :to="{name: type, params:{slug: slug}}" v-if="ViewMode == '0'" class="title" :class="{'loading':loading}" v-text="Anime.russian"></router-link>
-
-        <div class="hover-data right" :class="{'loading':loading}">
+        <router-link :disabled="!slug"  :to="{name: type, params:{slug: slug}}" v-if="ViewMode == '0'" class="title" :class="{'loading':loading}" v-text="Anime.russian"></router-link>
+        <div class="misc">
+            <span v-text="ariedOn"></span>
+            <span v-text="kind"></span>
+        </div>
+        <!-- <div class="hover-data right" :class="{'loading':loading}">
             <div class="header">
                 <div class="date" v-text="ariedOn"></div>
                 <div class="score" v-text="Anime.score"></div>
@@ -43,11 +46,11 @@
                         class="genre"
                         :to="{name:'Genre',params:{slug:j.name}}">
                             {{j.russian}} 
-                    </router-link>
+                </router-link>
             </div>
-        </div>
+        </div> -->
 
-        <div class="data" v-show="ViewMode == '1'" :class="{'loading':loading}"> 
+        <!-- <div class="data" v-show="ViewMode == '1'" :class="{'loading':loading}"> 
             <div class="body" v-if="!loading">
                 <div class="scroll-wrap">
                     <div class="header">
@@ -91,7 +94,7 @@
             <div v-show="loading && ViewMode=='1'"></div>
             <div v-show="loading && ViewMode=='1'"></div>
 
-        </div>
+        </div> -->
 
 
     </div>
@@ -118,6 +121,15 @@ export default {
     },
     computed:{
         ...mapGetters(['SHIKIURL']),
+        kind:{
+            get(){
+                if(this.Anime.kind){
+                    return this.$store.state.kind[this.Anime.kind]
+                }else{
+                    return ''
+                }
+            }
+        },
         poster:{
             get(){
                 if(this.Anime.image){
@@ -129,8 +141,8 @@ export default {
         },
         ariedOn:{
             get(){
-                if (this.Anime.airedOn){
-                    return this.Anime.airedOn.split('-')[0]
+                if (this.Anime.aired_on){
+                    return this.Anime.aired_on.split('-')[0]
                 }else{
                     return ''
                 }
@@ -231,13 +243,16 @@ export default {
 }
 .cover .title{
     color: rgb(var(--color-gray-700));
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
     font-size: 1.4rem;
     font-weight: 600;
     line-height: 21px;
     margin-top: 10px;
     overflow: hidden;
     transition: color .2s ease;
-    display: -webkit-box;
+    /* display: -webkit-box; */
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
 }
@@ -554,6 +569,12 @@ a.image-link {
 
 .cover .list-btns-wrap{
     display: none;
+}
+.misc span:first-child{
+    float: right;
+}
+.misc{
+    color: rgb(var(--color-gray-600));
 }
 @media (max-width: 1040px){
     .media-card {

@@ -75,7 +75,7 @@ export default {
         },
     },
     mounted(){
-        this.get_animes('carousel', 'popularity',10,2021)
+        this.get_animes('carousel', 'popularity', 10,'','ongoing')
         this.get_animes('raiting','ranked')
         this.get_animes('popularity','popularity',24,2021)
         this.get_animes('anons', 'popularity',24,'','anons')

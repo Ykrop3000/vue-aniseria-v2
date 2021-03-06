@@ -118,8 +118,8 @@ export default {
         aff(){
             if (this.width <= 760) this.active = false
         },
-        clear(){
-            console.log(123)
+        clear(update = true){
+
             this._options.forEach(function(item) {
                 item.active = false;
             });
@@ -127,15 +127,14 @@ export default {
                 item.active = false;
             });
 
-            let q = '?'
-            Object.keys(Object.assign(this.$route.query,{[this.type]:''})).forEach( e =>{
-                q += `${e}=${ Object.assign(this.$route.query,{[this.type]:''})[e]}&`
-            })
-            window.history.pushState('', '', q)
+            if (update) this.$query({[this.type]:''})
 
             this.$forceUpdate();
         },
         Select(i){
+            if (this.single) {
+                this.clear(false)
+            }
             this.options.forEach(function(item) {
                 if(item.id === i.id){
                     item.active = !item.active
@@ -144,21 +143,10 @@ export default {
 
             let params = this.options.filter(o => o.active === true).map(o => o.id).join(',')
             
-            // let q = '?'
-            // Object.keys(Object.assign(this.$route.query,{[this.type]:params})).forEach( e =>{
-            //     q += `${e}=${ Object.assign(this.$route.query,{[this.type]:params})[e]}&`
-            // })
-            // window.history.pushState('', '', q)
-
-            this.query({[this.type]:params})
+            this.$query({[this.type]:params})
 
             this.$forceUpdate();
         },
-        query (params) {
-            let query = Object.assign({}, this.$route.query, params)
-            this.$router.push({ query: query })
-            
-        }
     },
     watch:{
         input(){

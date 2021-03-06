@@ -17,16 +17,22 @@ Vue.use(ElementUI);
 
 Vue.config.productionTip = false
 Vue.prototype.$http = Axios;
+let smileSet = {}
+Axios.get('https://shikimori.one/api/constants/smileys').then(resp =>{
+  let data = resp.data
+  data.forEach(e => {
+    smileSet = Object.assign(smileSet, {[`${e.bbcode}`]:`<img src="https://shikimori.one${e.path}" calss="smiley">`})
+  })
+})
 
-bbCodeParser.setCodes({
+let bbcodes = {
   '\\[replies=.*\\]': '',
   '\\[comment=.*\\]': '',
   '\\[spoiler=(.+?)\\](.+?)\\[/spoiler\\]': '<span onclick="showSpoiler(this)" class="spoiler"><div class="text">$1</div><br><span>$2</span></span>',
   '\\[spoiler\\](.+?)\\[/spoiler\\]': '<span onclick="showSpoiler(this)" class="spoiler"><div class="text">спойлер</div><br><span>$1</span></span>',
-
-  '\\[character=(.+?)\\](.+?)\\[/character\\]': '<a class="br-link" href="http://localhost:8080/charapter/$1"> $2 </a>',
+  '\\[character=(.+?)\\](.+?)\\[/character\\]': `<a class="br-link" href="${window.location.protocol}//${window.location.host}/charapter/$1"> $2 </a>`,
   '\\[image=(.+?)\\]': '<img class="br-link" src="http://localhost:8080/charapter/$1">',
-  '\\[anime=(.+?)\\](.+?)\\[/anime\\]': '<a class="br-link" href="http://localhost:8080/anime/$1"> $2 </a>',
+  '\\[anime=(.+?)\\](.+?)\\[/anime\\]': `<a class="br-link" href="${window.location.protocol}//${window.location.host}/anime/$1"> $2 </a>`,
 
   '\\[br\\]': '<br>',
   '\\[b\\](.+?)\\[/b\\]': '<strong>$1</strong>',
@@ -52,12 +58,21 @@ bbCodeParser.setCodes({
   '\\[a=(.+?)\\](.+?)\\[/a\\]': '<a href="$1" name="$1">$2</a>',
   '\\[list\\](.+?)\\[/list\\]': '<ul>$1</ul>',
   '\\[\\*\\](.+?)\\[/\\*\\]':   '<li>$1</li>'
-});
+}
+bbcodes = Object.assign(smileSet, bbcodes)
+console.log(bbcodes)
+bbCodeParser.setCodes(bbcodes);
+
+function query (params) {
+  let query = Object.assign({}, this.$route.query, params)
+  router.push({ query: query })  
+}
 
 const plugin ={
   install(){
     Vue.bbcode = bbCodeParser
     Vue.prototype.$bbcode = bbCodeParser
+    Vue.prototype.$query = query
   }
 }
 Vue.use(plugin)
