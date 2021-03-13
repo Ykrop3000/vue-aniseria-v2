@@ -11,6 +11,25 @@ loadProgressBar()
 // const axios = rateLimit(axioss.create(), { maxRequests: 5,maxRPS: 5 })
 
 
+const sleepRequest = (milliseconds, originalRequest) => {
+  return new Promise((resolve) => {
+      setTimeout(() => resolve(axios(originalRequest)), milliseconds);
+  });
+};
+
+axios.interceptors.response.use(response => {
+  return response;
+}, error => {
+  const { config, response: { status }} = error;
+  const originalRequest = config;
+
+  if (status === 429) {
+      return sleepRequest(1000, originalRequest);
+  } else {
+      return Promise.reject(error);
+  }
+});
+
 Vue.use(Vuex);
 
 /*
@@ -58,6 +77,8 @@ export default new Vuex.Store({
 
       calendar: [],
 
+      carousel: [],
+
       client_id: 'vWH694NVtAjBy5zW6K119ViSypMjuZ3lstEBfGlSSwA',
       client_secret: '75yh1Jdj6AKwWVHQNaPEQZkdpIWvZlYxqCuo0YI_BPI',
       redirect_uri: 'https://vue-aniseria-v2.firebaseapp.com/login',
@@ -83,7 +104,11 @@ export default new Vuex.Store({
         "one_shot": 'Ваншот',
         "doujin": 'Додзинси'
       },
-
+      statusAnime:{
+        'anons': 'Анонсировано',
+        'ongoing': 'Сейчас выходит',
+        'released': 'Вышедшее'
+      },
       theme: localStorage.getItem('theme') || 'light',
 
       nav:[
@@ -134,6 +159,8 @@ export default new Vuex.Store({
       
   },
   getters: {
+
+
     NAV: state =>{
       return state.nav
     },
@@ -492,6 +519,19 @@ export default new Vuex.Store({
         this.state.banner =  response.data.Media? response.data.Media.bannerImage: NaN
         commit
       },
+      async GET_CAROUSEL({commit}) {
+        return new Promise((resolve, reject) => {
+          axios({url: `${this.state.shikiUrl}/api/animes`,params:{'status':'ongoing','order':'popularity','limit':10}, method: 'GET' })
+          .then(resp => {
+            this.state.carousel =  resp.data
+            commit
+            resolve(resp)
+          })
+          .catch(err => {
+            reject(err)
+          })
+        })
+       },
       GET_ANIME_RATES({commit}, id){
         return new Promise((resolve, reject) => {
           commit('ANIME_REQUEST')

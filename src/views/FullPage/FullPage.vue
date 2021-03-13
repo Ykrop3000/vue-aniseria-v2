@@ -43,10 +43,10 @@
                         <p class="description" :class="{'full': des}"  v-html="$bbcode.parse(ANIME.description)" v-if="ANIME.description"></p>
 
                         <div class="nav">
-                            <router-link :to="{ name: 'Anime'}" replace class="link">Обзор</router-link>
-                            <router-link v-if="!ANIME.anons" :to="{ name: 'Watch'}" replace class="link">Просмотр</router-link>
-                            <router-link :to="{ name: 'Characters'}" replace class="link">Персонажи</router-link>
-                            <router-link v-if="!ANIME.anons"  :to="{ name: 'Frames'}" replace class="link">Кадры</router-link>
+                            <router-link :to="{ name: $attrs.link}" replace class="link">Обзор</router-link>
+                            <router-link v-if="!ANIME.anons && $attrs.type != 'mangas'" :to="{ name: 'Watch'}" replace class="link">Просмотр</router-link>
+                            <router-link v-if="!ANIME.anons && $attrs.type != 'mangas'" :to="{ name: 'Characters'}" replace class="link">Персонажи</router-link>
+                            <router-link v-if="!ANIME.anons && $attrs.type != 'mangas'"  :to="{ name: 'Frames'}" replace class="link">Кадры</router-link>
                         </div>
                     </div>
                 </div>

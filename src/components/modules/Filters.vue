@@ -268,7 +268,7 @@ export default {
     margin-bottom: 25px;
     display: grid;
     grid-gap: 24px;
-    grid-template-columns: repeat(5,170px);
+    grid-template-columns: repeat(5,1fr);
 }
 .mobile-filters{
     align-items: center;
@@ -332,7 +332,7 @@ export default {
 
 @media (min-width: 1540px){
     .filters {
-        grid-template-columns: repeat(6,180px);
+        grid-template-columns: repeat(6,1fr);
     }
 }
 @media (max-width: 1040px){

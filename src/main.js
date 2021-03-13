@@ -60,7 +60,6 @@ let bbcodes = {
   '\\[\\*\\](.+?)\\[/\\*\\]':   '<li>$1</li>'
 }
 bbcodes = Object.assign(smileSet, bbcodes)
-console.log(bbcodes)
 bbCodeParser.setCodes(bbcodes);
 
 function query (params) {

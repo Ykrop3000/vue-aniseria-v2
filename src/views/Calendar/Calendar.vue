@@ -1,7 +1,7 @@
 <template>
     <div class="airing-view">
         <div class="calendar">
-            <div class="day" v-for="(j,id) in days" :key="id">
+            <div class="day" v-for="(j,id) in days.slice(1)" :key="id">
                 <h2 v-text="j.title"></h2>
                 <div class="cards" >
                     
@@ -10,7 +10,7 @@
                             <img v-lazy="SHIKIURL+i.anime.image.preview" alt="poster" class="image" >
                             <div class="content">
                                 <div class="title" v-text="i.anime.russian"></div>
-                                <div class="airing" v-text="`${i.next_episode} серия выйдет в ${moment_(i.next_episode_at).lang('ru').format('LT')}`"></div>
+                                <div class="airing" v-text="`${i.next_episode} серия выйдет ${moment_(i.next_episode_at).lang('ru').calendar()}`"></div>
                             </div>
                         </router-link>
                     </div>
@@ -24,7 +24,6 @@
 <script>
 import {mapGetters} from 'vuex'
 import moment from 'moment'
-
 export default {
     name: 'Calendar',
     data(){
@@ -42,22 +41,18 @@ export default {
                 if (this.CALENDAR.length != 0){
                     let data = []
                     this.CALENDAR.forEach(day => {
-
-                        let d = moment(day.next_episode_at).lang('ru').add(1, 'days').calendar().split(',')[0]
+                        
+                        let d = moment(day.next_episode_at).lang('ru').calendar().split(',')[0]
                         if (data.filter(t => t.title == d).length == 0){
                             data.push({
                                 title: d,
-                                animes: [day]
+                                animes: this.CALENDAR.filter(e => moment(e.next_episode_at).lang('ru').calendar().split(',')[0] == d)
                             })
                         }
-                        else{
-                            data.forEach(e =>{
-                                e.day == d
-                                e.animes.push(day)
-                            })
-                        }
+                        
 
                     });
+                    console.log(data)
                     return data
                 }else{
                     return []
@@ -87,6 +82,7 @@ h2{
     grid-template-columns: 50px auto;
 }
 .image {
+
     border-radius: 4px 0 0 4px;
     height: 100%;
     max-height: 65px;

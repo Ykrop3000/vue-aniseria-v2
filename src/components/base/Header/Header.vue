@@ -3,6 +3,10 @@
         <div class="wrap">
             <router-link :to="{name:'Home'}" class="logo">
                 <img src="@/assets/img/logo.svg" alt="logo"/>
+                <div class="name">
+                    <span>Ani</span>
+                    <span>Seria</span>
+                </div>
             </router-link>
             <Links :isLoggedIn="isLoggedIn"/>
             <Search v-if="isLoggedIn"/>
@@ -66,9 +70,29 @@ export default {
 
 
 <style scoped>
+
+
+.logo .name{
+    display: none;
+}
+
+
 .logo img {
     height: 50px;
     width: 50px;
+}
+.logo{
+    display: flex;
+    text-align: center;
+    align-items: center;
+    font-size: 1.6rem;
+    font-weight: bold;
+}
+.logo span{
+    color: white;
+}
+.logo span:last-child{
+    color: rgb(var(--color-blue));
 }
 .wrap {
     align-items: center;

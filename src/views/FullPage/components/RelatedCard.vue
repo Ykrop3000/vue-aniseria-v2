@@ -12,7 +12,7 @@
             <router-link :to="{name: (data.manga)? 'Manga' : 'Anime', params:{slug: i.url.split('/')[2]}}" class="title" v-text="i.russian">
             </router-link>
             <div class="info">
-                {{i.kind + ' · ' + i.status}}
+                {{kind + ' · ' + status}}
             </div>
         </div>
     </div>
@@ -26,6 +26,16 @@ export default {
             get(){
                 if (!this.data) return
                 return this.data.anime || this.data.manga
+            }
+        },
+        kind:{
+            get(){
+                return this.$store.state.kind[this.i.kind]
+            }
+        },
+        status:{
+            get(){
+                return this.$store.state.statusAnime[this.i.status]
             }
         }
     },

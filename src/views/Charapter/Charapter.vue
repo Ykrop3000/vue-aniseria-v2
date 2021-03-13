@@ -16,15 +16,15 @@
             <div class="body container">
                 <div ></div>
                 <div class="description-wrap">
-                    <div class="markdown description" :class="{'expandable':expandable}" v-html="$bbcode.parse(CHARAPTER.description)" ></div>
-                    <div class="description-length-toggle" @click="expandable = !expandable">Читать Больше </div>
+                    <div ref="description" class="markdown description" :class="{'expandable':expandable}" v-html="$bbcode.parse(CHARAPTER.description)" ></div>
+                    <div v-if="height==300" class="description-length-toggle" @click="expandable = !expandable">Читать Больше </div>
                 </div>
             </div>
         </div>
        
     </div>
     <div class="container">
-     <Similar v-if="CHARAPTER.animes" :title="' '" :similar="CHARAPTER.animes" />
+     <Similar :type="'Anime'" v-if="CHARAPTER.animes" :title="' '" :similar="CHARAPTER.animes" />
     </div>
 </div>
 </template>
@@ -49,6 +49,16 @@ export default {
     },
     computed: {
         ...mapGetters(['SHIKIURL','CHARAPTER']),
+        height:{
+            get(){
+                if (this.$refs.description){
+                    return this.$refs.description.clientHeight
+                }else{
+                    return 0
+                }
+                
+            }
+        },
         image:{
             get(){
                 if (this.CHARAPTER.image){

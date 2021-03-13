@@ -1,17 +1,19 @@
 <template>
-    <div class="container" >
+    <div class="">
+        <Carousel v-if="carousel.length != 0" :animes="carousel" :key="key"/>
+        <div class="container" >
 
-        <Carousel :animes="carousel" :key="key"/>
-        <MiniList :type="'Anime'" :isLoggedIn="isLoggedIn" :sectionName="'Лучшее'" :order="'ranked'" :ANIMES="raiting.slice(0,6)"/>
-        <MiniList :type="'Anime'" :isLoggedIn="isLoggedIn" :sectionName="'Новое'" :order="'popularity'" :season="'winter_2021'" :ANIMES="popularity.slice(0,6)"/>
-        <MiniList :type="'Anime'" :isLoggedIn="isLoggedIn" :sectionName="'Анонс'" :order="'popularity'" :status="'anons'" :ANIMES="anons.slice(0,6)"/>
+            
+            <MiniList :type="'Anime'" :isLoggedIn="isLoggedIn" :sectionName="'Лучшее'" :order="'ranked'" :ANIMES="raiting.slice(0,6)"/>
+            <MiniList :type="'Anime'" :isLoggedIn="isLoggedIn" :sectionName="'Новое'" :order="'popularity'" :season="'winter_2021'" :ANIMES="popularity.slice(0,6)"/>
+            <MiniList :type="'Anime'" :isLoggedIn="isLoggedIn" :sectionName="'Анонс'" :order="'popularity'" :status="'anons'" :ANIMES="anons.slice(0,6)"/>
 
+        </div>
     </div>
-
 </template>
 
 <script>
-
+// "https://st.kp.yandex.net/images/film_big/{kinopoisk_id}.jpg
 import Carousel from './components/Carousel'
 import MiniList from '@/views/List/components/MiniList'
 
@@ -41,7 +43,7 @@ export default {
         },
         carousel:{
             get(){
-                return this.ANIMES.carousel || []
+                return this.$store.state.carousel || []
             }
         }
     },
@@ -54,6 +56,7 @@ export default {
             key: 0,
         }
     },
+    
     methods:{
         get_animes(key, ordering, limit=24,season='',status=''){
             let anime = this.ANIMES[key] || []
@@ -75,6 +78,10 @@ export default {
         },
     },
     mounted(){
+        this.$store.dispatch('SET_TRANSPARENT',true)
+        if (this.$store.state.carousel.length == 0){
+            this.$store.dispatch('GET_CAROUSEL')
+        }
         this.get_animes('carousel', 'popularity', 10,'','ongoing')
         this.get_animes('raiting','ranked')
         this.get_animes('popularity','popularity',24,2021)
@@ -91,7 +98,7 @@ export default {
 }
 </script>
 <style>    
-.search-landing:nth-child(2n+1)::after{
+.search-landing:nth-child(2n)::after{
     content: '';
     background-color: rgb(var(--color-background-100));
     position: absolute;
@@ -100,15 +107,15 @@ export default {
     width: 110vw;
     height: 100%;
 }
-.search-landing:nth-child(2n+1) .landing-section {
+.search-landing:nth-child(2n) .landing-section {
     padding: 15px 0;
 }
 
-.search-landing:nth-child(2n+1){
+.search-landing:nth-child(2n){
     margin-bottom: 30px;
 }
 @media (max-width: 1040px){
-    .search-landing:nth-child(2n+1)::after{
+    .search-landing:nth-child(2n)::after{
         right: 0;
     }
 }

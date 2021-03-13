@@ -1,50 +1,59 @@
 <template>
 
-    <carousel
-     :center="true"
-     :dots="true"
-     :autoplay="false"
-     :loop="true"
-     :margin="10"
-     :items="items"
-     :nav="false"
-     class="carousel"
-     >
-        <router-link 
-            v-for="(i, id) in animes"
+    <VueSlickCarousel
+  
+      class="carousel"
+      :arrows="true"
+      :dots="false"
+      :lazyLoad="'ondemand'"
+      :slidesToShow="1"
+      :slidesToScroll="1"
+      :infinite="true"
+      :speed="500"
+      :autoplay="true"
+      :autoplaySpeed="15000"
+       @init="getBanner"
+      @lazyLoadError="getBanner"
+      @lazyLoad="getBanner"
+      >
+
+        <router-link
+            class="slide container"
+            v-for="(i,id) in animes.filter(e => !e.dis)"
             :key="id"
-            :to="{name: 'Anime', params:{slug: i.url.split('/')[2]}}"
-            class="cover image" :style="{'background-image':`url(${SHIKIURL + i.image.original}`}" :class="{'loaded': !i.load}"  @load="i.load = false">
-            <div class="image-text">
-                <div v-text="i.russian"></div>
+            :to="{name: 'Anime', params:{slug: getUrl(i)}}"
+        >
+
+            <div  class="img" :style="{'background-image': `url(${i.image.preview })`}" alt="slide"></div>
+            <div class="details">
+                <h1 class="title" v-text="i.russian"></h1>
             </div>
+
         </router-link>
-    </carousel>
+        
+    </VueSlickCarousel>
 
 </template>
 
 <script>
 import {mapGetters} from 'vuex';
-import carousel from 'vue-owl-carousel'
+import VueSlickCarousel from 'vue-slick-carousel'
+import 'vue-slick-carousel/dist/vue-slick-carousel.css'
+import 'vue-slick-carousel/dist/vue-slick-carousel-theme.css'
+ 
+import gql from 'graphql-tag';
+import graphqlClient from '@/utils/graphql';
 
 export default {
     name: 'Carousel',
     props: ['animes'],
     components:{
-        carousel
-    },
-    computed:{
-        ...mapGetters(['SHIKIURL']),
-        
+        VueSlickCarousel
     },
     data(){
         return{
             width: window.innerWidth,
-            items: 4
-        }
-    },
-    beforeMount(){
-        this.setItems()
+         }
     },
     mounted(){
         window.addEventListener(
@@ -52,83 +61,154 @@ export default {
             this.handleWidthChange
         );
     },
+    computed:{
+         ...mapGetters(['SHIKIURL']),
+    },
     methods:{
         handleWidthChange() {
             this.width =  window.innerWidth;
         },
-        setItems(){
-            if (this.width <= 760){
-                this.items = 2
-            }
-            else if (this.width <= 1400){
-                this.items = 3
-            }
-        }
+        getUrl(i){
+            return i.url.split('/')[2]
+        },
+        getBanner(i){
+            if (this.animes.length == 0) return
+            graphqlClient.query({ 
+            query: gql`
+                query ($search: String) {
+                    Media(search: $search, type: ANIME) {
+                        id
+                        bannerImage
+                    }
+                }
+            `,
+            variables: { search: this.animes[i].name },
+            }).then(resp => {
+                this.animes[i].image.preview = resp.data.Media.bannerImage
+                this.$store.state.carousel = this.animes
+            }).catch(err => {
+                console.log(err)
+                
+            })
+        },
+
+        
     },
-    watch:{
-    }
+
     
     
 }
 </script>
 
 <style>
-.owl-carousel .owl-stage-outer{
-    overflow: inherit !important;
+.slick-slider{
+    margin-bottom: 60px;
 }
-@media (max-width: 1040px){
+button.slick-arrow.slick-prev{
+    position: absolute;
+    z-index: 1000;
 
+    left: 0;
+    width: 5vw;
+    bottom: 0;
+    cursor: pointer;
+    opacity: 1;
+    transition: all .15s ease-out;
+}
+button.slick-arrow.slick-next{
+    position: absolute;
+    z-index: 1000;
+    right: 0;
+    width: 5vw;
+    bottom: 0;
+    cursor: pointer;
+    opacity: 1;
+    transition: all .15s ease-out;
+}
+.slick-prev:before{
+    content: "\276E" ;
+    position: absolute;
+    top: 50%;
+    color: #fff;
+    font-size: 30px !important;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    transform-origin: inherit;
+    z-index: 1;
+    transition: all .15s ease-out;
+}
+.slick-next:before{
+    content: "\276F" ;
+    position: absolute;
+    top: 50%;
+    color: #fff;
+    font-size: 30px !important;
+    left: 50%;
+    transform: translateX(-50%) translateY(-50%);
+    transform-origin: inherit;
+    z-index: 1;
+    transition: all .15s ease-out;
 }
 </style>
 
 <style scoped>
-.cover {
-    background: rgba(var(--color-background-300),.8);
-    box-shadow: 0 14px 30px rgba(var(--color-shadow-blue),.15),0 4px 4px rgba(var(--color-shadow-blue),.05);
-    cursor: pointer;
-    display: inline-block;
-    height: 265px;
-    overflow: hidden;
+.carousel .slide{
     position: relative;
-    width: 100%;
-    z-index: 5;
+    height: calc((4 / 19) * 100vw);
+    min-height: 25vh;
+}
+ .carousel .img{
+    background-color:rgb(var(--color-background-100));
     background-repeat: no-repeat;
-    background-position: center;
     background-size: cover;
-}
-.carousel{
-    margin-bottom: 60px;
-    padding-top: 20px;
-}
-.carousel a{
-    position: relative;
-    display: flex;
-    justify-content: center;
-    border-radius: 0 0 3px 3px;  
-}
-
-.image-text{
-    display: none;
-}
-.center .image-text div{
-    text-align: center;
-}
-.center .image-text{
-    background: rgba(var(--color-overlay),.7);
-    border-radius: 0 0 3px 3px;
-    bottom: 0;
-    color: rgba(var(--color-text-bright),.91);
-    display: flex;
-    justify-content: center;
-    font-size: 1.2rem;
-    font-weight: 400;
-    left: 0;
-    letter-spacing: .2px;
-    margin-bottom: 0;
-    padding-bottom: 10px;
-    padding-top: 10px;
+    background-position: center;
+    width: 100vw;
     position: absolute;
-    transition: .3s ease;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    transition: all .15s ease-out;
+ }
+ .details {
+    transition: all .15s ease-out;
+    background-color: transparent;
+    align-self: flex-end;
+    z-index: 2;
     width: 100%;
+    text-align: center;
+    position: absolute;
+    bottom: 20px;
+}
+.title{
+    font-size: 18px;
+    line-height: 18px;
+    text-shadow: 3px 3px 4px rgb(0 0 0 / 30%);
+    margin-bottom: 0;
+    color: #fff;
+    max-width: 90%;
+}
+@media only screen and (min-width: 768px){
+    .details {
+        width: auto;
+        max-width: 50%;
+        text-align: left;
+        vertical-align: bottom;
+    }
+   .title {
+        font-size: 35px;
+        line-height: 35px;
+        margin-bottom: 10px;
+        max-width: 100%;
+    }
+}
+@media only screen and (min-width: 1200px){
+
+    .title {
+        font-size: 60px;
+        line-height: 50px;
+        margin-bottom: 10px;
+        max-width: 100%;
+    }
 }
 </style>

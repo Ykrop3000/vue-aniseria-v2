@@ -99,12 +99,7 @@ export default {
         },
         status:{
             get(){
-                let data = {
-                    'anons': 'Анонсировано',
-                    'ongoing': 'Сейчас выходит',
-                    'released': 'Вышедшее'
-                }
-                return data[this.ANIME.status] 
+                return  this.$store.state.statusAnime[this.ANIME.status] 
             }
         }
     }

@@ -103,11 +103,6 @@ const routes =
       },
       children: [
       {
-        name: 'Watch',
-        path: 'watch',
-        component: Watch
-      },
-      {
         name: 'Manga',
         path: '',
         component: Overview
@@ -117,13 +112,6 @@ const routes =
         path: 'characters',
         component:function () {
           return import('../views/FullPage/contents/Characters.vue')
-        }
-      },
-      {
-        name: 'Frames',
-        path: 'frames',
-        component:function () {
-          return import('../views/FullPage/contents/Frames.vue')
         }
       },
     ]

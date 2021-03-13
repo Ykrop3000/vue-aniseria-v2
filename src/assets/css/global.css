@@ -220,4 +220,8 @@ img {
 [lazy="loaded"] {
   opacity: 1!important;
 }
+.smiley {
+  vertical-align: middle;
+  height: 32px;
+}
 /*----------------------------------*/
