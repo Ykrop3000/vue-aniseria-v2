@@ -26,8 +26,12 @@ npm run test:unit
 npm run lint
 ```
 
+https://vue-aniseria-v2.firebaseapp.com/
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
+
+
 
 p.s. карим лох
 
